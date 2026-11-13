@@ -332,5 +332,12 @@ export function accountStore(dataDir){
  function backupTo(file){fs.rmSync(file,{force:true});db.prepare('VACUUM INTO ?').run(file);return fs.statSync(file).size;}
  function counts(){const c=t=>db.prepare('SELECT COUNT(*) AS n FROM '+t).get().n;return {accounts:c('accounts'),progress:c('progress'),coopAwards:c('coop_awards'),scores:c('run_scores')};}
  function close(){try{db.exec('PRAGMA wal_checkpoint(TRUNCATE)');}catch{}try{db.close();}catch{}}
- return {route,current,snapshot,cleanup,grantCoop,spendConsumables,backupTo,counts,close};
+ /** V24.1 (admin): apaga contas pelo nome de usuário exato; progresso, sessões, prêmios e recordes saem junto (ON DELETE CASCADE). */
+ function removeAccounts(usernames){
+  const names=[...new Set((Array.isArray(usernames)?usernames:[]).map(x=>String(x||'').trim()).filter(x=>x&&x.length<=40))].slice(0,50);
+  const del=db.prepare('DELETE FROM accounts WHERE username=?');let removed=0;
+  db.exec('BEGIN IMMEDIATE');try{for(const n of names)removed+=Number(del.run(n).changes||0);db.exec('COMMIT');}catch(e){try{db.exec('ROLLBACK')}catch{};throw e}
+  return {requested:names.length,removed};
+ }
+ return {route,current,snapshot,cleanup,grantCoop,spendConsumables,backupTo,counts,close,removeAccounts};
 }

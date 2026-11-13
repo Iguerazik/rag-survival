@@ -45,6 +45,10 @@ test('V24: backup baixa o banco e a restauração migra as contas de outro servi
   const st=await (await fetch(s.base+'/api/admin/status',{headers:auth})).json();
   assert.equal(st.accounts,3);assert.equal(st.progress,3);
   assert.ok(fs.readdirSync(path.join(b,'backups')).some(f=>f.startsWith('antes-da-restauracao-')),'banco anterior guardado');
+  // apagar contas de teste pelo nome (progresso e recordes saem junto)
+  const del=await (await fetch(s.base+'/api/admin/delete-accounts',{method:'POST',headers:{...auth,'Content-Type':'application/json'},body:JSON.stringify({usernames:['conta3','nao_existe']})})).json();
+  assert.deepEqual(del,{requested:2,removed:1});
+  const st2=await (await fetch(s.base+'/api/admin/status',{headers:auth})).json();assert.equal(st2.accounts,2);assert.equal(st2.progress,2);
   const login=await fetch(s.base+'/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json','X-Midgard-Request':'1'},body:JSON.stringify({username:'conta2',password:'senha-longa-123'})});
   assert.equal(login.status,200,'a conta migrada entra com a mesma senha');
  }finally{s.child.kill();await new Promise(r=>s.child.once('exit',r));for(const d of [a,b])fs.rmSync(d,{recursive:true,force:true});if(file)fs.rmSync(file,{force:true});}
