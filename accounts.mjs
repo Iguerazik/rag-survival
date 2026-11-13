@@ -222,7 +222,9 @@ export function accountStore(dataDir){
   const n=v=>Number.isFinite(Number(v))?Number(v):0;
   const sum=o=>o&&typeof o==='object'?Object.values(o).reduce((t,v)=>t+Math.max(0,n(v)),0):0;
   if(n(data.zeny)<0||n(data.zeny)>2_000_000_000)return 'Zeny inválido.';
-  if(n(data.zeny)-n(trusted.zeny)>80_000)return 'Ganho de Zeny grande demais para uma partida. O progresso não foi salvo.';
+  // V25.1: o modo infinito (pós-MVP) rende bem mais Zeny numa run longa (o Zeny dos drops cresce com o tempo de partida).
+  // 80 mil travava a sincronização de runs legítimas de ~20 min; o teto continua barrando valores fabricados.
+  if(n(data.zeny)-n(trusted.zeny)>600_000)return 'Ganho de Zeny grande demais para uma partida. O progresso não foi salvo.';
   if(sum(data.album)-sum(trusted.album)>12)return 'Cartas demais de uma vez. O progresso não foi salvo.';
   if(n(data.codexCoins)-n(trusted.codexCoins)>1500)return 'Pontos de Códex demais de uma vez. O progresso não foi salvo.';
   if((Array.isArray(data.items)?data.items.length:0)-(Array.isArray(trusted.items)?trusted.items.length:0)>40)return 'Itens demais de uma vez. O progresso não foi salvo.';

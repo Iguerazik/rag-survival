@@ -25,6 +25,9 @@ test('V22.3: progresso do solo conta na conta (com limites de plausibilidade)',a
   const after=await (await fetch(t.base+'/api/account/progress',{headers:{Cookie:cookie}})).json();
   assert.equal(after.data.journeys.sword.base,9);assert.equal(after.data.zeny,1850);
   const forged=await put(t,cookie,{revision:after.revision,data:{...after.data,zeny:9_999_999}});assert.equal(forged.status,403);
+  // V25.1: uma run longa no modo infinito (~20 min) rendeu ~94 mil de Zeny e não pode travar a nuvem
+  const endless=await put(t,cookie,{revision:after.revision,data:{...after.data,zeny:after.data.zeny+93_748}});assert.equal(endless.status,200);
+  const after2=await (await fetch(t.base+'/api/account/progress',{headers:{Cookie:cookie}})).json();after.revision=after2.revision;after.data=after2.data;
   const levels=await put(t,cookie,{revision:after.revision,data:{...after.data,journeys:{...after.data.journeys,sword:{...after.data.journeys.sword,base:150}}}});
   assert.equal(levels.status,403);
  }finally{t.child.kill();fs.rmSync(t.dir,{recursive:true,force:true})}
