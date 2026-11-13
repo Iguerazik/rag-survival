@@ -96,7 +96,9 @@ test('V23.6: SOLO no navegador — MVP no mapa, aviso no chão e item do tesouro
    await browser.evaluate(`(()=>{const w=${W};w.mobs=w.mobs.filter(m=>m.elite==='mvp'||m.hp<=0);})()`);await sleep(100);}
   const before=await browser.evaluate('items().length');
   assert.ok(await browser.evaluate(`${P}.rewardChoices.every(o=>o.stat==='gear')`),'tesouro com equipamento');
-  await browser.evaluate("document.querySelector('#coop-server-rewards button').click()");
+  // Espera o painel do TESOURO aparecer na tela antes de clicar (sem isso, sob carga, o clique podia cair num painel antigo escondido).
+  for(let i=0;i<80&&!(await browser.evaluate("(()=>{const p=document.getElementById('coop-server-rewards');return !!p&&!p.hidden&&/Tesouro do MVP/.test(p.textContent)})()"));i++)await sleep(100);
+  await browser.evaluate("document.querySelector('#coop-server-rewards:not([hidden]) button').click()");
   // V24.1: depois do tesouro começa o modo infinito; Esc → "Encerrar run e receber recompensas".
   for(let i=0;i<60&&(await browser.evaluate('run.endless'))==null;i++)await sleep(100);
   assert.notEqual(await browser.evaluate('run.endless'),null,'modo infinito começou');

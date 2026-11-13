@@ -99,7 +99,7 @@ test('V25.4: poção azul volta limitada; EXP do solo e do Aprendiz T.; pontos d
 test('V25.4: menu com Pets, refino avisa que não quebra, cartas saem pelo inventário, Códex na partida',()=>{
  assert.match(read('index.html'),/id="mh-pets"/);
  assert.match(read('menu-home.js'),/'mh-pets': click\('nav-pets'\)/);
- assert.match(read('v12-systems.js'),/100% de sucesso, não quebra/);
+ assert.match(read('v12-systems.js'),/Falha sem quebra/); // V25.6: forja até +10 com chance de quebra
  assert.match(read('game.js'),/function removeCards\(uid\)/);
  assert.match(read('game.js'),/function codexSkillHint\(skillId,nextLevel\)/);
 });

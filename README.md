@@ -58,6 +58,12 @@ O painel mostra, atualizando a cada 5 s: quantas pessoas estão com o jogo abert
 jogando solo ou online, mapa/classe/nível, as salas do multiplayer com seus membros e o TPS/memória do servidor.
 A presença vem de um aviso do navegador a cada 20 s (`POST /api/presence`), guardado só na memória, sem IP. Sem a chave nada aparece.
 
+## Forja (refino até +10)
+
+Configuração central em `items.js` → `RefineRules` (chances, chance de quebra, custos e bônus por nível).
+Com conta, o **servidor** sorteia e grava (`POST /api/account/refine`, transação SQLite com `requestId` contra repetição);
+sem conta, o navegador usa as mesmas regras. Detalhes e tabela: `docs/FORJA.md`.
+
 ## Modo infinito (pós-MVP)
 
 Depois que o MVP do mapa cai e o tesouro é escolhido, a partida **não termina**: começa o modo infinito.

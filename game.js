@@ -494,7 +494,7 @@ function openGearDialog(slot, picking = false) {
       sockets.append(socket);
     }
     if (!itemDb[current.id].slots) sockets.textContent = 'Este item não tem encaixes.';
-    box.append(Gear.sprite(current.id), title, sockets, button('Desequipar', 'sound', () => {
+    box.append(Gear.sprite(current.id, current.refine||0), title, sockets, button('Desequipar', 'sound', () => {
       const next = { ...profile.gear };
       delete next[slot];
       saveJourney(selected, { ...profile, gear: next });
@@ -546,7 +546,7 @@ function openGearDialog(slot, picking = false) {
     copy.innerHTML = '<strong>' + Gear.label(item) + '</strong><small>' + (allowed ? (owner ? 'Em uso por ' + jobs[owner.line].name + ' · clique para trazer' : 'Clique para equipar') :
       itemDb[item.id].katar ? 'Katar: só Mercenário, Algoz e Sicário' : 'Não pode ser usado por esta classe') + '</small><em>' + ItemQuality.describe(item) +
       (item.cards.length ? ' · Cartas: ' + item.cards.map(id => cardDb[id].name).join(', ') : '') + '</em>';
-    entry.append(Gear.sprite(item.id), copy);
+    entry.append(Gear.sprite(item.id, item.refine||0), copy);
     nodes.push(entry);
   }
   list.replaceChildren(...nodes);
@@ -2739,7 +2739,8 @@ function openInventory() {
         if (!owner) actions.append(button('Vender · '+resaleValue(item)+' z', 'sell-item', () => {
           if (sellStored(item.uid)) {render();if(!inGame)renderJourney();}
         }));
-        row.append(Gear.sprite(item.id), detail, actions); list.append(row);
+        row.dataset.refineBand = String(RefineRules.tier(item.refine||0));
+        row.append(Gear.sprite(item.id, item.refine||0), detail, actions); list.append(row);
       }
     }
     if (!list.children.length) {

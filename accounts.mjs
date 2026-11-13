@@ -1,7 +1,7 @@
 /** V18 online identities: SQLite (Node 22.13+), scrypt, hashed session identifiers. */
-import { grantMvpItem } from './server-gear.mjs';
+import { grantMvpItem, refineAttempt, refineConfig, refineErrors } from './server-gear.mjs';
 import { DatabaseSync } from 'node:sqlite';
-import { randomBytes, createHash, scrypt as scryptCallback, timingSafeEqual } from 'node:crypto';
+import { randomBytes, randomInt, createHash, scrypt as scryptCallback, timingSafeEqual } from 'node:crypto';
 import { promisify } from 'node:util';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -43,6 +43,68 @@ export function accountStore(dataDir){
     mode TEXT NOT NULL, line TEXT NOT NULL, map TEXT NOT NULL, difficulty TEXT NOT NULL,
     level INTEGER NOT NULL, kills INTEGER NOT NULL, seconds INTEGER NOT NULL, win INTEGER NOT NULL, at INTEGER NOT NULL);
     CREATE INDEX IF NOT EXISTS run_scores_by_player ON run_scores(account_id,level,kills);`);
+ // V24: registro de cada tentativa na forja (tabela NOVA; nada existente muda). Serve de trava contra repetição da
+ // mesma requisição (request_id) e de lista de equipamentos destruídos (não podem voltar por um save antigo).
+ db.exec(`CREATE TABLE IF NOT EXISTS refine_log (
+    account_id TEXT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE, request_id TEXT NOT NULL,
+    item_uid TEXT NOT NULL, item_id TEXT NOT NULL, from_refine INTEGER NOT NULL, outcome TEXT NOT NULL,
+    cost INTEGER NOT NULL, zeny_after INTEGER NOT NULL, revision INTEGER NOT NULL, at INTEGER NOT NULL,
+    PRIMARY KEY(account_id,request_id));
+    CREATE INDEX IF NOT EXISTS refine_log_broken ON refine_log(account_id,outcome);`);
+ const refineByRequest=db.prepare('SELECT * FROM refine_log WHERE account_id=? AND request_id=?');
+ const brokenUids=db.prepare("SELECT item_uid FROM refine_log WHERE account_id=? AND outcome='broken'");
+ const insertRefine=db.prepare('INSERT INTO refine_log(account_id,request_id,item_uid,item_id,from_refine,outcome,cost,zeny_after,revision,at) VALUES(?,?,?,?,?,?,?,?,?,?)');
+ // Sorteio da forja: crypto (imprevisível). Só em testes (fora de produção) RAG_TEST_REFINE_ROLLS fixa a sequência.
+ const testRolls=process.env.NODE_ENV!=='production'&&process.env.RAG_TEST_REFINE_ROLLS?String(process.env.RAG_TEST_REFINE_ROLLS).split(',').map(Number):null;let rollIndex=0;
+ const refineRng=()=>testRolls?testRolls[rollIndex++%testRolls.length]:randomInt(0,2**32)/2**32;
+ /** Uma tentativa de refino, transacional: desconta o Zeny uma vez, aplica o resultado e grava tudo junto. */
+ function refine(id,input){
+  const requestId=String(input?.requestId||''),uid=String(input?.uid||''),from=Number(input?.from);
+  if(!/^[A-Za-z0-9_-]{8,64}$/.test(requestId)||!uid||uid.length>80||!Number.isInteger(from)||!Number.isSafeInteger(input?.revision))
+   return {status:400,body:{error:'Pedido de refino inválido.'}};
+  db.exec('BEGIN IMMEDIATE');
+  try{
+   const done=refineByRequest.get(id,requestId);
+   if(done){db.exec('COMMIT');const snap=snapshot(id);
+    return {status:200,body:{replay:true,result:done.outcome,from:done.from_refine,to:done.from_refine+1,cost:done.cost,uid:done.item_uid,
+     item:(snap.data.items||[]).find(x=>x&&x.uid===done.item_uid)||null,zeny:Number(snap.data.zeny)||0,progress:snap}};}
+   const current=snapshot(id),data=current.data||{};
+   if(input.revision!==current.revision){db.exec('ROLLBACK');return {status:409,body:{error:'Seu progresso mudou (outra aba ou partida). A forja foi atualizada: confira e tente de novo.',progress:current}};}
+   const list=Array.isArray(data.items)?data.items:[],index=list.findIndex(x=>x&&x.uid===uid);
+   const attempt=refineAttempt(index>=0?list[index]:null,Number(data.zeny)||0,refineRng,from);
+   if(!attempt.ok){db.exec('ROLLBACK');
+    const code=attempt.error==='missing'?404:attempt.error==='stale'?409:attempt.error==='rng'?500:400;
+    return {status:code,body:{error:refineErrors[attempt.error]||'Refino recusado.',code:attempt.error,progress:current}};}
+   data.zeny=Math.max(0,(Number(data.zeny)||0)-attempt.cost);
+   if(attempt.result==='broken'){
+    data.items=list.filter((_,i)=>i!==index);
+    // Item destruído sai também de qualquer personagem que o tinha equipado.
+    for(const j of Object.values(data.journeys||{}))if(j&&j.gear&&typeof j.gear==='object')for(const [slot,u] of Object.entries(j.gear))if(u===uid)delete j.gear[slot];
+   }else data.items=list.map((x,i)=>i===index?attempt.item:x);
+   trustedProgress.run(JSON.stringify(data),Date.now(),id);
+   insertRefine.run(id,requestId,uid,list[index].id,attempt.from,attempt.result,attempt.cost,data.zeny,current.revision+1,Date.now());
+   db.exec('COMMIT');
+   return {status:200,body:{result:attempt.result,from:attempt.from,to:attempt.to,cost:attempt.cost,uid,gain:attempt.gain,item:attempt.item,zeny:data.zeny,
+    progress:{data,revision:current.revision+1,updatedAt:Date.now()}}};
+  }catch(e){try{db.exec('ROLLBACK')}catch{};throw e}
+ }
+ /** Save do navegador (PUT): refino +9/+10 e itens destruídos na forja só mudam pelo servidor. */
+ function refineProblem(id,data,trusted){
+  const broken=new Set(brokenUids.all(id).map(r=>r.item_uid));
+  const before=new Map((Array.isArray(trusted.items)?trusted.items:[]).filter(x=>x&&typeof x==='object').map(x=>[String(x.uid),Math.floor(Number(x.refine)||0)]));
+  for(const item of Array.isArray(data.items)?data.items:[]){
+   if(!item||typeof item!=='object')continue;
+   const uid=String(item.uid),r=Number(item.refine)||0;
+   if(broken.has(uid))return 'Este equipamento foi destruído na forja e não pode voltar. O progresso não foi salvo.';
+   if(r<0||r>refineConfig.MAX||!Number.isInteger(r))return 'Refino inválido. O progresso não foi salvo.';
+   const old=before.get(uid);
+   if(old!==undefined&&r<old)return 'Este equipamento está com refino maior no servidor (+'+old+'). Recarregue o jogo. O progresso não foi salvo.';
+   // Só a cópia repetida do tesouro do MVP sobe refino fora da forja, e só até +8.
+   if(old===undefined?r>refineConfig.DUPLICATE_CAP:(r>old&&(r>refineConfig.DUPLICATE_CAP||r-old>2)))
+    return 'Refino acima de +'+refineConfig.DUPLICATE_CAP+' só pela forja do servidor. O progresso não foi salvo.';
+  }
+  return '';
+ }
  const insertScore=db.prepare('INSERT INTO run_scores(account_id,mode,line,map,difficulty,level,kills,seconds,win,at) VALUES(?,?,?,?,?,?,?,?,?,?)');
  const LINES=new Set(['sword','mage','archer','acolyte','merchant','thief']),DIFFS=new Set(['story','easy','normal','hard','nightmare']);
  function recordScore(id,mode,s){
@@ -305,6 +367,12 @@ export function accountStore(dataDir){
      const input=await body(req);if(!recordScore(me.id,'solo',input))return send(res,400,{error:'Resultado inválido.'});
      return send(res,201,{ok:true});
    }
+   // V24: forja — a decisão (sucesso, falha ou quebra) e o desconto de Zeny acontecem só aqui.
+   if(endpoint==='/api/account/refine'&&req.method==='POST'){
+     if(!rateLimit(req,'refine:'+me.id,900,3_600_000))return send(res,429,{error:'Muitas tentativas de refino. Aguarde um pouco.'});
+     const out=refine(me.id,await body(req));return send(res,out.status,out.body);
+   }
+   if(endpoint==='/api/account/refine-rules'&&req.method==='GET')return send(res,200,refineConfig);
    if(endpoint==='/api/account/progress'&&req.method==='GET')return send(res,200,snapshot(me.id));
    if(endpoint==='/api/account/coop-rewards'&&req.method==='GET')return send(res,200,{awards:awardsByUser.all(me.id)});
    if(endpoint==='/api/account/progress'&&req.method==='PUT'){
@@ -321,7 +389,7 @@ export function accountStore(dataDir){
      const mode=process.env.STRICT_ONLINE_PROGRESS??'1';
      if(mode!=='0'){
        const trusted=snapshot(me.id).data;
-       const problem=mode==='2'?lockedKeys(input.data,trusted):implausible(input.data,trusted);
+       const problem=mode==='2'?lockedKeys(input.data,trusted):implausible(input.data,trusted)||refineProblem(me.id,input.data,trusted);
        if(problem)return send(res,403,{error:problem});
      }
      const result=updateProgress.run(serialized,Date.now(),me.id,input.revision);

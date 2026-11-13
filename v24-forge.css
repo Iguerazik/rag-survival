@@ -1,0 +1,108 @@
+/* V24 · Forja de refinamento até +10 e destaque visual dos equipamentos refinados.
+ * Só CSS: os sprites originais não são alterados. Efeitos leves (drop-shadow) e desligados com "reduzir movimento". */
+
+/* ---------- Destaque por faixa de refino (inventário, equipamentos e forja) ---------- */
+img.refine-glow { transition: filter .2s ease; }
+img.refine-band-2 { filter: drop-shadow(0 0 2px rgba(255, 214, 120, .55)); }                       /* +5 e +6: sutil */
+img.refine-band-3 { filter: drop-shadow(0 0 2px rgba(255, 205, 90, .9)) drop-shadow(0 0 5px rgba(255, 170, 40, .55)); } /* +7 e +8 */
+img.refine-band-4 { filter: drop-shadow(0 0 3px rgba(130, 200, 255, .95)) drop-shadow(0 0 7px rgba(80, 150, 255, .6)); animation: refinePulse 2.6s ease-in-out infinite; } /* +9 */
+img.refine-band-5 { animation: refineMax 3.2s ease-in-out infinite; }                                 /* +10 */
+@keyframes refinePulse {
+  0%, 100% { filter: drop-shadow(0 0 3px rgba(130, 200, 255, .9)) drop-shadow(0 0 6px rgba(80, 150, 255, .45)); }
+  50% { filter: drop-shadow(0 0 4px rgba(170, 220, 255, 1)) drop-shadow(0 0 10px rgba(90, 160, 255, .75)); }
+}
+@keyframes refineMax {
+  0%, 100% { filter: drop-shadow(0 0 3px rgba(255, 220, 110, 1)) drop-shadow(0 0 9px rgba(255, 120, 60, .75)); }
+  50% { filter: drop-shadow(0 0 4px rgba(255, 255, 220, 1)) drop-shadow(0 0 12px rgba(190, 110, 255, .85)); }
+}
+[data-refine-band="3"] { box-shadow: inset 0 0 0 1px rgba(255, 196, 80, .55); }
+[data-refine-band="4"] { box-shadow: inset 0 0 0 1px rgba(120, 190, 255, .75), 0 0 8px rgba(90, 160, 255, .25); }
+[data-refine-band="5"] { box-shadow: inset 0 0 0 1px rgba(255, 210, 110, .9), 0 0 10px rgba(200, 120, 255, .35); }
+.item-refine-line.refine-band-2, .item-refine-line.refine-band-3 { color: #9a6a12; }
+.item-refine-line.refine-band-4 { color: #2366b8; }
+.item-refine-line.refine-band-5 { color: #8a3fc0; font-weight: 700; }
+@media (prefers-reduced-motion: reduce) { img.refine-band-4, img.refine-band-5 { animation: none; } }
+
+/* ---------- Painel da forja ---------- */
+.forge-panel { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(200px, 300px) minmax(0, 1fr); gap: 12px;
+  padding: 12px; border: 1px solid var(--r10-edge, #6b5a3c); border-radius: 6px; background: var(--r10-card, #2a2217); color: var(--r10-ink, #f3f1df); }
+.forge-head { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; border-bottom: 1px solid var(--r10-edge, #6b5a3c); padding-bottom: 8px; }
+.forge-head h3 { margin: 0; font: 700 15px/1.3 Tahoma, sans-serif; color: #9a6a12; letter-spacing: .02em; }
+.forge-head small { font: 12px/1.4 Tahoma, sans-serif; color: var(--r10-muted, #c8bfa6); }
+.forge-items { display: flex; flex-direction: column; gap: 4px; max-height: 420px; overflow: auto; padding-right: 2px; }
+.forge-item { display: grid; grid-template-columns: 32px minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 8px; align-items: center; text-align: left;
+  padding: 6px 8px; border: 1px solid transparent; border-radius: 5px; background: var(--r10-window2, rgba(0, 0, 0, .18)); color: inherit; cursor: pointer; font: 12px/1.3 Tahoma, sans-serif; }
+.forge-item img { grid-row: 1 / 3; width: 32px; height: 32px; object-fit: contain; image-rendering: pixelated; }
+.forge-item small { color: var(--r10-muted, #c8bfa6); font-size: 11px; }
+.forge-item:hover { background: var(--r10-hover, rgba(255, 255, 255, .08)); }
+.forge-item.active { border-color: var(--r10-gold, #e9c46a); background: rgba(233, 196, 106, .12); }
+.forge-item-name { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.forge-detail { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.forge-selected { display: flex; gap: 12px; align-items: center; padding: 8px; border-radius: 6px; background: var(--r10-window2, rgba(0, 0, 0, .18)); }
+.forge-icon { width: 56px; height: 56px; object-fit: contain; image-rendering: pixelated; flex: none; }
+.forge-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; font: 12px/1.4 Tahoma, sans-serif; }
+.forge-name { font-size: 15px; }
+.forge-meta, .forge-cards { color: var(--r10-muted, #c8bfa6); }
+.forge-step { margin: 0; text-align: center; font: 700 18px/1 Tahoma, sans-serif; color: #9a6a12; letter-spacing: .08em; }
+.forge-compare { width: 100%; border-collapse: collapse; font: 13px/1.4 Tahoma, sans-serif; }
+.forge-compare th, .forge-compare td { padding: 5px 8px; border-bottom: 1px solid rgba(255, 255, 255, .08); text-align: right; }
+.forge-compare thead th { color: var(--r10-muted, #c8bfa6); font-weight: 400; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; }
+.forge-compare tbody th, .forge-compare thead th:first-child { text-align: left; }
+.forge-after { font-weight: 700; }
+.forge-gain { color: #1f8a4c; font-weight: 700; }
+.forge-odds-bar { display: flex; height: 12px; border-radius: 6px; overflow: hidden; background: rgba(0, 0, 0, .35); }
+.forge-seg { display: block; height: 100%; }
+.forge-seg.ok { background: #4cb872; } .forge-seg.keep { background: #d8a43c; } .forge-seg.broke { background: #d14b4b; }
+.forge-odds-legend { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 2px; font: 12px/1.45 Tahoma, sans-serif; }
+.forge-odds-legend li::before { content: ''; display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+.forge-odds-legend .ok::before { background: #4cb872; } .forge-odds-legend .keep::before { background: #d8a43c; } .forge-odds-legend .broke::before { background: #d14b4b; }
+.forge-odds-legend .broke strong { color: #c53030; }
+.forge-cost { font: 13px/1.5 Tahoma, sans-serif; } .forge-cost strong { color: #9a6a12; }
+.forge-cost.short strong { color: #c53030; } .forge-balance { color: var(--r10-muted, #c8bfa6); }
+.forge-note { margin: 0; font: 12px/1.4 Tahoma, sans-serif; color: #9a6a12; }
+.forge-actions { display: flex; flex-direction: column; gap: 8px; }
+.forge-go { padding: 10px 14px; font: 700 14px/1.2 Tahoma, sans-serif; border-radius: 5px; cursor: pointer; }
+.forge-go.risky { border-color: #d8a43c; }
+.forge-go.danger { background: #8e2626; border-color: #d14b4b; color: #fff; }
+.forge-go:disabled { opacity: .55; cursor: not-allowed; }
+.forge-confirm { padding: 10px; border: 1px solid #d14b4b; border-radius: 6px; background: rgba(209, 75, 75, .14); font: 13px/1.45 Tahoma, sans-serif; }
+.forge-confirm p { margin: 4px 0 8px; }
+.forge-confirm-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.forge-cancel { padding: 10px 14px; }
+.forge-feedback { padding: 10px 12px; border-radius: 6px; font: 13px/1.45 Tahoma, sans-serif; border: 1px solid transparent; }
+.forge-feedback p { margin: 4px 0 0; }
+.forge-gains { margin: 4px 0 0; padding-left: 18px; color: #1f8a4c; font-weight: 700; }
+.forge-success { border-color: #4cb872; background: rgba(76, 184, 114, .16); animation: forgeFlash .7s ease-out; }
+.forge-fail { border-color: #d8a43c; background: rgba(216, 164, 60, .14); animation: forgeShake .45s ease-in-out; }
+.forge-broken { border-color: #d14b4b; background: rgba(209, 75, 75, .2); animation: forgeShake .6s ease-in-out; }
+.forge-zeny, .forge-error { border-color: #d8a43c; background: rgba(216, 164, 60, .1); }
+.forge-max { border-color: #c99a2e; background: rgba(233, 196, 106, .16); color: #8a5d0c; font-weight: 700; }
+.forge-busy { border-color: var(--r10-edge, #6b5a3c); opacity: .85; }
+.forge-max-stats { margin: 0; font: 13px/1.4 Tahoma, sans-serif; }
+.forge-empty { margin: 8px 0; color: var(--r10-muted, #c8bfa6); font: 12px/1.5 Tahoma, sans-serif; }
+@keyframes forgeFlash { from { box-shadow: 0 0 0 0 rgba(126, 226, 160, .8); } to { box-shadow: 0 0 0 14px rgba(126, 226, 160, 0); } }
+@keyframes forgeShake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+@media (prefers-reduced-motion: reduce) { .forge-success, .forge-fail, .forge-broken { animation: none; } }
+@media (max-width: 720px) {
+  .forge-panel { grid-template-columns: 1fr; }
+  .forge-items { max-height: 30vh; }
+  .forge-compare th, .forge-compare td { padding: 4px 5px; }
+}
+
+/* Modo escuro: tons mais claros para manter o contraste. */
+html[data-theme=dark] .forge-step, html[data-theme=dark] .forge-head h3, html[data-theme=dark] .forge-cost strong, html[data-theme=dark] .forge-note { color: #f0c96a; }
+html[data-theme=dark] .forge-gain, html[data-theme=dark] .forge-gains { color: #7ee2a0; }
+html[data-theme=dark] .forge-cost.short strong, html[data-theme=dark] .forge-odds-legend .broke strong { color: #ff8e8e; }
+html[data-theme=dark] .forge-max { color: #f0c96a; }
+html[data-theme=dark] .item-refine-line.refine-band-2, html[data-theme=dark] .item-refine-line.refine-band-3 { color: #f0c96a; }
+html[data-theme=dark] .item-refine-line.refine-band-4 { color: #8cc8ff; }
+html[data-theme=dark] .item-refine-line.refine-band-5 { color: #ffd36e; }
+
+/* O inventário antigo (v6.css) pinta todo <p> de creme com !important; dentro da forja valem as cores acima. */
+html body dialog .forge-panel p { color: var(--r10-ink, #26323d) !important; }
+html body dialog .forge-panel .forge-step, html body dialog .forge-panel .forge-note { color: #9a6a12 !important; }
+html body dialog .forge-panel .forge-empty { color: var(--r10-muted, #5b6b78) !important; }
+html[data-theme=dark] body dialog .forge-panel p { color: var(--r10-ink, #f3f1df) !important; }
+html[data-theme=dark] body dialog .forge-panel .forge-step, html[data-theme=dark] body dialog .forge-panel .forge-note { color: #f0c96a !important; }
+html body dialog .forge-panel .forge-go.danger { background: #9b2c2c !important; border-color: #d14b4b !important; color: #fff !important; }
+html body dialog .forge-panel .forge-item.active { border-color: #c99a2e !important; }

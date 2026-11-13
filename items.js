@@ -179,6 +179,77 @@ const roOfficialItemIds = Object.freeze({
   clip: 2607,
 });
 
+/* ===================== V24 · FORJA (refino permanente) — CONFIGURAÇÃO CENTRAL =====================
+ * Único lugar com chances, custos e bônus do refino. O MESMO arquivo roda no navegador (solo sem conta),
+ * no servidor (contas: a decisão é SEMPRE do servidor) e nos testes. Ajuste o balanceamento só aqui.
+ */
+const RefineRules = (() => {
+  const MAX = 10;            // refino máximo
+  const DUPLICATE_CAP = 8;   // cópia repetida do tesouro do MVP ainda sobe +1 de graça, mas só até +8 (regra da V23)
+  // nível desejado → [chance de sucesso, chance de QUEBRA quando falha (condicional), custo em Zeny]
+  const TABLE = Object.freeze({
+    1: [1.00, 0.00, 500],     2: [1.00, 0.00, 1000],    3: [0.95, 0.00, 2000],
+    4: [0.90, 0.00, 4000],    5: [0.80, 0.05, 8000],    6: [0.70, 0.10, 16000],
+    7: [0.55, 0.20, 35000],   8: [0.40, 0.30, 75000],   9: [0.25, 0.35, 120000],
+    10: [0.15, 0.50, 220000], // V25.6: +9/+10 com a proposta do docs/FORJA.md (menos quebra e mais baratos)
+  });
+  // Bônus por nível de refino, por categoria (o que o jogo já aplicava desde a V12; +9 e +10 seguem a mesma fórmula).
+  //   arma: ATK +(3 + 2×tier) e MATK +(2 + tier) por nível · demais equipamentos: DEF +1,25 por nível
+  const perLevel = data => data.type === 'weapon'
+    ? { atk: 3 + data.tier * 2, matk: 2 + data.tier }
+    : { def: 1.25 };
+  const level = item => Math.max(0, Math.min(MAX, Math.floor(Number(item?.refine) || 0)));
+  const refinable = id => !!itemDb[id];
+  const pct = x => Math.round(x * 10000) / 100; // 0,1755 → 17.55 (%)
+  function odds(target) {
+    const row = TABLE[target]; if (!row) return null;
+    const [success, breakOnFail, cost] = row;
+    return { target, success, failKeep: (1 - success) * (1 - breakOnFail), destroy: (1 - success) * breakOnFail, breakOnFail, cost,
+      percent: { success: pct(success), failKeep: pct((1 - success) * (1 - breakOnFail)), destroy: pct((1 - success) * breakOnFail) } };
+  }
+  /** Atributos do próprio equipamento com um refino (base do item + bônus do refino). Só os que existem no item. */
+  function stats(id, refine) {
+    const data = itemDb[id]; if (!data) return {};
+    const per = perLevel(data), r = Math.max(0, Math.min(MAX, refine | 0)), out = {};
+    if (data.type === 'weapon') { out.atk = data.atk + per.atk * r; out.matk = (data.matk || 0) + per.matk * r; }
+    else out.def = Math.round(((data.def || 0) + per.def * r) * 100) / 100;
+    return out;
+  }
+  /** Prévia da próxima tentativa: atributos atuais, após o sucesso e o ganho exato de cada um. */
+  function preview(item) {
+    const from = level(item), data = item && itemDb[item.id];
+    if (!data) return { ok: false, error: 'missing' };
+    if (from >= MAX) return { ok: false, error: 'max', from, current: stats(item.id, from) };
+    const to = from + 1, current = stats(item.id, from), after = stats(item.id, to), gain = {};
+    for (const key of Object.keys(after)) { const d = Math.round((after[key] - (current[key] || 0)) * 100) / 100; if (d) gain[key] = d; }
+    return { ok: true, from, to, current, after, gain, odds: odds(to), cost: TABLE[to][2] };
+  }
+  /** Resultado de UMA tentativa a partir de UM número aleatório u ∈ [0,1): sucesso, falha sem quebra ou quebra. */
+  function outcome(target, u) {
+    const [success, breakOnFail] = TABLE[target];
+    if (u < success) return 'success';
+    return (u - success) / (1 - success) < breakOnFail ? 'broken' : 'fail';
+  }
+  /** Valida e resolve uma tentativa (sem efeitos colaterais). rng(): [0,1). Devolve o item novo (ou null se quebrou). */
+  function attempt(item, zeny, rng, expectFrom) {
+    if (!item || !itemDb[item.id]) return { ok: false, error: 'missing' };
+    const from = level(item);
+    if (Number.isInteger(expectFrom) && expectFrom !== from) return { ok: false, error: 'stale', from };
+    if (from >= MAX) return { ok: false, error: 'max', from };
+    const to = from + 1, cost = TABLE[to][2];
+    if (!(Number(zeny) >= cost)) return { ok: false, error: 'zeny', from, to, cost };
+    const u = Number(rng()); if (!(u >= 0 && u < 1)) return { ok: false, error: 'rng' };
+    const result = outcome(to, u), gain = preview(item).gain;
+    return { ok: true, from, to, cost, result, roll: u, gain: result === 'success' ? gain : {},
+      item: result === 'broken' ? null : result === 'success' ? { ...item, refine: to } : { ...item, refine: from } };
+  }
+  /** Faixa visual: 0 nenhum, 1 (+1…+4), 2 (+5/+6), 3 (+7/+8), 4 (+9), 5 (+10). */
+  const tier = refine => { const r = refine | 0; return r >= 10 ? 5 : r >= 9 ? 4 : r >= 7 ? 3 : r >= 5 ? 2 : r >= 1 ? 1 : 0; };
+  const errors = { missing: 'Equipamento não encontrado no seu inventário.', stale: 'Este equipamento mudou desde que você abriu a forja. Confira e tente de novo.',
+    max: 'Refinamento máximo alcançado (+10).', zeny: 'Zeny insuficiente para esta tentativa.', rng: 'Falha ao sortear o resultado.' };
+  return Object.freeze({ MAX, DUPLICATE_CAP, TABLE, perLevel, stats, preview, odds, outcome, attempt, tier, refinable, level, errors });
+})();
+
 const Gear = (() => {
   let seq = Date.now() % 100000;
   const newItem = id => ({ uid: 'i' + (seq++).toString(36) + Math.floor(Math.random() * 1296).toString(36), id, cards: [], refine: 0, upgrades: {}, affixes:ItemQuality.roll(id) });
@@ -226,13 +297,15 @@ const Gear = (() => {
       if (!item) continue;
       const data = itemDb[item.id];
       if (slot === 'shield' && gear.weapon && itemDb[gear.weapon.id]?.twoHanded) continue;
+      // V24: bônus do refino vêm da configuração central (RefineRules), a mesma usada pela prévia da forja.
+      const refine = RefineRules.level(item), per = RefineRules.perLevel(data);
       // V25.5: arma da mão esquerda soma em offhandAtk; o motor aplica a perícia (35% + 6% por nível de Mão Esquerda).
-      if (slot === 'shield' && data.type === 'weapon') totals.offhandAtk += data.atk + (item.refine||0) * (3 + data.tier*2);
+      if (slot === 'shield' && data.type === 'weapon') totals.offhandAtk += data.atk + refine * per.atk;
       else if (data.type === 'weapon') { totals.weaponAtk += data.atk; totals.weaponMatk += data.matk ?? 0; totals.twoHanded = !!data.twoHanded; }
-      totals.itemDef += (data.def ?? 0) + (data.type === 'weapon' ? 0 : (item.refine||0)*1.25);
+      totals.itemDef += (data.def ?? 0) + (data.type === 'weapon' ? 0 : refine * per.def);
       const mainWeapon = data.type === 'weapon' && slot !== 'shield';
-      totals.weaponAtk += mainWeapon ? (item.refine||0) * (3 + data.tier*2) : 0;
-      totals.weaponMatk += mainWeapon ? (item.refine||0) * (2 + data.tier) : 0;
+      totals.weaponAtk += mainWeapon ? refine * per.atk : 0;
+      totals.weaponMatk += mainWeapon ? refine * per.matk : 0;
       totals.itemMdef += data.mdef ?? 0;
       totals.sp += data.sp ?? 0;
       totals.hpRegen += data.hpRegen||0;
@@ -247,9 +320,9 @@ const Gear = (() => {
       for(const [key,value]of Object.entries(item.affixes||{}))if(key in totals)totals[key]+=value;
       for (const [key, value] of Object.entries(data.bonus ?? {})) totals[key] += value;
       cardIds.push(...item.cards);
-      // Nine Tail is +9 in classic RO; this Survivors edition caps gear at +8.
-      // Activate the high-refinement milestone at the game's reachable cap.
-      if((item.refine||0)>=8 && data.type==='garment' && item.cards.includes('nine_tail'))totals.flee+=20;
+      // Carta Nove Caudas: FLEE +20 com capa +9 (regra do RO). Até a V23 o refino máximo era +8 e o marco era +8;
+      // com o limite +10, capas já em +8 continuam com o bônus (compatibilidade) e o marco do RO (+9) passa a valer.
+      if(refine>=8 && data.type==='garment' && item.cards.includes('nine_tail'))totals.flee+=20;
     }
     // Pantie + Undershirt: AGI +5/FLEE +10; Tidal Shoes + Wool Scarf: max HP +10%.
     const worn = new Set(Object.values(gear).filter(Boolean).map(item=>item.id));
@@ -268,7 +341,7 @@ const Gear = (() => {
   // V23: equipamento VÁLIDO de um personagem. A MESMA função roda no navegador (solo) e no servidor (online,
   // lendo a conta no SQLite): só vale item que existe, no espaço certo, que a classe pode usar, com refino
   // dentro do limite e cartas do tipo certo até o número de encaixes. Nada que o navegador "invente" passa daqui.
-  const MAX_REFINE = 8; // o ferreiro do jogo (v12-systems.js) refina até +8
+  const MAX_REFINE = RefineRules.MAX; // V24: forja até +10 (configuração central em RefineRules)
   const whole = (v, lo, hi) => Number.isFinite(Number(v)) ? Math.max(lo, Math.min(hi, Math.floor(Number(v)))) : lo;
   const cleanLevels = obj => Object.fromEntries(Object.entries(obj && typeof obj === 'object' ? obj : {})
     .filter(([k]) => /^[a-zA-Z]{2,12}$/.test(k)).map(([k, v]) => [k, whole(v, 0, 8)]).filter(([, v]) => v > 0));
@@ -298,16 +371,16 @@ const Gear = (() => {
     return out;
   }
   // V23 Etapa 4: guarda o item escolhido no tesouro do MVP (mesma regra no solo e no servidor).
-  // Repetido: +1 de refino na melhor cópia (até +8); com refino máximo, vira Zeny.
+  // Repetido: +1 de refino na melhor cópia (até +8, RefineRules.DUPLICATE_CAP); acima disso, vira Zeny (+9/+10 só na forja).
   function grantItem(list, chosen, mapTier, uid) {
     const items = Array.isArray(list) ? list : [], data = chosen && itemDb[chosen.id];
     if (!data) return { items, zeny: 0, item: null, text: '' };
     const owned = items.filter(item => item && item.id === chosen.id).sort((a, b) => (b.refine || 0) - (a.refine || 0));
     if (owned.length) {
       const previous = owned[0];
-      if ((previous.refine || 0) < MAX_REFINE) {
+      if ((previous.refine || 0) < RefineRules.DUPLICATE_CAP) {
         const refine = (previous.refine || 0) + 1, item = { ...previous, refine };
-        return { items: items.map(entry => entry === previous ? item : entry), zeny: 0, item, text: 'refino ' + refine + '/8 (cópia repetida transformada em melhoria)' };
+        return { items: items.map(entry => entry === previous ? item : entry), zeny: 0, item, text: 'refino ' + refine + '/' + RefineRules.DUPLICATE_CAP + ' (cópia repetida transformada em melhoria)' };
       }
       const salvage = 45 + data.tier * 35 + whole(mapTier, 0, 9) * 10;
       return { items, zeny: salvage, item: previous, text: 'cópia convertida em +' + salvage + ' Zeny (refino máximo)' };
@@ -370,8 +443,11 @@ const Gear = (() => {
     }
     return picks;
   }
-  function sprite(id) {
+  function sprite(id, refine = 0) {
     const img = document.createElement('img');
+    // V24: destaque discreto por faixa de refino (CSS em v24-forge.css; o sprite original não é alterado).
+    const band = RefineRules.tier(refine);
+    if (band) { img.classList.add('refine-glow', 'refine-band-' + band); img.dataset.refine = String(refine); }
     const key = itemDb[id] ? id : 'knife';
     const itemID = roOfficialItemIds[key];
     const fallback = 'assets/items/' + key + '.png';
@@ -419,5 +495,5 @@ const Gear = (() => {
     ctx.restore();
   }
 
-  return { newItem, label, canEquip, canOffhand, slotFor, describe, bonuses, equipped, engineBonuses, grantItem, MAX_REFINE, roll, rollChoices, sprite, trainingGear, drawChest };
+  return { newItem, label, canEquip, canOffhand, slotFor, describe, bonuses, equipped, engineBonuses, grantItem, MAX_REFINE, roll, rollChoices, sprite, trainingGear, drawChest, refineBand: RefineRules.tier };
 })();

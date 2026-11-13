@@ -87,8 +87,8 @@ const archer = {
   add('vulture','Olhos de Águia',10,'passive','Passiva: aumenta o alcance dos ataques e das habilidades.',{stats:{range:12},ic:'vulture'}),
  ],
  second: [
-  add('falconry','Adestrar Falcão',1,'passive','Passiva: seu falcão acompanha você e às vezes ataca junto com seus disparos.',{stats:{autoblitz:.14},ic:'falcon'}),
-  add('falcon','Ataque Aéreo',5,'ball','Manda o falcão mergulhar no alvo e nos monstros ao redor.',{r:390,rad:72,cd:2.45,m:1.7,ic:'falcon',fx:'falcon',req:'falconry'}),
+  add('falconry','Adestrar Falcão',1,'passive','Passiva: o falcão passa a acompanhar você e libera o Ataque Aéreo (habilidade ativa) e as Garras de Aço. Ele ataca sozinho às vezes (5%).',{stats:{autoblitz:.05},ic:'falcon'}),
+  add('falcon','Ataque Aéreo',5,'ball','Ativa: manda o falcão mergulhar no alvo e nos monstros ao redor. Cada nível também aumenta em 2% o ataque automático do falcão.',{r:390,rad:72,cd:2.45,m:1.7,ic:'falcon',fx:'falcon',req:'falconry'}),
   add('steelcrow','Garras de Aço',10,'passive','Passiva: aumenta o dano do falcão.',{stats:{falcon:.08},ic:'falcon',req:'falconry'}),
   add('beastbane','Flagelo das Feras',10,'passive','Passiva: +3% de dano por nível.',{stats:{dmg:.03},ic:'owl'}),
   add('landmine','Mina Terrestre',5,'trap','Planta uma mina que explode e pode atordoar.',{rad:78,cd:4.1,m:1.9,el:'earth',st:{stun:[.3,0,1.5]},ic:'landmine',fx:'landmineHit'}),

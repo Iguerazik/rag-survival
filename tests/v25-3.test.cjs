@@ -49,3 +49,26 @@ test('V25.3: efeito do falcão sem ângulo não quebra o canvas; painel de níve
  assert.notEqual(color('goldMagnet'),color('xpMagnet'));
  assert.notEqual(color('goldMagnet'),color('zenyCache'));
 });
+
+test('V25.6: depois de Adestrar Falcão, o Ataque Aéreo (ativa) aparece na escolha seguinte e melhora o ataque automático',async()=>{
+ const core=await engine();
+ for(let seed=1;seed<=20;seed++){
+  const w=core.makeWorld('sewer','normal',[member('a','archer','hunter')],{seed});
+  w.spawnAt=1e9;w.nextRiftAt=1e9;w.eliteAt=1e9;w.nextMagnetAt=1e9;w.contract.done=true;w.trials=[];w.mobs=[];
+  const p=w.players.get('a');
+  p.choices=['falconry'];p.pendingUps=2;core.command(w,'a',{upgrade:{seq:(p.upgradeSeq||0)+1,id:'falconry'}});
+  assert.ok(p.choices.includes('falcon'),'seed '+seed+': '+p.choices.join(','));
+ }
+ const w=core.makeWorld('sewer','normal',[member('a','archer','hunter')],{seed:1});w.spawnAt=1e9;w.mobs=[];
+ const p=w.players.get('a');p.skills.falconry=1;core.tickWorld(w,.05);const before=p.st.autoblitz;
+ p.skills.falcon=5;core.tickWorld(w,.05);
+ assert.ok(Math.abs(p.st.autoblitz-before-.1)<1e-9,'Ataque Aéreo nv. 5: +10% de ataque automático');
+ assert.equal(core.skillCatalog.skills.falcon.k,'ball','Ataque Aéreo é ativa');
+});
+
+test('V25.6: animações de habilidade não deixam o canvas desbalanceado (save/restore protegidos, origem padrão)',()=>{
+ const fx=read('skillfx.js');
+ assert.match(fx,/function guarded\(ctx, run\)/);
+ assert.match(fx,/function draw\(ctx, time\) \{ guarded\(ctx, \(\) => drawAll\(ctx, time\)\); \}/);
+ assert.match(fx,/options = \{ from: \{ x: options\.x - 55, y: options\.y \+ 22 \}, \.\.\.options \}/);
+});

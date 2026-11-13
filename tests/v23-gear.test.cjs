@@ -45,7 +45,7 @@ test('V23 Etapa 2: equipamento inválido não passa (encaixes, tipo da carta, re
   {uid:'r',id:'arcwand',cards:[]},{uid:'x',id:'item_que_nao_existe',cards:[]},{uid:'a',id:'ring',cards:['mantis','mantis']},
  ];
  let eq=Gear.equipped({stage:1,gear:{weapon:'w',shield:'s',accessory1:'a',headgear:'x'}},items,'sword');
- assert.equal(eq.weapon.refine,8,'refino limitado a +8 (limite do ferreiro)');
+ assert.equal(eq.weapon.refine,10,'refino limitado a +10 (limite da forja desde a V24)');
  assert.deepEqual(eq.weapon.cards,['sidewinder'],'só 1 encaixe e só carta de arma');
  assert.deepEqual(eq.accessory1.cards,['mantis'],'Anel tem 1 encaixe');
  assert.equal(eq.headgear,undefined,'item inexistente é ignorado');

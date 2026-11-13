@@ -1014,6 +1014,8 @@ const SkillFX = (() => {
     }
     const id = renderers[kind] ? kind : alias[kind];
     if (!renderers[id]) return false;
+    // Sem origem informada, o efeito sai um pouco atrás do alvo (falcão, sopro do dragão, investida...).
+    if (options && !options.from && Number.isFinite(options.x) && Number.isFinite(options.y)) options = { from: { x: options.x - 55, y: options.y + 22 }, ...options };
     if (options?.from && (options.angle == null || options.length == null) && Number.isFinite(options.x) && Number.isFinite(options.y)) {
       const dx = options.x - options.from.x, dy = options.y - options.from.y;
       options = { angle: Math.atan2(dy, dx), length: Math.hypot(dx, dy), ...options };
@@ -1027,7 +1029,16 @@ const SkillFX = (() => {
     for (const fx of list) fx.t += dt;
     list = list.filter(fx => fx.t < fx.dur);
   }
-  function draw(ctx, time) {
+  // V25.6: conta save/restore durante cada animação; se uma falhar no meio, desfaz os níveis que ficaram abertos
+  // (antes um erro entre save e restore deixava o canvas encolhendo a cada quadro e o herói sumia).
+  function guarded(ctx, run) {
+    const save = ctx.save, restore = ctx.restore; let depth = 0;
+    ctx.save = function () { depth++; return save.call(this); };
+    ctx.restore = function () { if (depth > 0) { depth--; return restore.call(this); } };
+    try { run(); } finally { delete ctx.save; delete ctx.restore; while (depth-- > 0) restore.call(ctx); }
+  }
+  function draw(ctx, time) { guarded(ctx, () => drawAll(ctx, time)); }
+  function drawAll(ctx, time) {
     for (const fx of list) {
       if ((fx.x != null && !Number.isFinite(fx.x)) || (fx.y != null && !Number.isFinite(fx.y))) continue;
       ctx.save();

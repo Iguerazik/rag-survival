@@ -546,6 +546,8 @@ function refreshStats(world,p){
  for(const [id,level] of Object.entries(p.skills)){const def=SK[id];if(def?.k!=='passive')continue;for(const [k,v] of Object.entries(def.stats))st[k]=(st[k]||0)+v*level;}
  // V25.5: duas armas. Com a segunda arma o dano sobe (perícia da mão esquerda melhora a fração);
  // sem ela (e sem katar), a Perícia com Mão Esquerda vale só metade do golpe duplo.
+ // V25.6: como no Ragnarok, o Ataque Aéreo (ativa) também melhora o ataque automático do falcão (+2% por nível).
+ if(p.skills.falconry&&p.skills.falcon)st.autoblitz=(st.autoblitz||0)+.02*p.skills.falcon;
  const left=p.skills.lefthand||0;
  if(p.base.dualGain>0)st.dmg+=p.base.dualGain*(.35+.06*left);
  else if(left&&!ITEMS[p.base.gear.slots?.weapon]?.katar)st.dbl-=SK.lefthand.stats.dbl*left/2; // katar ocupa as duas mãos: vale inteira
@@ -813,6 +815,11 @@ function offerUpgrade(world,p){
  if(!options.length&&!(p.level>=3&&runeOptions(p).length)){p.pendingUps=0;return;}
  for(let i=options.length-1;i>0;i--){const j=Math.floor(rand(world)*(i+1));[options[i],options[j]]=[options[j],options[i]];}
  p.choices=options.slice(0,3);
+ // V25.6: habilidade recém-liberada por um pré-requisito (ex.: Ataque Aéreo depois de Adestrar Falcão) aparece na próxima escolha.
+ // Só uma vez por habilidade, e a ativa primeiro (o Ataque Aéreo vem antes das Garras de Aço).
+ const shown=p.reqShown||(p.reqShown={});
+ const fresh=options.filter(id=>SK[id].req&&!(p.skills[id]>0)&&!shown[id]).sort((a,b)=>Number(isActive(b))-Number(isActive(a)));
+ if(fresh.length&&p.choices.length){const id=fresh[0];shown[id]=true;if(!p.choices.includes(id))p.choices[p.choices.length-1]=id;}
  // A partir do nível 3 da run, uma das opções pode ser uma runa para uma habilidade já aprendida (como no solo).
  const runes=runeOptions(p);
  if(runes.length&&p.level>=3){const pick=runes[Math.floor(rand(world)*runes.length)];if(p.choices.length>=3)p.choices.splice(2,1,pick);else p.choices.push(pick);}
