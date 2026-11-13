@@ -80,6 +80,8 @@ function journeyOf(line = selected) {
   let changed = false;
   if (!profile || !stages[profile.stage]) { profile = newJourney(); changed = true; }
   if (profile.v !== 2) { profile = RO.migrate(profile); changed = true; }
+  // V25.4: quem já renasceu antes recebe uma vez os 40 pontos a mais do renascimento.
+  if (profile.stage >= 2 && !profile.rebirthBonus) { profile = { ...profile, points: (profile.points || 0) + 40, rebirthBonus: true }; changed = true; }
   if (!profile.gear) return withStarterGear(line, profile);
   if (changed) {
     saved = { ...saved, journeys: { ...saved.journeys, [line]: profile } };
@@ -169,6 +171,16 @@ function statusFor(line, profile) {
   return RO.derive(job, profile, Gear.bonuses(gearOf(profile)));
 }
 function album() { return saved.album ?? {}; }
+/** Tira todas as cartas de um item e devolve ao álbum (o item continua com os encaixes vazios). */
+function removeCards(uid) {
+  const item = itemByUid(uid); if (!item?.cards?.length) return false;
+  const cards = [...item.cards];
+  updateItem(uid, { cards: [] });
+  const next = { ...album() };
+  for (const id of cards) next[id] = (next[id] ?? 0) + 1;
+  persist({ album: next, found: { ...saved.found, ...Object.fromEntries(cards.map(id => [id, true])) } });
+  return true;
+}
 function addToAlbum(id, amount = 1) {
   const next = { ...album(), [id]: Math.max(0, (album()[id] ?? 0) + amount) };
   if (!next[id]) delete next[id];
@@ -796,6 +808,19 @@ function offerButton(head,info,onPick,icon=''){
  if(info){const d=document.createElement('small');d.className='coop-offer-desc';d.textContent=info;btn.append(d);}
  btn.addEventListener('click',onPick);return btn;
 }
+/* V25.4: rastreio do Códex na partida — avisa quando a habilidade ou o equipamento oferecido faz parte
+ * de uma combinação ainda não descoberta (habilidade nv. 2 + item equipado ao começar a run). */
+function codexPending(){const found=saved.codexFound||{};return Object.entries(Codex.recipes).filter(([id])=>!found[id]);}
+function codexWorn(){return new Set(Object.values(run?.gear||{}).filter(Boolean).map(it=>it.id));}
+function codexSkillHint(skillId,nextLevel){
+ const worn=codexWorn();
+ const hits=codexPending().filter(([,r])=>r.skill===skillId);if(!hits.length)return '';
+ return hits.map(([,r])=>'✧ Códex '+r.name+': '+(worn.has(r.item)?(nextLevel>=2?'COMPLETA a combinação!':'com '+(itemDb[r.item]?.name||r.item)+' equipado, falta o nv. 2'):'precisa de '+(itemDb[r.item]?.name||r.item)+' equipado')).join(' · ');
+}
+function codexItemHint(itemId){
+ const hits=codexPending().filter(([,r])=>r.item===itemId);if(!hits.length)return '';
+ return hits.map(([,r])=>'✧ Códex '+r.name+': equipe e leve '+(skillInfo(r.skill)?.n||r.skill)+' ao nv. 2').join(' · ');
+}
 /** Escolha de habilidade ao subir de nível. `seq` identifica a oferta: uma escolha antiga nunca esconde uma oferta nova. */
 function serverUpgradeChoices(offers,seq=0,pending=0){
  const el=serverPanel('coop-server-upgrades');
@@ -813,7 +838,10 @@ function serverUpgradeChoices(offers,seq=0,pending=0){
   // V25.2: Melhorias de treino (Aprendiz T. e 1ª transclasse) aparecem como MELHORIA, não como habilidade.
   const boon=!!info?.boon;
   const head=offer.rune?'RUNA · '+name+' · '+(offer.level+1)+'/2':boon?(offer.level?'MELHORIA · '+name+' · nível '+offer.level+' → '+(offer.level+1):'MELHORIA · '+name):offer.level?'Melhorar · '+name+' · nível '+offer.level+' → '+(offer.level+1):'NOVA · '+name+(passive?' (passiva)':'');
-  el.append(offerButton(head,offer.d||info?.d||'',()=>{run.coopUpgrade={id:offer.id,seq:++run.coopUpgradeSeq,offer:seq};el.hidden=true;},skillIconUrl(offer.id)));
+  const codex=offer.rune?'':codexSkillHint(offer.id,(offer.level||0)+1);
+  const btn=offerButton(head,(offer.d||info?.d||'')+(codex?' · '+codex:''),()=>{run.coopUpgrade={id:offer.id,seq:++run.coopUpgradeSeq,offer:seq};el.hidden=true;},skillIconUrl(offer.id));
+  if(codex)btn.classList.add('coop-offer-codex');
+  el.append(btn);
  }
 }
 /** Baús: melhoria de atributo (elite) ou imbuimento (investigação e fenda). Cada jogador escolhe o seu. */
@@ -843,7 +871,9 @@ function serverRewardChoices(offers,seq=0,queued=0){
    const opts=Object.entries(offer.affixes||{}).map(([k,v])=>(labels[k]||k)+' +'+v).join(', ');
    const owned=items().some(it=>it.id===offer.id);
    const text='T'+offer.tier+' '+(ItemQuality.tiers[offer.tier]?.name||'')+' · '+Gear.describe(offer.id)+(opts?' · Opções: '+opts:'')+(owned?' · Repetido: vira +1 de refino':'');
-   const b=offerButton('♛ '+offer.n,text,()=>{run.coopReward={id:offer.id,seq:++run.coopRewardSeq,offer:seq};el.hidden=true;});
+   const codex=codexItemHint(offer.id);
+   const b=offerButton('♛ '+offer.n,text+(codex?' · '+codex:''),()=>{run.coopReward={id:offer.id,seq:++run.coopRewardSeq,offer:seq};el.hidden=true;});
+   if(codex)b.classList.add('coop-offer-codex');
    const img=Gear.sprite(offer.id);img.className='coop-gear-icon';b.prepend(img);el.append(b);continue;
   }
   if(blessing){
@@ -1479,7 +1509,7 @@ function finish(victory) {
     level:run.level,kills:run.kills,seconds:Math.floor(Math.max(0,run.time-(run.mapStart||0))),win:!!victory})}).catch(()=>{});
   let progress = '';
   if (run.career && !serverOwned) {
-    const next = awardJourney(run.journey, run.kills, run.time, run.victories);
+    const next = awardJourney(run.journey, run.kills, run.time, run.victories, 1.25); // V25.4: solo rende +25% de EXP de base/classe
     saveJourney(run.line, next);
     progress = ' · Base ' + run.journey.base + ' → ' + next.base + ' · Classe ' + run.journey.job + ' → ' + next.job;
     if (advanceJourney(next)) progress += ' · Mudança de classe disponível';
@@ -2035,7 +2065,7 @@ function nearbyPortal(){
   const p=run.player;
   if(run.rift?.active)return run.portal&&distance(p,run.portal)<=110?'Sair da fenda':null;
   if(run.riftPortal&&!run.inMvp&&distance(p,run.riftPortal)<=150)return 'Entrar na fenda';
-  if(run.map==='maze'&&!run.mazeEvent?.active&&!run.mvpActive&&(run.field?.warps||[]).some(w=>Math.hypot(w.x-p.x,w.y-p.y)<44))return 'Usar o portal';
+  if(run.map==='maze'&&!run.mazeEvent?.active&&(run.field?.warps||[]).some(w=>Math.hypot(w.x-p.x,w.y-p.y)<44))return 'Usar o portal';
   return null;
 }
 function drawPortal(portal) {
@@ -2697,6 +2727,10 @@ function openInventory() {
           $('inventory-dialog').close();
           selected = currentLine;
           openGearDialog(owner.slot);
+        }));
+        // V25.4: qualquer item (equipado ou guardado) pode devolver as cartas ao álbum direto do inventário.
+        if (item.cards?.length) actions.append(button('Remover cartas · '+item.cards.length, 'sound', () => {
+          if (removeCards(item.uid)) { render(); if (!inGame) renderJourney(); }
         }));
         if (!owner) actions.append(button('Vender · '+resaleValue(item)+' z', 'sell-item', () => {
           if (sellStored(item.uid)) {render();if(!inGame)renderJourney();}

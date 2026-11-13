@@ -15,7 +15,8 @@ const RO = (() => {
     return level < 100 ? floor(level / 5) + 3 : floor(level / 10) + 13;
   }
   // V13 balancing: fresh journeys earn status points as Base levels rise; rebirth grants a 20-point reserve.
-  function startPoints(stage) { return stage >= 2 ? 20 : 0; }
+  // V25.4: o Aprendiz T. renasce com 60 pontos de atributo (eram 20) para não começar tão fraco.
+  function startPoints(stage) { return stage >= 2 ? 60 : 0; }
   function statCap(stage) { return stage >= 5 ? 130 : 99; }
   function totalPoints(stage, base) {
     let total = startPoints(stage);

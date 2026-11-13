@@ -56,6 +56,16 @@ const mobStat={
  orc_zombie:[65,55,17,3],orc_skeleton:[58,74,16,3],steel_chonchon:[43,110,12,2],
  marionette:[55,76,16,3],whisper:[44,83,13,3],nightmare:[82,82,22,4],deviruchi:[70,94,20,4],
  savage:[76,90,20,4],beetle_king:[85,84,21,4],greatestgeneral:[98,30,25,5]};
+/* V25.4: cada mapa da sequência tem monstros com mais vida e mais dano que o anterior. A média do elenco de cada
+ * mapa (já com o bônus por mapa) nunca fica abaixo da do mapa anterior +12% de HP e +8% de dano; mapas que já
+ * eram mais fortes não mudam. MAP_SCALE[mapa] = [fator de HP, fator de dano]. */
+const MAP_SCALE=(()=>{
+ const order=['sewer','payon','maze','orc','geffen','payonfield','glast','mine','temple','shadow'],out={};let hp=0,dmg=0;
+ order.forEach((id,t)=>{const r=rosters[id].map(k=>mobStat[k]),avg=i=>r.reduce((a,v)=>a+v[i],0)/r.length;
+  const baseHp=avg(0)*(1+t*.2),baseDmg=avg(2)*(1+t*.1),wantHp=Math.max(baseHp,hp*1.12),wantDmg=Math.max(baseDmg,dmg*1.08);
+  out[id]=[wantHp/baseHp,wantDmg/baseDmg];hp=wantHp;dmg=wantDmg;});
+ return out;
+})();
 const jobStat={sword:[120,180,23,75,.68],mage:[85,175,14,310,.73],archer:[98,193,16,400,.65],acolyte:[112,176,17,200,.75],merchant:[125,174,24,85,.86],thief:[100,205,20,85,.5]};
 // Alcance dos buffs de grupo (Bênção, Aumentar Agilidade, Angelus…): quem está perto de você.
 const PARTY_BUFF_RANGE=200;
@@ -397,7 +407,10 @@ function spawn(world,id,{elite='',boss=false,at=null,near=null,edge=false}={}){
  // V24.1: no MVP o crescimento da horda pesa menos (^0,75): aos 12 min o MVP tinha ~5,6× o HP base e a luta só demorava.
  // ...e o dano do MVP subiu 35% (23 → 31) para a luta ter perigo de verdade.
  const growth=boss?D.pow(hordeGrowth(world),.75):hordeGrowth(world);
- const hp=(boss?bossHp[id]||1900:stats[0])*(boss?2.15:elite?4.3:1)*factor[0]*teamHealthScale(count)*(boss?1.14:1)*growth*(1+mapTier(world)*.2);
+ const scale=boss?[1,1]:MAP_SCALE[world.map]||[1,1];
+ // V25.4: no modo infinito os monstros ficam mais fortes a cada minuto (HP +15%/min com aceleração, dano +10%/min).
+ const em=world.endless?Math.max(0,(world.time-world.endless.start)/lag(world,60)):0,endHp=1+em*.15+em*em*.01,endDmg=1+em*.1;
+ const hp=(boss?bossHp[id]||1900:stats[0])*(boss?2.15:elite?4.3:1)*factor[0]*teamHealthScale(count)*(boss?1.14:1)*growth*(1+mapTier(world)*.2)*scale[0]*endHp;
  const living=[...world.players.values()].filter(p=>p.hp>0),target=near||living[Math.floor(rand(world)*living.length)]||{x:map.spawn[0],y:map.spawn[1]};
  let x=at?at.x:target.x,y=at?at.y:target.y;
  const fromEdge=!at&&edge?edgeSpot(world,map,target,living):null;
@@ -408,7 +421,7 @@ function spawn(world,id,{elite='',boss=false,at=null,near=null,edge=false}={}){
   if(passable(map,nx,ny)&&passable(map,nx+12,ny)&&passable(map,nx,ny+12)&&living.every(p=>D.hypot(nx-p.x,ny-p.y)>95)&&(!map.rooms||roomAt(map,nx,ny)===roomAt(map,target.x,target.y))){x=nx;y=ny;break;}
  }
  const safe=nearestOpen(map,x,y);x=safe.x;y=safe.y;
- const m={uid:++world.mobSeq,id,x,y,hp,max:hp,damage:(boss?23*1.35:stats[2])*(elite?1.22:1)*factor[1]*teamDamageScale(count)*(1+mapTier(world)*.1)*(.78+clock(world)/60*.09),
+ const m={uid:++world.mobSeq,id,x,y,hp,max:hp,damage:(boss?23*1.35:stats[2])*(elite?1.22:1)*factor[1]*teamDamageScale(count)*(1+mapTier(world)*.1)*(.78+clock(world)/60*.09)*scale[1]*endDmg,
   speed:(boss?77:stats[1])*(elite?1.07:1),xp:stats[3],dir:0,elite:boss?'mvp':elite,r:boss?32:elite?21:13,
   contactAt:0,attackAt:0,hitFlash:0,strike:null,warning:null,riftId:0,riftGuardian:false,riftSeal:false,noLoot:false,
   target:target.id||null,stunUntil:0,slowUntil:0,slowBy:1,poisonUntil:0,poisonDps:0,poisonBy:null,vulnUntil:0,vuln:0,lex:false};world.mobs.push(m);
@@ -432,9 +445,12 @@ function defeated(world,m,source){
  if(zenyChance&&rand(world)<zenyChance){const gain=1+Math.floor(rand(world)*500);source.zeny+=gain;event(world,'cardZeny',{player:source.id,amount:gain,x:Math.round(m.x),y:Math.round(m.y)});}
  const rare=!!m.elite,amount=(m.xp*(1+clock(world)/900)+(rare?12:0))*(world.endless?ENDLESS.xp:1);
  groundDrop(world,'xp',m.x,m.y,Math.round(amount));
- // Drops do solo: Zeny em 55% dos abates (2 a 5+6×mapa), poção vermelha em 4,5% (sem poção azul).
+ // Drops do solo: Zeny em 55% dos abates (2 a 5+6×mapa), poção vermelha em 4,5%.
  if(rand(world)<.55||rare)groundDrop(world,'zeny',m.x+8,m.y,(2+Math.floor(rand(world)*(4+mapTier(world)*6)))*(rare?5:1));
  if(rand(world)<.045&&world.pickups.filter(o=>o.kind==='potion').length<12)groundDrop(world,'potion',m.x-5,m.y+5,1);
+ // V25.4: poção azul (30% do SP) volta, mas limitada: 2,5% por abate (elite 25%), no máximo 3 no chão e uma a cada 18 s.
+ if(world.time>=(world.spPotionAt||0)&&rand(world)<(rare?.25:.025)&&world.pickups.filter(o=>o.kind==='sppotion'&&!o.taken).length<3){
+  world.spPotionAt=world.time+lag(world,18);groundDrop(world,'sppotion',m.x+5,m.y+5,30);}
  // Mesmas chances de carta do modo solo (cards.js / game.js): comum 0,035% · elite 0,045% · miniboss 0,08% · MVP 0,75%.
  // Só monstros que TÊM carta (antes o online sorteava carta até de quem não tem, como Gatuna/Gatuno).
  if(CARDS.has(m.id)&&rand(world)<(m.cardRate??(m.elite==='mvp'?.0075:m.elite==='miniBoss'?.0008:m.elite?.00045:.00035))){
@@ -1127,7 +1143,8 @@ const xpNeeded=level=>Math.ceil(26*D.pow(level,1.42));
 function giveExperience(world,amount){
  // XP is shared across the party, including anyone awaiting resurrection.
  for(const p of world.players.values()){
-  p.xp+=amount*(1+p.st.xp+(p.runBonus?.xpBonus||0));let guard=0;
+  // V25.4: jogando sozinho a EXP da run rende +20% (no grupo todos já recebem a EXP inteira de cada abate).
+  p.xp+=amount*(1+p.st.xp+(p.runBonus?.xpBonus||0))*(world.players.size===1?1.2:1);let guard=0;
   while(p.xp>=p.needed && guard++<8){
    p.xp-=p.needed;p.level++;p.needed=xpNeeded(p.level);
    // Como no solo: subir de nível não cura HP; devolve 25% do SP (no mínimo 8).
@@ -1430,9 +1447,13 @@ function usePotion(world,p){
 /** Teleporte do labirinto: sozinho, sala aleatória; em grupo, destino fixo para todos poderem se seguir (como no solo). */
 function mazeWarp(world,p,w){
  const map=nav(world);
- if(world.arena||!map.warps||world.bossSpawned||world.maze.active||world.time<p.warpReady||!w)return false;
+ // V25.4: os portais do labirinto também funcionam durante o MVP e no modo infinito (antes ficavam travados
+ // depois que o chefe aparecia, e quem estava em outra sala não conseguia chegar até ele).
+ if(world.arena||!map.warps||world.maze.active||world.time<p.warpReady||!w)return false;
  const count=map.rooms.length,fixed=world.players.size>1;let room;
- if(fixed){room=(w.room*7+w.side*3+5)%count;if(room===w.room)room=(room+1)%count;}
+ const boss=world.bossAlive&&world.mobs.find(m=>m.uid===world.mvpArena?.boss&&m.hp>0),bossRoom=boss?roomAt(map,boss.x,boss.y):-1;
+ if(bossRoom>=0&&bossRoom!==w.room)room=bossRoom; // com o MVP vivo, o portal leva até a sala dele
+ else if(fixed){room=(w.room*7+w.side*3+5)%count;if(room===w.room)room=(room+1)%count;}
  else{room=Math.floor(rand(world)*(count-1));if(room>=w.room)room++;}
  const exits=map.warps.filter(item=>item.room===room),exit=fixed?exits[(w.side+2)%exits.length]:exits[Math.floor(rand(world)*exits.length)];
  const target=map.rooms[room].center,gap=D.hypot(target.x-exit.x,target.y-exit.y)||1;
@@ -1542,6 +1563,11 @@ export function rollMvpGear(world,p){
  const usable=Object.keys(ITEMS).filter(id=>ITEMS[id].tier<=high&&canEquipItem(id,p.job,stage));
  const types=[...new Set(usable.map(id=>ITEMS[id].type))].sort();
  const picks=[];
+ // V25.4: 60% de chance de um dos itens ser a peça de uma combinação do Códex que falta para a classe
+ // (a Varinha, por exemplo, sumia a partir do 2º mapa porque é raridade 2).
+ const worn=new Set(gearItems(p)),found=new Set(p.discoveries?.codex||[]);
+ const wanted=[...new Set(Object.entries(CODEX_EVOLUTIONS).filter(([id,r])=>!found.has(id)&&p.pool.includes(r.skill)&&!worn.has(r.item)&&canEquipItem(r.item,p.job,stage)).map(([,r])=>r.item))];
+ if(wanted.length&&rand(world)<.6){const id=wanted[Math.floor(rand(world)*wanted.length)];picks.push(id);types.splice(types.indexOf(ITEMS[id].type),1);}
  while(picks.length<4&&types.length){
   const type=types.splice(Math.floor(rand(world)*types.length),1)[0];
   const ofType=usable.filter(id=>ITEMS[id].type===type);
@@ -1591,7 +1617,8 @@ function strikePlayers(world,m,w){
 function bossAct(world,m,p){
  const now=world.time,low=m.hp<m.max*.5;
  if((m.elite==='mvp'||m.riftGuardian)&&!m.warning&&now>=(m.gapNext||0)&&distance(m,p)>255){
-  const sp=playerSpeed(p),pred={x:p.x+p.input.dx*sp*.85,y:p.y+p.input.dy*sp*.85};
+  // V25.4: mira menos adiantada (antes previa 0,85 s à frente e acertava quase sempre quem estava correndo).
+  const sp=playerSpeed(p),pred={x:p.x+p.input.dx*sp*.3,y:p.y+p.input.dy*sp*.3};
   const a=D.atan2(pred.y-m.y,pred.x-m.x),gap=Math.min(440,Math.max(100,distance(m,pred)-45));
   m.warning={kind:'line',x:m.x,y:m.y,angle:a,radius:90,since:now,at:now+1.05,dash:true,toX:m.x+D.cos(a)*gap,toY:m.y+D.sin(a)*gap};
   m.gapNext=now+(low?7:10);event(world,'bossAttack',{uid:m.uid,name:'Investida! Desvie para os lados.'});
@@ -1617,7 +1644,8 @@ function bossAct(world,m,p){
   m.patternAt=now+3;return;
  }
  const centered=kind!=='circle';
- m.warning={kind,x:centered?m.x:p.x,y:centered?m.y:p.y,radius:kind==='ring'?225:100,angle:D.atan2(p.y-m.y,p.x-m.x),since:now,at:now+(low?.94:1.18)};
+ const extra=m.elite==='mvp'?0:.22; // elites e mini chefes: um pouco mais de aviso
+ m.warning={kind,x:centered?m.x:p.x,y:centered?m.y:p.y,radius:kind==='ring'?225:100,angle:D.atan2(p.y-m.y,p.x-m.x),since:now,at:now+(low?.94:1.18)+extra};
  m.patternAt=now+(low?2.65:3.45);
 }
 function tickRift(world){
@@ -1650,6 +1678,22 @@ function leaveRift(world,success,wiped=false){
  for(const p of players){
   const back=r.saved.positions.get(p.id)||nearestOpen(map,portal.x,portal.y);
   warp(p,back.x,back.y,world);
+  p.invulnerableUntil=Math.max(p.invulnerableUntil||0,world.time+lag(world,1.5));
+ }
+ // V25.4: quem esperava em volta do portal não bate na hora: os monstros perto de quem volta recuam para longe
+ // (como se chegassem pela borda da tela) e só voltam a atacar ou a lançar habilidades depois de alguns segundos.
+ for(const m of world.mobs){
+  if(m.hp<=0)continue;
+  let near=null,best=1e9;for(const p of players){const d=distance(m,p);if(d<best){best=d;near=p;}}
+  if(near&&best<420){
+   const a=best>1?D.atan2(m.y-near.y,m.x-near.x):random(world,0,D.PI*2),dist=random(world,480,620);
+   const spot=nearestOpen(map,near.x+D.cos(a)*dist,near.y+D.sin(a)*dist*.75);
+   if(spot&&distance(spot,near)>380){m.x=spot.x;m.y=spot.y;}
+  }
+  m.warning=null;m.strike=null;
+  m.contactAt=Math.max(m.contactAt||0,world.time+lag(world,2));
+  if(m.patternAt!=null)m.patternAt=Math.max(m.patternAt||0,world.time+lag(world,3.5));
+  if(m.gapNext!=null)m.gapNext=Math.max(m.gapNext||0,world.time+lag(world,5));
  }
  if(success){
   world.riftsDone++;
@@ -1711,4 +1755,4 @@ export function snapshotWorld(world,id,sinceEvent=0,opts={}){
 }
 export function roomStatus(world){return {id:world.id,map:world.map,phase:world.phase,time:world.time,kills:world.kills,players:[...world.players.values()].map(p=>({id:p.id,level:p.level,hp:p.hp,zeny:p.zeny}))}}
 /** Ganchos só para os testes automáticos (não usados pelo jogo). */
-export const testing=Object.freeze({defeated:(world,mob,by)=>defeated(world,mob,by),spawn:(world,id,opts)=>spawn(world,id,opts),basicStrike:(world,p,mob)=>basicStrike(world,p,mob),evades:(world,p,m)=>evades(world,p,m)});
+export const testing=Object.freeze({defeated:(world,mob,by)=>defeated(world,mob,by),spawn:(world,id,opts)=>spawn(world,id,opts),basicStrike:(world,p,mob)=>basicStrike(world,p,mob),evades:(world,p,m)=>evades(world,p,m),nav:world=>nav(world)});

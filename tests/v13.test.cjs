@@ -47,7 +47,7 @@ test('legacy V12 progress attaches to selected character only',()=>{
 });
 test('new stats are earned on base levels, not frontloaded at character creation',()=>{
  const s=vm.createContext({});vm.runInContext(source('status.js')+'\nthis.R=RO;',s);
- assert.equal(s.R.startPoints(0),0);assert.equal(s.R.startPoints(2),20);
+ assert.equal(s.R.startPoints(0),0);assert.equal(s.R.startPoints(2),60); // V25.4: renascimento com 60 pontos
  assert.ok(s.R.totalPoints(0,10)>s.R.totalPoints(0,1));
  assert.ok(s.R.levelPoints(20)>s.R.levelPoints(1));
 });

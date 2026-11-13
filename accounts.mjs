@@ -72,8 +72,9 @@ export function accountStore(dataDir){
   next.base=Math.max(1,Math.floor(num(next.base,1)));next.job=Math.max(1,Math.floor(num(next.job,1)));
   next.baseXp=Math.max(0,num(next.baseXp));next.jobXp=Math.max(0,num(next.jobXp));next.points=Math.max(0,Math.floor(num(next.points)));
   next.proofs=Math.floor(num(next.proofs))+(victory?1:0);
-  next.baseXp+=Math.floor(1.5*(kills*3.6+seconds*.36+135*Number(!!victory)));
-  next.jobXp+=Math.floor(1.5*(kills*2.2+seconds*.24+90*Number(!!victory)));
+  const gain=1.5*(stage===2?1.5:1); // V25.4: Aprendiz T. +50% (igual ao renewal.js do cliente)
+  next.baseXp+=Math.floor(gain*(kills*3.6+seconds*.36+135*Number(!!victory)));
+  next.jobXp+=Math.floor(gain*(kills*2.2+seconds*.24+90*Number(!!victory)));
   let guard=0;
   while(next.base<baseCap&&next.baseXp>=levelCost(next.base)&&guard++<400){next.baseXp-=levelCost(next.base);next.points+=levelPoints(next.base);next.base++;}
   while(next.job<jobCap&&next.jobXp>=levelCost(next.job,true)&&guard++<800)next.jobXp-=levelCost(next.job++,true);
@@ -239,7 +240,8 @@ export function accountStore(dataDir){
    if(stage===n(old.stage)){
     // Compara a EXP acumulada (não o nível): níveis baixos sobem muitos de uma vez, o que é legítimo.
     const total=(level,xp,jobLine)=>{let t=Math.max(0,n(xp));for(let l=1;l<Math.min(200,Math.floor(level));l++)t+=levelCost(l,jobLine);return t;};
-    if(total(base,j.baseXp,false)-total(n(old.base)||1,old.baseXp,false)>14000||total(job,j.jobXp,true)-total(n(old.job)||1,old.jobXp,true)>9000)
+    // V25.4: teto maior — runs longas do modo infinito, o bônus do solo e o do Aprendiz T. passavam de 14 mil.
+    if(total(base,j.baseXp,false)-total(n(old.base)||1,old.baseXp,false)>45000||total(job,j.jobXp,true)-total(n(old.job)||1,old.jobXp,true)>30000)
       return 'Ganho de EXP grande demais para uma partida. O progresso não foi salvo.';
    }
   }

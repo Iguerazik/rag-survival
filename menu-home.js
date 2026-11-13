@@ -162,6 +162,7 @@ const MenuHome = (() => {
     'mh-bestiary': click('nav-bestiary'),
     'mh-progress': click('nav-progression'),
     'mh-codex': click('nav-codex'),
+    'mh-pets': click('nav-pets'),
     'mh-settings': click('nav-settings'),
     'mh-help': click('online-help-open'),
     'mh-updates': () => dialog('updates-dialog'),

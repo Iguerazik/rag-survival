@@ -124,3 +124,6 @@ html body .menu #match-prep { scroll-margin-top: 12px; }
   html body .menu .menu-home .mh-hero-tag { order: 1; }
 }
 @media (prefers-reduced-motion: reduce) { html body .menu .menu-home * { transition: none !important; } }
+
+/* V25.4: 7º atalho (Pets e loja) ocupa a linha inteira. */
+html body .menu .menu-home .mh-more > button:last-child:nth-child(3n+1) { grid-column: 1 / -1; }

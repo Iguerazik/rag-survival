@@ -175,15 +175,17 @@ function advanceJourney(journey) {
   if(!ProgressionGoals.canAdvance(journey))return null;
   if (!rule.nextJob || journey.job < rule.nextJob || journey.base < rule.nextBase || (journey.proofs||0)<marks[journey.stage]) return null;
   if ((journey.stage===0 || journey.stage===4) && !journey.guildTrials?.[journey.stage]) return null;
-  if (journey.stage === 1) return { ...newJourney(2), cards: journey.cards, proofs: journey.proofs,runRecords:journey.runRecords };
+  if (journey.stage === 1) return { ...newJourney(2), cards: journey.cards, proofs: journey.proofs,runRecords:journey.runRecords, rebirthBonus: true };
   return { ...journey, stage: journey.stage + 1, job: 1, jobXp: 0 };
 }
-function awardJourney(journey, kills, seconds, victory) {
+// V25.4: `bonus` multiplica a EXP (solo = 1,25) e o Aprendiz T. ganha +50% (precisa de menos partidas para o nível 10 de classe).
+function awardJourney(journey, kills, seconds, victory, bonus = 1) {
   const next = { ...journey, stats: { ...journey.stats } };
   const rule = stages[next.stage];
+  const gain = 1.5 * Math.max(1, Math.min(2, Number(bonus) || 1)) * (next.stage === 2 ? 1.5 : 1);
   next.proofs = (next.proofs||0) + Math.min(3, Math.max(0,Number(victory)||0));
-  next.baseXp += Math.floor(1.5*(kills * 3.6 + seconds * .36 + 135 * Number(!!victory)));
-  next.jobXp += Math.floor(1.5*(kills * 2.2 + seconds * .24 + 90 * Number(!!victory)));
+  next.baseXp += Math.floor(gain*(kills * 3.6 + seconds * .36 + 135 * Number(!!victory)));
+  next.jobXp += Math.floor(gain*(kills * 2.2 + seconds * .24 + 90 * Number(!!victory)));
   while (next.base < rule.baseCap && next.baseXp >= levelCost(next.base)) {
     next.baseXp -= levelCost(next.base);
     next.points += RO.levelPoints(next.base);
