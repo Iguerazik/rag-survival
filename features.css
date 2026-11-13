@@ -1,0 +1,67 @@
+/* RO status window, card equipment, card album and theme toggle. */
+.ro-status .status-body {display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;margin-top:7px;align-items:start}
+.status-migrated {grid-column:1 / -1;margin:0;padding:6px 8px;border:1px solid #c6a45f;border-radius:4px;background:#fff6dc;color:#5c4416;font-size:11px}
+.status-grid {display:grid;gap:3px}
+.status-row {display:grid;grid-template-columns:36px minmax(0,1fr) 24px 30px;align-items:center;gap:4px;padding:3px 5px;border:1px solid #a3b3c6;border-radius:3px;background:#f6f8fa;color:#223b58}
+.status-row strong {font-size:11px;letter-spacing:.04em}
+.status-value {font:800 13px/1 "DM Sans",system-ui,sans-serif;font-variant-numeric:tabular-nums}
+.status-bonus {margin-left:4px;font-size:10px;color:#2f7a3a;font-weight:800}
+.status-cost {font-size:10px;color:#6b5a35;text-align:right;font-variant-numeric:tabular-nums}
+.status-row .attribute-add {width:22px;height:20px;padding:0;font-size:9px;line-height:1;border:1px solid #8ca2bc;border-radius:3px;color:#203b5b;background:var(--client-button,#e7eef6)}
+.status-row .attribute-add:disabled {opacity:.4;cursor:default}
+.status-derived {display:grid;grid-template-columns:1fr 1fr;gap:3px;margin:0}
+.status-derived div {display:flex;justify-content:space-between;gap:6px;padding:4px 6px;border:1px solid #b6c3d2;border-radius:3px;background:#eef3f8}
+.status-derived dt {font-size:10px;font-weight:800;color:#4d657c;letter-spacing:.05em}
+.status-derived dd {margin:0;font:800 12px "DM Sans",system-ui,sans-serif;color:#1f3a59;font-variant-numeric:tabular-nums}
+.status-foot {grid-column:1 / -1;margin:0;font-size:10px;color:#4d657c}
+.status-foot b {color:#7a5418;font-size:12px}
+.status-foot kbd {font-size:9px;min-width:0;padding:0 3px;background:#e5ecf4;color:#2b4562;border-color:#9fb1c5}
+
+.card-equipment .slot-grid {display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:4px;margin-top:7px}
+.card-slot {display:flex;align-items:center;gap:6px;min-height:52px;padding:4px 6px;text-align:left;border:1px dashed #9fb0c3;border-radius:4px;background:#f6f8fa;color:#223b58}
+.card-slot[data-filled=true] {border-style:solid;border-color:#b08a45;background:linear-gradient(#fffaf0,#f2e6cc)}
+.card-slot:hover {border-color:#5e83ae}
+.card-slot span {display:grid;min-width:0}
+.card-slot small {font-size:9px;font-weight:800;color:#6c512b;letter-spacing:.05em;text-transform:uppercase}
+.card-slot strong {font-size:11px;line-height:1.2;overflow:hidden;text-overflow:ellipsis}
+.card-art {display:block;image-rendering:pixelated;border-radius:3px;box-shadow:0 1px 3px #0004;flex:none}
+.card-actions {display:flex;justify-content:space-between;align-items:center;margin-top:7px;gap:8px}
+.card-actions .sound {font-size:11px;padding:5px 8px}
+.zeny {font:800 12px "DM Sans",system-ui,sans-serif;color:#7a5418}
+
+.card-dialog {width:min(620px,94vw);max-width:none;max-height:86vh;overflow:auto}
+.card-dialog p {font-size:13px;margin:6px 0 10px}
+.card-list {display:grid;gap:6px;margin-bottom:12px}
+.card-entry {display:grid;grid-template-columns:52px minmax(0,1fr);gap:9px;align-items:center;padding:6px;text-align:left;border:1px solid #a3b3c6;border-radius:5px;background:#f8fafc;color:#203a58;font:inherit}
+button.card-entry:not(:disabled):hover {border-color:#5e83ae;background:#e7f1fd;cursor:pointer}
+button.card-entry:disabled {opacity:.55;cursor:default}
+.card-entry > i {display:block;width:52px;height:70px;border-radius:3px;background:repeating-linear-gradient(135deg,#c8d2dc 0 6px,#b8c3cf 6px 12px)}
+.card-entry span {display:grid;gap:2px}
+.card-entry strong {font-size:13px}
+.card-entry small {font-size:10px;font-weight:800;color:#6c512b;letter-spacing:.03em}
+.card-entry em {font-style:normal;font-size:12px;color:#405873;line-height:1.35}
+.card-entry[data-found=false] strong {color:#7f8b98}
+.card-dialog > .sound {margin-top:4px}
+
+.theme-toggle {white-space:nowrap}
+@media (max-width:760px) {
+  .ro-status .status-body {grid-template-columns:1fr}
+  .card-equipment .slot-grid {grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+/* Equipment items, sockets and locked expeditions */
+.gear-slot span {display:grid;min-width:0;gap:1px}
+.gear-slot em {font-style:normal;font-size:10px;color:#6c512b;letter-spacing:.06em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gear-slot:disabled {opacity:.55;cursor:default}
+.gear-current {display:grid;gap:7px;padding:9px;border:1px solid #b08a45;border-radius:5px;background:linear-gradient(#fffaf0,#f2e6cc);color:#3d2c12}
+.gear-current > strong {font-size:15px}
+.gear-current > .sound {justify-self:start;font-size:11px;padding:5px 9px}
+.gear-sockets {display:grid;gap:5px;font-size:12px}
+.gear-socket {display:flex;align-items:center;gap:8px;min-height:34px;padding:4px 8px;text-align:left;border:1px dashed #a88c55;border-radius:4px;background:#fffdf6;color:#4a3514;font:inherit;font-size:12px}
+.gear-socket[data-filled=true] {border-style:solid}
+.gear-socket:hover {border-color:#5e83ae}
+.gear-heading {margin:8px 0 2px;font:800 12px "DM Sans",system-ui,sans-serif;color:#4d657c;text-transform:uppercase;letter-spacing:.06em}
+.gear-entry {grid-template-columns:1fr}
+.expedition-card canvas {width:53px;height:39px;image-rendering:pixelated;border-radius:3px;background:#222}
+.expedition-card[data-locked=true] {opacity:.62;cursor:not-allowed;filter:grayscale(.5)}
+.expedition-card[data-locked=true] small {color:#7a6a55}

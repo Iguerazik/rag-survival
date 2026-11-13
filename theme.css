@@ -1,0 +1,137 @@
+/* Dark mode. The light theme is the default client look; these rules only apply with data-theme="dark". */
+html[data-theme=dark] {
+  color-scheme:dark;
+  --client-ink:#dfe8f3;
+  --client-muted:#9fb2c6;
+  --client-edge:#3e536c;
+  --client-panel:#151f2b;
+  --client-title:linear-gradient(#2d3f57 0%,#223248 48%,#1b293b 52%,#22334a 100%);
+  --client-button:linear-gradient(#2c3d53 0%,#24344a 50%,#1c2a3c 51%,#253649 100%);
+  --client-focus:#8dc1ff;
+}
+html[data-theme=dark] body {background:#0c131c}
+html[data-theme=dark] .menu {
+  color:var(--client-ink);color-scheme:dark;
+  background:radial-gradient(ellipse at 28% 1%,#2a2a1c 0%,transparent 42%),linear-gradient(#0f1823,#111b26 68%,#0d151f);
+}
+html[data-theme=dark] .site-head {border-bottom-color:#3e536c80}
+html[data-theme=dark] .brand {color:#dfe8f3}
+html[data-theme=dark] .brand b {color:#e8c27d}
+html[data-theme=dark] .menu .sound,html[data-theme=dark] .arena .secondary,html[data-theme=dark] .arena .window-button {
+  color:#dbe7f5;background:var(--client-button);border-color:#4b6380;box-shadow:inset 0 0 0 1px #ffffff12,0 1px 1px #0006;
+}
+html[data-theme=dark] .menu .sound:hover,html[data-theme=dark] .arena .secondary:hover,html[data-theme=dark] .arena .window-button:hover {background:#304661}
+html[data-theme=dark] .menu .sound[aria-pressed=true] {color:#f1cb83;border-color:#8f753f}
+html[data-theme=dark] .hero {border-color:#5a4f36;box-shadow:0 6px 18px #0008}
+html[data-theme=dark] .hero:before {background:linear-gradient(90deg,#0e1622 0%,#101a27f2 26%,#121c29e0 37%,#141f2c80 52%,transparent 66%)}
+html[data-theme=dark] .hero:after {border-color:#e8d19530}
+html[data-theme=dark] .hero .eyebrow {color:#e2be7a}
+html[data-theme=dark] .hero h1 {color:#eef4ff;text-shadow:0 3px 14px #000a}
+html[data-theme=dark] .hero h1 em {color:#e9bf77}
+html[data-theme=dark] .hero .intro {color:#c9d5e3}
+html[data-theme=dark] .hero-meta {color:#aebdcd}
+html[data-theme=dark] .client-window {background:var(--client-panel);border-color:var(--client-edge);box-shadow:inset 0 0 0 1px #ffffff0d,0 3px 10px #0007}
+html[data-theme=dark] .client-title,html[data-theme=dark] .menu .class-tree>h3 {background:var(--client-title);border-bottom-color:#3e536c;color:#e5eefa;text-shadow:0 1px #0008}
+html[data-theme=dark] .client-title h2,html[data-theme=dark] .client-title h3,html[data-theme=dark] .menu .class-tree>h3 {color:#e5eefa}
+html[data-theme=dark] .client-title span {color:#a9bccf}
+html[data-theme=dark] .menu .journey-mode label span,html[data-theme=dark] .menu .combat-mode label span {color:#c8d6e6;background:var(--client-button);border-color:#465d79}
+html[data-theme=dark] .menu .journey-mode input:checked+span,html[data-theme=dark] .menu .combat-mode input:checked+span {color:#fff1cf;background:#33496a;border-color:#7b9ac2;box-shadow:inset 0 0 0 1px #ffffff1a}
+html[data-theme=dark] .menu .classes .class {border-color:#3f5470;background:linear-gradient(#1d2a3a,#172231);color:#dfe8f3;box-shadow:inset 0 0 0 1px #ffffff0d}
+html[data-theme=dark] .menu .classes .class:hover {border-color:#6f93bf;background:#22324a}
+html[data-theme=dark] .menu .classes .class[aria-pressed=true] {border-color:#d1b06c;background:linear-gradient(#2a3446,#222c3c);box-shadow:inset 0 0 18px #d6b56c22}
+html[data-theme=dark] .menu .portrait {background:radial-gradient(ellipse at 50% 69%,#3e5470,#1a2635 72%);border-color:#4a607c}
+html[data-theme=dark] .menu .portrait:before {background:linear-gradient(135deg,transparent 35%,#ffffff14)}
+html[data-theme=dark] .menu .class strong {color:#eef3fb}
+html[data-theme=dark] .menu .class small {color:#a8b9cc}
+html[data-theme=dark] .menu .class .starter {color:#e0bb7a}
+html[data-theme=dark] .menu .journey {background:#111a25;border-color:#3a4e67}
+html[data-theme=dark] .menu .journey h3,html[data-theme=dark] .menu .journey-note,html[data-theme=dark] .menu .journey-title p,
+html[data-theme=dark] .menu .journey-meter,html[data-theme=dark] .menu .journey-stats {color:#c3d2e3}
+html[data-theme=dark] .menu .journey-path li {background:#18232f;border-color:#3d526b;color:#b4c4d6}
+html[data-theme=dark] .menu .journey-path li[aria-current=true] {background:#2c3e57;border-color:#7d9ec7;color:#f3f7ff}
+html[data-theme=dark] .menu .journey-path li small {color:#93a7bd}
+html[data-theme=dark] .menu .expedition-card {background:linear-gradient(#1d2a3a,#172231);color:#e3ecf7;border-color:#3f5470}
+html[data-theme=dark] .menu .expedition-card[aria-pressed=true] {border-color:#7d9ec7;background:linear-gradient(#273a53,#1f2f45);box-shadow:inset 0 0 0 1px #ffffff14}
+html[data-theme=dark] .menu .expedition-card small {color:#e0bb7a}
+html[data-theme=dark] .menu .combat-mode {border-color:#3f5470}
+html[data-theme=dark] .menu .combat-mode legend {color:#b4c5d8}
+html[data-theme=dark] .menu .primary {background:linear-gradient(#f3dea0,#d9b35f 49%,#c99a45 51%,#e4bf73);border-color:#a8874d;color:#2b200f;box-shadow:inset 0 0 0 1px #fff4cf88}
+html[data-theme=dark] .menu .controls-help {color:#a6b8cb}
+html[data-theme=dark] .menu .coop-panel {background:#111a25;border-color:#3a4e67}
+html[data-theme=dark] .menu .coop-panel h3,html[data-theme=dark] .menu .coop-panel .section-head span,
+html[data-theme=dark] .menu .coop-setup label,html[data-theme=dark] .menu #coop-status {color:#c3d2e3}
+html[data-theme=dark] .menu .coop-setup input {background:#0f1721;color:#e6eef8;border-color:#465d79}
+html[data-theme=dark] .menu .coop-members li {background:#18232f;border-color:#3d526b}
+html[data-theme=dark] .menu .class-tree {background:var(--client-panel);border-color:var(--client-edge)}
+html[data-theme=dark] .menu .tree-node {background:#18232f;border-color:#3d526b;color:#e0e9f4}
+html[data-theme=dark] .menu .tree-node small {color:#a6b8cb}
+html[data-theme=dark] .menu .tree-meta,html[data-theme=dark] .menu .tree-requirement {color:#d9be86}
+html[data-theme=dark] .tree-node .tree-glyph {background:#3a4a5c}
+html[data-theme=dark] .menu .footer {color:#8fa3b8;border-color:#33465c}
+html[data-theme=dark] .rebirth-dialog {background:#161f2b;color:#dfe8f3;border-color:#4b6380}
+html[data-theme=dark] .rebirth-dialog h2 {color:#f0e2bd}
+html[data-theme=dark] kbd {background:#243446;color:#e3ebf5;border-color:#4b6380}
+
+/* Status window, equipment and album */
+html[data-theme=dark] .status-row,html[data-theme=dark] .card-slot {background:#18232f;border-color:#3d526b;color:#e0e9f4}
+html[data-theme=dark] .status-row .attribute-add {color:#e3ecf7;border-color:#4f6886}
+html[data-theme=dark] .status-bonus {color:#8fe39c}
+html[data-theme=dark] .status-cost,html[data-theme=dark] .card-slot small,html[data-theme=dark] .card-entry small {color:#d9be86}
+html[data-theme=dark] .status-derived div {background:#131c27;border-color:#33475f}
+html[data-theme=dark] .status-derived dt,html[data-theme=dark] .status-foot {color:#9fb2c6}
+html[data-theme=dark] .status-derived dd {color:#eef4ff}
+html[data-theme=dark] .status-foot b,html[data-theme=dark] .zeny {color:#f1cb83}
+html[data-theme=dark] .status-foot kbd {background:#243446;color:#dbe6f3;border-color:#4b6380}
+html[data-theme=dark] .status-migrated {background:#2d2615;border-color:#7d6431;color:#f1dba6}
+html[data-theme=dark] .card-slot[data-filled=true] {background:linear-gradient(#2c2618,#221d13);border-color:#9c7a3c}
+html[data-theme=dark] .card-entry {background:#18232f;border-color:#3d526b;color:#e3ecf7}
+html[data-theme=dark] button.card-entry:not(:disabled):hover {background:#22324a;border-color:#6f93bf}
+html[data-theme=dark] .card-entry em {color:#b2c3d6}
+html[data-theme=dark] .card-entry > i {background:repeating-linear-gradient(135deg,#263445 0 6px,#1e2a38 6px 12px)}
+
+/* In-match windows */
+html[data-theme=dark] .arena {color-scheme:dark}
+html[data-theme=dark] .ro-window,html[data-theme=dark] .arena .ro-window {background:#141e2af2;border-color:#4a6280;color:#e0e9f4;box-shadow:inset 0 0 0 1px #ffffff10,0 2px 8px #000b}
+html[data-theme=dark] .ro-title,html[data-theme=dark] .arena .ro-title {background:var(--client-title);color:#e8f0fb;border-bottom-color:#3e536c;text-shadow:0 1px #0009}
+html[data-theme=dark] .hud-player strong {color:#eef4ff}
+html[data-theme=dark] .hud-emblem {background:radial-gradient(ellipse,#33475f,#1a2635);border-color:#4a607c}
+html[data-theme=dark] .vital>b {color:#a9bdd2}
+html[data-theme=dark] .vital .health {background:#26313d;border-color:#4b6380;box-shadow:inset 0 1px 2px #0008}
+html[data-theme=dark] .vital .health span {color:#f3f7ff;text-shadow:0 1px 2px #000}
+html[data-theme=dark] .hud-level,html[data-theme=dark] .map-stats {background:#101824;color:#cbd8e7;border-top-color:#33475f}
+html[data-theme=dark] .map-stats small,html[data-theme=dark] .map-stats span {color:#a9c3e2}
+html[data-theme=dark] .hud-actions button,html[data-theme=dark] .window-button {background:var(--client-button);border-color:#4b6380;color:#dbe6f3}
+html[data-theme=dark] .quest-window p {color:#cbd8e7}
+html[data-theme=dark] .shortcut-window .skill-slot {background:#1c2939;border-color:#4b6380;box-shadow:inset 0 0 0 1px #ffffff12}
+html[data-theme=dark] .shortcut-window .skill-slot[data-learned=false] {background:#141d28}
+html[data-theme=dark] .skill-slot .skill-key,html[data-theme=dark] .skill-slot b {color:#f0f5fc;text-shadow:0 1px 1px #000}
+html[data-theme=dark] .shortcut-window .tree-button,html[data-theme=dark] .tree-button {background:var(--client-button);color:#dbe6f3;border-color:#4b6380}
+html[data-theme=dark] .tree-button b {color:#f1cb83}
+html[data-theme=dark] .xp {background:#121b26;border-color:#3e536c}
+html[data-theme=dark] .xp i {background:linear-gradient(#7fb5e6,#3f73a8)}
+html[data-theme=dark] .xp span {color:#eef4ff;text-shadow:0 1px 2px #000}
+html[data-theme=dark] .arena .announcement {background:#121c29f2;color:#e3f0ff;border-color:#5a7a9e;text-shadow:0 1px 2px #000}
+html[data-theme=dark] .arena .boss-hud {background:#221a22f2;color:#ffd3c3;border-color:#a0675c}
+html[data-theme=dark] .arena .boss-hud div {background:#3c2a2c;border-color:#7d5550}
+html[data-theme=dark] .combat-note {background:#121c29ee;color:#e3ecf7;border-color:#4b6380}
+html[data-theme=dark] .arena .dialog {background:linear-gradient(#1b2635,#121b27);color:#dfe8f3;border-color:#4f6a8c;box-shadow:inset 0 0 0 3px #ffffff0d,0 10px 40px #000c}
+html[data-theme=dark] .arena .dialog .eyebrow {color:#a9bcd3}
+html[data-theme=dark] .arena .dialog h2 {color:#f0e2bd}
+html[data-theme=dark] .arena .dialog p {color:#bccbdc}
+html[data-theme=dark] .arena .level-offer,html[data-theme=dark] .arena .tree-node {background:#1a2635;border-color:#3f5672;color:#e3ecf7}
+html[data-theme=dark] .arena .level-offer:hover,html[data-theme=dark] .arena .tree-node:hover {background:#24344a;border-color:#7d9ec7}
+html[data-theme=dark] .arena .level-offer strong,html[data-theme=dark] .arena .tree-node strong {color:#f2f6fc}
+html[data-theme=dark] .arena .level-offer small,html[data-theme=dark] .arena .tree-node small {color:#a9bcd0}
+html[data-theme=dark] .arena .level-offer span,html[data-theme=dark] .arena .level-offer b,
+html[data-theme=dark] .arena .tree-meta,html[data-theme=dark] .arena .tree-requirement {color:#e0c286}
+html[data-theme=dark] .arena .dialog .primary {color:#2b200f}
+html[data-theme=dark] .equipped-cards {color:#e8cf95}
+html[data-theme=dark] .overlay {background:#04080dcc}
+@media (max-width:680px) {
+  html[data-theme=dark] .hero:before {background:linear-gradient(90deg,#0e1622 0%,#101a27f0 22%,#121c29c8 56%,#141f2c40 100%)}
+}
+html[data-theme=dark] .gear-slot em {color:#d9be86}
+html[data-theme=dark] .gear-current {background:linear-gradient(#2c2618,#221d13);border-color:#9c7a3c;color:#f1e2bf}
+html[data-theme=dark] .gear-socket {background:#1b1710;border-color:#7d6431;color:#efdcb4}
+html[data-theme=dark] .gear-heading {color:#9fb2c6}
+html[data-theme=dark] .expedition-card[data-locked=true] small {color:#a8977a}

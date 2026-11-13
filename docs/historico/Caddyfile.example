@@ -1,0 +1,5 @@
+# Troque o dominio e aponte o DNS para o IP do seu VPS.
+jogo.exemplo.com {
+    encode gzip zstd
+    reverse_proxy 127.0.0.1:3000
+}

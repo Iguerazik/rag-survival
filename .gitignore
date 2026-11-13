@@ -1,0 +1,43 @@
+# Dependências e builds
+node_modules/
+dist/
+.cache/
+.npm/
+
+# Credenciais e configuração local
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa*
+secrets/
+
+# Dados de jogadores (contas, senhas com hash, progresso) — NUNCA versionar
+data/
+backups/
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+*.db
+lobbies-restart.json
+restore-pending.sqlite
+
+# Logs, temporários e pacotes
+*.log
+logs/
+tmp/
+*.tmp
+*.zip
+*.rar
+*.7z
+*.exe
+
+# Sistema operacional / editores
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/

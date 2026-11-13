@@ -1,0 +1,111 @@
+/* Ecos V15 — compact Rune-Midgard HUD, actual theme coverage and equipment paper doll.
+   Override only presentation; preserved draggable frames / layout persistence. */
+:root { --r15-plate:#f1f4ed;--r15-plate2:#d9e4e9;--r15-ink:#1e3851;--r15-muted:#466178;
+  --r15-border:#7996a8;--r15-sheen:#fcfff8;--r15-accent:#bf8b49;--r15-bar1:#658eac;--r15-bar2:#314f71;
+  --r15-surface:#e9f0ef;--r15-shadow:#0e253766; }
+html[data-theme=dark] { --r15-plate:#1c2938;--r15-plate2:#22384b;--r15-ink:#edf5f5;--r15-muted:#bbd0de;
+  --r15-border:#58788e;--r15-sheen:#466277;--r15-accent:#e0ba74;--r15-bar1:#365b75;--r15-bar2:#142d42;
+  --r15-surface:#152a3c;--r15-shadow:#020710bf; }
+/* The framed windows feel like equipment tabs in the original client, without tiny gray labels. */
+html body .arena .ro-window, html body .arena .ro-quickbar,html body .arena .ro-music-in-game {
+ background:linear-gradient(155deg,var(--r15-plate),var(--r15-plate2))!important;
+ border:2px solid var(--r15-border)!important;border-radius:6px!important;
+ outline:1px solid var(--r15-sheen)!important;box-shadow:inset 0 1px 0 var(--r15-sheen),0 7px 24px var(--r15-shadow)!important;
+ color:var(--r15-ink)!important; }
+html body .arena .ro-window .ro-title,html body .arena .ro-quickbar .ro-toolbar-grip{
+ background:linear-gradient(var(--r15-bar1),var(--r15-bar2))!important;border-bottom:1px solid var(--r15-accent)!important;
+ min-height:27px!important;letter-spacing:.035em!important;color:#fff8e9!important;text-shadow:0 1px 2px #061421!important;
+}
+html body .arena .hud-player .hud-character{padding:11px 10px 8px!important}
+html body .arena .hud-player #hud-class{font-size:13px!important;color:var(--r15-ink)!important}
+html body .arena .hud-player .hud-level,html body .arena .map-window .map-stats{
+ background:var(--r15-surface)!important;border-color:var(--r15-border)!important;color:var(--r15-ink)!important;
+}
+html body .arena .quest-window p{font:600 11px/1.55 Tahoma,Arial,sans-serif!important;color:var(--r15-ink)!important}
+html body .arena .quest-window progress{height:10px;border-radius:6px;overflow:hidden;accent-color:var(--r15-accent)}
+html body .arena .ro-quickbar{width:352px!important;padding:6px!important}
+html body .arena .ro-toolbar-buttons{gap:5px!important}
+html body .arena .ro-toolbar-buttons button,html body .arena .ro-quickbar .ro-toolbar-buttons button[data-label]{
+ background:linear-gradient(var(--r15-plate),var(--r15-plate2))!important;color:var(--r15-ink)!important;
+ border:1px solid var(--r15-border)!important;border-radius:4px!important;min-height:54px!important;height:54px!important;
+ box-shadow:inset 0 1px var(--r15-sheen)!important;gap:3px!important;
+}
+html body .arena .ro-toolbar-buttons button img{width:25px!important;height:25px!important;max-width:25px!important;max-height:25px!important;
+ object-fit:contain!important;image-rendering:auto!important;filter:drop-shadow(0 1px 1px #0004)!important}
+html body .arena .ro-toolbar-buttons button span {font:800 10px/1.15 Tahoma,Arial,sans-serif!important;color:var(--r15-ink)!important;text-shadow:none!important}
+html body .arena .ro-toolbar-buttons button kbd{background:var(--r15-bar2)!important;color:#fff5e3!important;right:2px!important;top:1px!important;font-size:8px!important}
+html body .arena .ro-toolbar-buttons button:hover,html body .arena .ro-toolbar-buttons button:focus-visible{border-color:var(--r15-accent)!important;box-shadow:0 0 0 2px #d8b97655!important}
+html body .arena .skill-slot,html body .arena .tree-button{border-radius:4px!important;outline:1px solid var(--r15-border);}
+html body .arena #boss-hud{background:#111b29e8!important;border:1px solid #e3c17c!important;border-radius:6px!important;box-shadow:0 4px 24px #000b!important;color:#fff7df!important}
+html body .arena #boss-hud strong{color:#fff6df!important;text-shadow:0 1px 3px #000!important;font-size:12px!important}
+/* In-game equipment and status windows */
+html body dialog.ro-character-dialog{
+ width:min(850px,96vw)!important;max-height:90dvh!important;
+ background:linear-gradient(135deg,var(--r15-plate),var(--r15-plate2))!important;
+ border:2px solid var(--r15-border)!important;border-radius:6px!important;
+ box-shadow:0 18px 60px #000b,inset 0 1px var(--r15-sheen)!important;color:var(--r15-ink)!important;
+}
+html body dialog.ro-character-dialog .ro-dialog-bar{
+ background:linear-gradient(var(--r15-bar1),var(--r15-bar2))!important;
+ min-height:34px!important;border-bottom:1px solid var(--r15-accent)!important;
+}
+html body dialog.ro-character-dialog .ro-client-tabs{padding:9px 14px 5px;gap:8px;display:flex;flex-wrap:wrap}
+html body dialog.ro-character-dialog .ro-client-tabs .ro-client-button{
+ min-height:34px!important;gap:7px!important;display:inline-flex!important;align-items:center!important;
+ padding:5px 12px!important;font:800 12px Tahoma,Arial,sans-serif!important;
+ color:var(--r15-ink)!important;background:var(--r15-surface)!important;
+ border:1px solid var(--r15-border)!important;border-radius:5px!important;
+}
+html body dialog.ro-character-dialog .ro-client-tabs .ro-client-button img{width:22px!important;height:22px!important;object-fit:contain!important;image-rendering:pixelated!important}
+html body dialog.ro-character-dialog .ro-client-tabs .selected {box-shadow:inset 0 -3px var(--r15-accent)!important;background:var(--r15-plate2)!important}
+html body dialog.ro-character-dialog .ro-client-heading{padding:12px 16px!important;border-top:1px solid var(--r15-border)!important;
+ background:var(--r15-surface)!important}
+html body dialog.ro-character-dialog .ro-client-heading b{font:800 16px Georgia,serif!important;color:var(--r15-ink)!important}
+html body dialog.ro-character-dialog .ro-client-heading small{font:600 11px/1.5 Tahoma,Arial,sans-serif!important;color:var(--r15-muted)!important}
+html body dialog.ro-character-dialog .ro-client-main{gap:13px!important;padding:14px!important;grid-template-columns:minmax(270px,1fr) minmax(230px,1fr)!important}
+html body dialog.ro-character-dialog .ro-paper-doll{
+ min-height:315px!important;aspect-ratio:1.13!important;overflow:hidden!important;
+ background:radial-gradient(ellipse at 50% 47%,#abcee22a,transparent 60%),url('assets/ro-skin/equipwin_bg.png') center/cover,var(--r15-surface)!important;
+ border:2px ridge var(--r15-border)!important;border-radius:7px!important;
+ box-shadow:inset 0 0 0 2px var(--r15-sheen),inset 0 0 30px #0002!important;
+}
+html body dialog.ro-character-dialog .ro-paper-avatar{
+ width:115px!important;height:164px!important;left:50%!important;top:47%!important;
+ background:transparent!important;border:0!important;filter:drop-shadow(0 4px 4px #0007)!important;
+}
+html body dialog.ro-character-dialog .ro-paper-avatar canvas{max-width:110px!important;max-height:155px!important;object-fit:contain!important}
+html body dialog.ro-character-dialog .ro-slot{
+ width:59px!important;height:52px!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;
+ padding:4px 3px!important;gap:0!important;color:var(--r15-ink)!important;
+ background:linear-gradient(var(--r15-plate),var(--r15-surface))!important;
+ border:2px solid var(--r15-border)!important;border-radius:5px!important;box-shadow:inset 0 1px var(--r15-sheen),0 3px 7px #0003!important;
+}
+html body dialog.ro-character-dialog .ro-slot.filled{border-color:var(--r15-accent)!important}
+html body dialog.ro-character-dialog .ro-slot:hover{border-color:#d9b773!important;transform:translate(-50%,-50%) scale(1.04)!important}
+html body dialog.ro-character-dialog .ro-slot .item-sprite{width:30px!important;height:30px!important;object-fit:contain!important;flex:none!important}
+html body dialog.ro-character-dialog .ro-v15-slot-label{
+ max-width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
+ font:800 8px/1.2 Tahoma,Arial,sans-serif!important;color:var(--r15-ink)!important;display:block!important;
+}
+html body dialog.ro-character-dialog .ro-gear-details,html body dialog.ro-character-dialog .ro-stats-panel,
+html body dialog.ro-character-dialog .ro-derived{
+ background:var(--r15-surface)!important;border:1px solid var(--r15-border)!important;border-radius:7px!important;
+ color:var(--r15-ink)!important;padding:12px 13px!important;
+}
+html body dialog.ro-character-dialog .ro-gear-details h3,html body dialog.ro-character-dialog .ro-stats-panel h3,
+html body dialog.ro-character-dialog .ro-derived h3{font:800 12px Georgia,serif!important;color:var(--r15-ink)!important;border-bottom:1px solid var(--r15-accent)!important}
+html body dialog.ro-character-dialog .ro-gear-row {display:grid!important;grid-template-columns:105px minmax(0,1fr);padding:7px 2px!important;gap:8px!important;border-bottom:1px solid var(--r15-border)!important}
+html body dialog.ro-character-dialog .ro-gear-row span{color:var(--r15-muted)!important;font:600 11px/1.3 Tahoma,Arial,sans-serif!important}
+html body dialog.ro-character-dialog .ro-gear-row strong{color:var(--r15-ink)!important;font:800 11px/1.3 Tahoma,Arial,sans-serif!important;text-align:right!important}
+html body dialog.ro-character-dialog .ro-gear-cards{color:var(--r15-accent)!important;font-size:10px!important}
+html body dialog.ro-character-dialog .ro-hint{color:var(--r15-muted)!important;font-size:11px!important;line-height:1.55!important}
+@media(max-width:680px){
+ html body dialog.ro-character-dialog .ro-client-main{grid-template-columns:minmax(0,1fr)!important;padding:8px!important}
+ html body dialog.ro-character-dialog .ro-paper-doll{min-height:270px!important;max-width:390px!important;margin:auto!important}
+ html body dialog.ro-character-dialog .ro-slot{width:48px!important;height:45px!important}
+ html body dialog.ro-character-dialog .ro-slot .item-sprite{width:27px!important;height:27px!important}
+ html body dialog.ro-character-dialog .ro-v15-slot-label{font-size:7px!important}
+ html body .arena .ro-toolbar-buttons button{min-height:44px!important;height:44px!important}
+ html body .arena .ro-toolbar-buttons button img{width:19px!important;height:19px!important}
+ html body .arena .ro-toolbar-buttons button span{font-size:8px!important}
+}

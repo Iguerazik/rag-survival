@@ -1,0 +1,494 @@
+{
+  "version": "11.0.0",
+  "base": "Ecos_de_Rune_Midgard_V10_CLIENTE_RO_COMPLETO_COPIA_SEGURA.zip",
+  "base_sha256": "0bf5a44396c05534503cf5a97048cc320943e7f97dd647d67e01454146829755",
+  "original_archive_preserved": true,
+  "self_excluded_from_checksums": true,
+  "changes": [
+    {
+      "file": "BUILDS_V11.md",
+      "status": "added",
+      "sha256": "88682860db57c71578f5a5244da12509a77876b355b478036c8101c3a7bb2cd9"
+    },
+    {
+      "file": "FONTES_V11.md",
+      "status": "added",
+      "sha256": "38f5bed04d57a8128829380982fa65caea37f8c12fcf4ef2c74dc873b86b2829"
+    },
+    {
+      "file": "INICIAR_WINDOWS.bat",
+      "status": "added",
+      "sha256": "5b6d5d386f3835923b558ba84572045d5dbe06665931b862b22429fcf0434eeb"
+    },
+    {
+      "file": "LEIA-ME_V11.md",
+      "status": "added",
+      "sha256": "d840dbee1e8041613ae4a081b531db0b6a4ed74649b409fbc8a2e109fca85300"
+    },
+    {
+      "file": "MUDANCAS_V11.md",
+      "status": "added",
+      "sha256": "9b367201ed7b7b702c5389104f192dc5cb7ea8d342a7f7a6a15593331e30aa16"
+    },
+    {
+      "file": "TABELA_DE_DROPS_V11.md",
+      "status": "added",
+      "sha256": "f46fcfcd00ede722023372d0d3c70e28eee8799299f2abfcdb9a5448f0cb6235"
+    },
+    {
+      "file": "VALIDACAO_V11.md",
+      "status": "added",
+      "sha256": "ab01c45e63c54e7ae8705210cda5c523658df66ef9abf658aa0b7ff2c010c56c"
+    },
+    {
+      "file": "assets/fx/ro-catalog/blessing-angels.png",
+      "status": "added",
+      "sha256": "c1dfa69e109f89f549bcb07438adf32a71549cf33ff9a78ddf661463f8c30470"
+    },
+    {
+      "file": "assets/fx/ro-catalog/dragon-flame.png",
+      "status": "added",
+      "sha256": "f37bdfc00e98e1333f567fbfbcbeaef5c547297412c4d0f532f52af04ce44fc1"
+    },
+    {
+      "file": "assets/fx/ro-catalog/frost-crystal.png",
+      "status": "added",
+      "sha256": "8b752c1bf645cee52ce6b0ddd4245fd8f3b5125206976d71c58ed0d64d09561a"
+    },
+    {
+      "file": "assets/fx/ro-catalog/manifest.js",
+      "status": "added",
+      "sha256": "5631c83a7554c409a2fd445497af470d8117630e226e33625ff462e4b69b418c"
+    },
+    {
+      "file": "assets/fx/ro-catalog/source-blessing.png",
+      "status": "added",
+      "sha256": "8745632545dda96dd3a4311e718ead7408bbb949a46d92884759004e9f168724"
+    },
+    {
+      "file": "assets/fx/ro-catalog/source-dragon.png",
+      "status": "added",
+      "sha256": "6d9f88ded75bbc4d9c4b1a695d5fcf66baf6d809d93daa97b326f961906739b9"
+    },
+    {
+      "file": "assets/fx/ro-catalog/source-frost.png",
+      "status": "added",
+      "sha256": "a1b10323b816b7132d8eea85b732305e81115ab50a1b929faac67bb28c2074ac"
+    },
+    {
+      "file": "assets/monsters/baphomet.gif",
+      "status": "added",
+      "sha256": "d2b347a555451639300e225e42e48c84ecb830c8406ba4cd38bcec7ece63c16e"
+    },
+    {
+      "file": "assets/monsters/baphometjr.gif",
+      "status": "added",
+      "sha256": "f1c6ff3240bd43d3dbb1308609547653b50bd3b22205732ca5e0468b40a9d462"
+    },
+    {
+      "file": "assets/monsters/bongun.gif",
+      "status": "added",
+      "sha256": "f17644dd04910d77a1deb588d0936528cb949cb71e9ce3d98debc494d5d2e216"
+    },
+    {
+      "file": "assets/monsters/cramp.gif",
+      "status": "added",
+      "sha256": "215c7c3dd5e922cca52370bbe86d41eac39bdd624fe46cb3804fdc9ca1ed64d7"
+    },
+    {
+      "file": "assets/monsters/doppelganger.gif",
+      "status": "added",
+      "sha256": "454cb7e7eb1506247268d7c9328b8b6eeb2436559f3184da35ed404ace999b41"
+    },
+    {
+      "file": "assets/monsters/drainliar.gif",
+      "status": "added",
+      "sha256": "c46853a088d0a3adc15b82142ce57095721403fed4d981f7a8e61556107ae7db"
+    },
+    {
+      "file": "assets/monsters/eddga.gif",
+      "status": "added",
+      "sha256": "9ef51110613ff4d554509521a283617b67b0040ab3640c5f0d4b77920efa61f9"
+    },
+    {
+      "file": "assets/monsters/fabre.gif",
+      "status": "added",
+      "sha256": "e5c4a8f67f3fcc29a372d80784da9ffd5efb9f2b4d2bac11993f13c8efb44db8"
+    },
+    {
+      "file": "assets/monsters/goldenbug.gif",
+      "status": "added",
+      "sha256": "a61eef66e90a811b83a4e4d8a4d38f4d750fe4c717691a7383eab0ff2639284c"
+    },
+    {
+      "file": "assets/monsters/hunterfly.gif",
+      "status": "added",
+      "sha256": "132e00a82c83c7d7b631ad1f7836949692b12246d7f4aa16c7820148b575a6e6"
+    },
+    {
+      "file": "assets/monsters/lunatic.gif",
+      "status": "added",
+      "sha256": "2911be4b37cfc29afe50e7bf30163d7b295032c68d55f1e01f61a9319178eb9c"
+    },
+    {
+      "file": "assets/monsters/mantis.gif",
+      "status": "added",
+      "sha256": "761ed567337b10f0090dc7ddf494d73154dd520f913fa4af4c726ae0bcf62d36"
+    },
+    {
+      "file": "assets/monsters/moonlight.gif",
+      "status": "added",
+      "sha256": "66691c7edddae49881a0e71eb697851564dc50890d90ca3de39b453049be5d71"
+    },
+    {
+      "file": "assets/monsters/munak.gif",
+      "status": "added",
+      "sha256": "fedd7a8f6e7808126d6ce4931e44891278b5b9468e72af7b44e546a67dc8c9a1"
+    },
+    {
+      "file": "assets/monsters/nine_tail.gif",
+      "status": "added",
+      "sha256": "dd6e2cc127eb25957e95db14f8beacea1e5e7cb1bf9c242eacc3a7c88f01de3e"
+    },
+    {
+      "file": "assets/monsters/orc_hero.gif",
+      "status": "added",
+      "sha256": "a35af678c4d51bd138dd887980bdd27b1c33efb17283c592431469c463a898f8"
+    },
+    {
+      "file": "assets/monsters/poring.gif",
+      "status": "added",
+      "sha256": "0e1eb095ec32294c81243ba2e642897211b3dca6e3c5669144ec5765f85382bd"
+    },
+    {
+      "file": "assets/monsters/sidewinder.gif",
+      "status": "added",
+      "sha256": "d146da4debec0f9aca1f5f067239f4ade0b0a391ea8a0a11c3ced33765a27e1b"
+    },
+    {
+      "file": "assets/monsters/sohee.gif",
+      "status": "added",
+      "sha256": "ba4a7cef622438a5d2663f5e758f647e53a0ec835d3dfcc3b88810446a8695ed"
+    },
+    {
+      "file": "assets/monsters/spore.gif",
+      "status": "added",
+      "sha256": "14a1815a05fc3c75635596ad8fc1cf2ec2a3debd0dc280dbd97d373a5fdf84e3"
+    },
+    {
+      "file": "assets/monsters/tarou.gif",
+      "status": "added",
+      "sha256": "32303d587e1920f2d8e0fb9f9d7a1422a1e76934f490f48fada72fd7a1a50e0c"
+    },
+    {
+      "file": "assets/monsters/thiefbug.gif",
+      "status": "added",
+      "sha256": "9f92d45a9b0de9ff972860ce4279803ac67bb1875c77a8a129e0ea1c3c528f13"
+    },
+    {
+      "file": "assets/skin-v11/btn_equip_dis.png",
+      "status": "added",
+      "sha256": "08098f5da17d11cfa07fb1f18ce2e16e3457ad72b88cfe25c85e8a70398c0490"
+    },
+    {
+      "file": "assets/skin-v11/btn_equip_off.png",
+      "status": "added",
+      "sha256": "dd9c759871d20d153ef7be26b2ab1be58746cac3369b092b58e5f30927aa88a7"
+    },
+    {
+      "file": "assets/skin-v11/btn_equip_on.png",
+      "status": "added",
+      "sha256": "8891744a95c57896082676531b3bfcee4acf126c9b81d847c4fbb09a7171e426"
+    },
+    {
+      "file": "assets/skin-v11/btn_items_dis.png",
+      "status": "added",
+      "sha256": "326e1e58b6687ff2c128166b02a366918c75b45c232210e7d43e4eb836f1de95"
+    },
+    {
+      "file": "assets/skin-v11/btn_items_off.png",
+      "status": "added",
+      "sha256": "ddd4255e0f4704e710eed76e258e333a780b2e92d8ca5dbbdfb38391282e8882"
+    },
+    {
+      "file": "assets/skin-v11/btn_items_on.png",
+      "status": "added",
+      "sha256": "7e6e9be2ecb7c50ccbd6b800f3d331f2d019e6326b55b540f131c03c280adad3"
+    },
+    {
+      "file": "assets/skin-v11/btn_option_dis.png",
+      "status": "added",
+      "sha256": "154c94a93df0052d8b24116cab0dd2a4c3dbe37b8b6c2a0b03bbb7a145dbca46"
+    },
+    {
+      "file": "assets/skin-v11/btn_option_off.png",
+      "status": "added",
+      "sha256": "4b6607a6b2b104ac113e9930db62dc97faf7cd43cac182dcecad1053505d522d"
+    },
+    {
+      "file": "assets/skin-v11/btn_option_on.png",
+      "status": "added",
+      "sha256": "2091e71e746924c5adb78767d16e553b85d7b1d01c751f340b81a628dff6047e"
+    },
+    {
+      "file": "assets/skin-v11/btn_skill_dis.png",
+      "status": "added",
+      "sha256": "e1b66ffc0103824ed14334c71b9123a3b47fd1888a65b32dfe0cbc02ffa94fc2"
+    },
+    {
+      "file": "assets/skin-v11/btn_skill_off.png",
+      "status": "added",
+      "sha256": "4a18aa3a6ff739631c53c0f48687c48b34353df81bc5a55983d6c6109c7ae350"
+    },
+    {
+      "file": "assets/skin-v11/btn_skill_on.png",
+      "status": "added",
+      "sha256": "08725241cc5169117798acddaa4a99c220343bf575b0a7ee555ea6b0f1857ed6"
+    },
+    {
+      "file": "assets/skin-v11/btn_status_dis.png",
+      "status": "added",
+      "sha256": "edfb0cfae19f0fdd0e040a322e2b5ace3ea357e30bf13ffeffbd17a638b6329e"
+    },
+    {
+      "file": "assets/skin-v11/btn_status_off.png",
+      "status": "added",
+      "sha256": "b91aa20bf2268018f4e9b8d10cb23f3aff674ab8127a0881e86c7d23fbff0b44"
+    },
+    {
+      "file": "assets/skin-v11/btn_status_on.png",
+      "status": "added",
+      "sha256": "8c12b5a1bd1be018c252a6d07e9bb0ab35cc606ae4eecca8f24f9951bcd08cc7"
+    },
+    {
+      "file": "assets/skin-v11/btnbar_arrow.png",
+      "status": "added",
+      "sha256": "6287be5dd0b56d87876a18a4d51898e50da7caae5f3d77acf21092f0625121d0"
+    },
+    {
+      "file": "assets/skin-v11/btnbar_left.png",
+      "status": "added",
+      "sha256": "9db54c80ab57c19a8c43214d370b6abcee0ff096965960e222bafd3fccf8e627"
+    },
+    {
+      "file": "assets/skin-v11/btnbar_left2.png",
+      "status": "added",
+      "sha256": "1112f4b36cc138b7f8cadb59d5e45327b3eba30f0189747f578565ade413beb0"
+    },
+    {
+      "file": "assets/skin-v11/btnbar_mid.png",
+      "status": "added",
+      "sha256": "9603f66803a80899adf418cc27acea7b060e4ec470726c1c473da764f91c55e0"
+    },
+    {
+      "file": "assets/skin-v11/btnbar_mid2.png",
+      "status": "added",
+      "sha256": "455b27f93502939efa69b660ce4dc4c3d982f6962371dad414149e233b724c7f"
+    },
+    {
+      "file": "assets/skin-v11/btnbar_right.png",
+      "status": "added",
+      "sha256": "edc94141924c2fde2a6f1b1f4dfaa548df69cfe447698342682631c974c78631"
+    },
+    {
+      "file": "assets/skin-v11/btnbar_right2.png",
+      "status": "added",
+      "sha256": "6a94ac6fb7d5e781e97e666a0537a752bb0d869539f27041c9099b7b776fa162"
+    },
+    {
+      "file": "assets/skin-v11/close.png",
+      "status": "added",
+      "sha256": "9a144945a3070b40361f2ae2bc88b49a940ba86be359eb97ab6bd4c86b4d04aa"
+    },
+    {
+      "file": "assets/skin-v11/close2.png",
+      "status": "added",
+      "sha256": "7c69c95c00d36fdfca231c8322faa56e2078b373ea13dc0c38ad8c31489313c6"
+    },
+    {
+      "file": "assets/skin-v11/close2_a.png",
+      "status": "added",
+      "sha256": "21221ee62ee4dd3c2346ad5dfa729febf93ab3e765b6a47237faa7fe3b93472a"
+    },
+    {
+      "file": "assets/skin-v11/close_a.png",
+      "status": "added",
+      "sha256": "71691352151549c075e19538383b557946f16cc8e32aebaf503e331dd574e055"
+    },
+    {
+      "file": "assets/skin-v11/sys_close_off.png",
+      "status": "added",
+      "sha256": "b957ec37f78f01e30248e873d5776402b080956bd7347e8a78a43dfa5fd3f8ed"
+    },
+    {
+      "file": "assets/skin-v11/sys_close_on.png",
+      "status": "added",
+      "sha256": "52cc235f8ceaca37caad671946354c14059e2c69d85e1d49ac57f0f38f40dc81"
+    },
+    {
+      "file": "assets/skin-v11/sysboxs_ld.png",
+      "status": "added",
+      "sha256": "c8b619057616bb69cefe9664955c685304f310f35591f7e4793bc5cec1920634"
+    },
+    {
+      "file": "assets/skin-v11/sysboxs_lu.png",
+      "status": "added",
+      "sha256": "f20258993b98b5261eca941a89b3a76a7c039e53441f32de43ad170fd0787d46"
+    },
+    {
+      "file": "assets/skin-v11/sysboxs_rd.png",
+      "status": "added",
+      "sha256": "99b57a89fac7382191967f14ce692bf2f9fda6ffb39d88c4f92969b1f0b70a3f"
+    },
+    {
+      "file": "assets/skin-v11/sysboxs_ru.png",
+      "status": "added",
+      "sha256": "675c2d8c353c4d4595f4d242bbd48640286bfabe8bacc255ed57b6fd95bef454"
+    },
+    {
+      "file": "assets/skin-v11/tab_a_l.png",
+      "status": "added",
+      "sha256": "60c633ad41a8630f9240ab56a8b8c94eabbe063e9a7f4a0d3ba01de6664c61c4"
+    },
+    {
+      "file": "assets/skin-v11/tab_a_m.png",
+      "status": "added",
+      "sha256": "e763a7262b3f7043dcb0a878f0f94d14045f067d5b4d6ff23a1a80dff039b837"
+    },
+    {
+      "file": "assets/skin-v11/tab_a_r.png",
+      "status": "added",
+      "sha256": "6785d4b8b06a0f340dfc567bd854dd475b463049173060f702db5184b8feebfb"
+    },
+    {
+      "file": "assets/skin-v11/tab_l.png",
+      "status": "added",
+      "sha256": "c38f153d88b06842664622d15eb9335d72cb53c8b970f82e261a824b773ad0b7"
+    },
+    {
+      "file": "assets/skin-v11/tab_m.png",
+      "status": "added",
+      "sha256": "e9d807dd0dcb6e0016f17b9b72effcbad3cb119d481365d9d3dc2fe3f2c0f476"
+    },
+    {
+      "file": "assets/skin-v11/tab_r.png",
+      "status": "added",
+      "sha256": "102bba1e1c8d1892a96804e161e34bf2bbb29f9fdbfe29ab0b37ff834fba732f"
+    },
+    {
+      "file": "assets/skin-v11/titlebar_fix.png",
+      "status": "added",
+      "sha256": "0f4cac6da34ce00c9d6602afcce6d186bd480780ee2f9e539713b6104dbca982"
+    },
+    {
+      "file": "assets/skin-v11/titlebar_left.png",
+      "status": "added",
+      "sha256": "4701641a26c3be74c51ac4bc7334a0e353bcb06d3a417426b474be04ada3b1c1"
+    },
+    {
+      "file": "assets/skin-v11/titlebar_left2.png",
+      "status": "added",
+      "sha256": "0018b040a1f135e24d2d703cc6314076c6583b987ed90d4bd60a5e965264ff7a"
+    },
+    {
+      "file": "assets/skin-v11/titlebar_mid.png",
+      "status": "added",
+      "sha256": "708120d6ea85be08ff0d2d16242055a942884c2377da324b896ae4f3840304ee"
+    },
+    {
+      "file": "assets/skin-v11/titlebar_mid2.png",
+      "status": "added",
+      "sha256": "684c2655ba7a5365a27bc4e3739fe1c68cb19caac2f2a5eb8933f5b7cb538262"
+    },
+    {
+      "file": "assets/skin-v11/titlebar_right.png",
+      "status": "added",
+      "sha256": "2aea820a308fa5953e4d33e864ec2893b0c60d1a029e277bec9ee031b857bb2a"
+    },
+    {
+      "file": "assets/skin-v11/titlebar_right2.png",
+      "status": "added",
+      "sha256": "c9a974a7949aa130b1560d3cca8f37ba554ef390dd49891487424b00fe1392f2"
+    },
+    {
+      "file": "bestiary.js",
+      "status": "added",
+      "sha256": "ba7190682a36d1df4bca6a1477009948d40ff3da6402256fc1c6361b3c084fd2"
+    },
+    {
+      "file": "cards.js",
+      "status": "modified",
+      "sha256": "77a75a11278c76f4f7dc27b72d41a9ef0457a43056c5c9b7dc263f3dd4914796"
+    },
+    {
+      "file": "elements.js",
+      "status": "added",
+      "sha256": "4da941c3eca3a1cdf36be5ab747922b10d9e67c9bad1281f0abe306771a0aa19"
+    },
+    {
+      "file": "encounters.js",
+      "status": "modified",
+      "sha256": "6a403882ac781f5843b6e39f4942981d4bc82a2df788e9fd37fac0582ec98b46"
+    },
+    {
+      "file": "game.js",
+      "status": "modified",
+      "sha256": "44e4d679274f50c004473140388f2d8b2fd6d7f8a1599c1541aea5150bbbb044"
+    },
+    {
+      "file": "index.html",
+      "status": "modified",
+      "sha256": "70b9d687f213ea250f69528e49ca0f0655f67a51d86260ba86801fca107bee6f"
+    },
+    {
+      "file": "iniciar.sh",
+      "status": "added",
+      "sha256": "1fb441d603c5ee9ed8c630a499c43efb0db974ec4a8f1ff302ab016b8405d909"
+    },
+    {
+      "file": "items.js",
+      "status": "modified",
+      "sha256": "ede01fc914298e7591f31893098c016ad82d426039aa4e4ac54d1fad2e23dbd7"
+    },
+    {
+      "file": "package.json",
+      "status": "modified",
+      "sha256": "d7b0991e162ccf73fca0dcec2e446476468f99abca86913f4d7f4ea368af37b6"
+    },
+    {
+      "file": "roguelike.js",
+      "status": "added",
+      "sha256": "3ad6bb245035b33e1eb25a76675a8047f6b867a980016812a4c5dba52db3793b"
+    },
+    {
+      "file": "run-items.js",
+      "status": "added",
+      "sha256": "d6aee6f59c0ef9a4fb76cf6c2d5b09be9fc9b6f21bf93363d49d01cb04111290"
+    },
+    {
+      "file": "server.mjs",
+      "status": "modified",
+      "sha256": "e8b4871743c189d61031420a2537b7e0de92f2c2591a60087c0d8ad6575e4f41"
+    },
+    {
+      "file": "tests/monster-properties.json",
+      "status": "added",
+      "sha256": "44e768b82c99f9dc3c43e89bcda3bf62fc1fc8b155d915126ae425faa27b9a4a"
+    },
+    {
+      "file": "tests/rules.test.cjs",
+      "status": "added",
+      "sha256": "7fe5737e545d8b138dd0eab6e89c14d677ce72d042717da897f870c09ca4c3cd"
+    },
+    {
+      "file": "tools/pack_ro_effects.py",
+      "status": "added",
+      "sha256": "6f92ac742834cf7fcaa1242c9e8dc33279fa8ce6fe0856017ffe2d902ef0ad72"
+    },
+    {
+      "file": "v11.css",
+      "status": "added",
+      "sha256": "c7a86e1e2fdd55640e4d426ada1677b94969f7a98805e20792d27bb75c1c5c4e"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "version": "V10",
+  "base": "V9_HUD_CLASSICA_COMPLETO_COPIA_SEGURA",
+  "not_overwritten": true,
+  "new_or_modified": [
+    "LEIA-ME_V10.md",
+    "cards.js",
+    "controls.js",
+    "game.js",
+    "index.html",
+    "items.js",
+    "ro-hud-layout.js",
+    "ro-windows.js",
+    "status.js",
+    "v10-classic.css"
+  ],
+  "unchanged_count": 347
+}

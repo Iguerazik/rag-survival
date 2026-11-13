@@ -1,0 +1,204 @@
+/* Character selection and combat windows inspired by the classic client. */
+:root {
+  --client-ink: #203551;
+  --client-muted: #465e73;
+  --client-edge: #8298b0;
+  --client-panel: #f2f4f3;
+  --client-title: linear-gradient(#f9fcff 0%, #dce9fb 44%, #adc5e5 49%, #d0e1f6 100%);
+  --client-button: linear-gradient(#fff 0%, #edf3fb 50%, #d2e1f3 51%, #f0f6ff 100%);
+  --client-focus: #1d61a9;
+}
+body {background:#dce8ed}
+.menu {
+  color:var(--client-ink);
+  color-scheme:light;
+  background:radial-gradient(ellipse at 28% 1%, #f7f1dd 0%, transparent 42%), linear-gradient(#dae8ef,#edf0eb 68%,#d9e5eb);
+}
+.menu .wrap {max-width:1136px}
+.site-head {min-height:62px; padding-block:10px; border-bottom:1px solid #7c96aa58}
+.brand {color:#233c59;letter-spacing:.095em}
+.brand b {color:#765222}
+.menu .sound,.arena .secondary,.arena .window-button {
+  color:#203b5b; background:var(--client-button); border:1px solid #8ca2bc; border-radius:4px;
+  box-shadow:inset 0 0 0 1px #ffffff9c,0 1px 1px #566d852b;
+}
+.menu .sound:hover,.arena .secondary:hover,.arena .window-button:hover {background:#d5e7ff}
+.menu button:focus-visible,.menu a:focus-visible,.arena button:focus-visible {outline:2px solid var(--client-focus);outline-offset:2px}
+.hero {
+  height:clamp(247px,31vw,345px);
+  margin-top:15px;
+  border:1px solid #9c8b60;
+  border-radius:6px;
+  background:#354b38 url('assets/forest.webp') right 50% / 70% auto no-repeat;
+  box-shadow:0 6px 16px #314b4f3d;
+}
+.hero:before {
+  background:linear-gradient(90deg,#fff8e5 0%,#fff5dc 26%,#f4ebcbf0 37%,#e0dbbc66 52%,transparent 65%);
+}
+.hero:after {border:1px solid #fff6cf9e; inset:6px; border-radius:3px}
+.hero-content {padding:20px clamp(24px,4vw,56px)}
+.hero .eyebrow {color:#684c29;font-weight:800}
+.hero h1 {color:#233c5c;text-shadow:0 2px #fffdf2;letter-spacing:-.045em;font-size:clamp(39px,6vw,78px);line-height:.94}
+.hero h1 em {color:#76501f;font-size:.85em;white-space:nowrap}
+.hero .intro {max-width:385px;color:#364658;margin:14px 0 12px}
+.hero-meta {color:#4a5561;font-weight:700}
+.hero-meta span {color:#936c2c}
+
+.roster {padding-top:17px}
+.lobby-columns {display:grid;grid-template-columns:minmax(0,1.46fr) minmax(285px,.85fr);gap:12px;align-items:start}
+.client-window {
+  background:var(--client-panel); border:1px solid var(--client-edge); border-radius:5px;
+  box-shadow:inset 0 0 0 1px #ffffffbf,0 2px 6px #384e6126; overflow:hidden;
+}
+.client-title,.menu .class-tree>h3 {
+  background:var(--client-title); border-bottom:1px solid #91a6c1; min-height:29px;
+  margin:0; padding:5px 10px; color:#243c5e; text-shadow:0 1px #fff;
+}
+.client-title h2,.client-title h3,.menu .class-tree>h3 {
+  font:800 14px/1.25 "DM Sans",Arial,sans-serif; color:#243c5e; margin:0; text-transform:none;
+}
+.client-title span {color:#384f68;font-size:9px;white-space:nowrap}
+.client-content {padding:10px}
+.menu .journey-mode {margin:0 0 8px}
+.menu .journey-mode label span,.menu .combat-mode label span {
+  color:#354e6a;background:var(--client-button);border:1px solid #a2b4c8;border-radius:3px;padding:5px 7px;
+}
+.menu .journey-mode input:checked+span,.menu .combat-mode input:checked+span {
+  color:#163a65;background:#d6e8ff;border-color:#628dbd;box-shadow:inset 0 0 0 1px #ffffff9c;
+}
+.menu .journey-mode input:focus-visible+span,.menu .combat-mode input:focus-visible+span {outline-color:var(--client-focus)}
+.menu .classes {grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.menu .classes .class {
+  grid-template-columns:55px minmax(0,1fr);gap:6px;padding:5px;min-height:74px;
+  border-color:#a1afbe;background:linear-gradient(#fff,#ebf0f4);border-radius:4px;color:#223a55;
+  box-shadow:inset 0 0 0 1px #ffffffd6;
+}
+.menu .classes .class:hover {border-color:#638cb9;transform:none;background:#e4effc}
+.menu .classes .class[aria-pressed=true] {border-color:#527ba8;background:linear-gradient(#edf6ff,#d3e6fa);box-shadow:inset 0 0 0 1px #fff}
+.menu .class[aria-pressed=true]::after {color:#9a742d;right:5px;top:4px;font-size:8px}
+.menu .portrait {height:58px;width:55px;background:radial-gradient(ellipse at 50% 69%,#fff,#dbe7ef 72%);border:1px solid #9dadc1;border-radius:3px}
+.menu .portrait:before {background:linear-gradient(135deg,transparent 35%,#fff8)}
+.menu .portrait canvas {width:53px;height:53px}
+.menu .class strong {font:800 13px/1.11 "DM Sans",Arial,sans-serif;color:#203b5a}
+.menu .class small {color:#4d6378;margin:2px 0 3px;font-size:10px}
+.menu .class .starter {color:#6d5329;font-size:10px;line-height:1.2;display:block}
+.menu .journey {margin-top:9px;padding:8px;background:#e6edf4;border:1px solid #9fafc1;border-radius:4px}
+.menu .journey h3,.menu .journey-note,.menu .journey-title p,.menu .journey-meter,.menu .journey-stats {color:#324f6b}
+.menu .journey h3 {font:800 13px "DM Sans",Arial,sans-serif}
+.menu .journey-path {grid-template-columns:repeat(3,minmax(0,1fr));margin-block:6px}
+.menu .journey-path li,.menu .attribute-grid div {background:#f6f8fa;border-color:#a3b3c6;color:#36516e}
+.menu .journey-path li[aria-current=true] {background:#d3e7fc;border-color:#6489af;color:#1a3e65}
+.menu .journey-path li small {color:#4d657c}
+.menu .attribute-grid button {color:#223b58;background:var(--client-button)}
+.menu .expeditions {padding:0;margin:0;border:0;background:none}
+.menu .expedition-options {grid-template-columns:1fr;gap:6px}
+.menu .expedition-card {grid-template-columns:53px minmax(0,1fr);justify-items:stretch;text-align:left;gap:7px;padding:5px;min-height:54px;background:linear-gradient(#fff,#e8eef5);color:#223e5b;border-color:#a1b0c2;border-radius:4px}
+.menu .expedition-card[aria-pressed=true] {border-color:#5e83ae;background:linear-gradient(#e7f2ff,#d7e8fa);box-shadow:inset 0 0 0 1px white}
+.menu .expedition-card img {width:53px;height:39px;background:#435c57}
+.menu .expedition-card strong {font-size:12px}
+.menu .expedition-card small {color:#6c512b;font-size:10px}
+.menu .launch {margin-top:9px;align-items:flex-end}
+.menu .combat-mode {padding:3px 4px 4px;gap:3px;border-color:#a6b6c8}
+.menu .combat-mode legend {color:#334d69}
+.menu .launch-actions {gap:5px}
+.menu .primary {background:linear-gradient(#fff4cc,#eed28f 49%,#e3ba6b 51%,#f5d794);border-color:#a8874d;color:#382b17;box-shadow:inset 0 0 0 1px #fff8da;min-height:36px}
+.menu .launch .primary,.menu .launch .sound {font-size:12px;padding:6px 9px;min-height:35px}
+.menu .launch .primary span {margin-left:4px}
+.menu .controls-help {font-size:11px;color:#415a74;line-height:1.35}
+.menu .coop-panel {background:#e7eef6;border-color:#99adc3;margin-top:9px;padding:8px}
+.menu .coop-panel h3,.menu .coop-panel .section-head span,.menu .coop-setup label,.menu #coop-status {color:#344f6a}
+.menu .coop-setup input {background:#fff;color:#243c5a;border-color:#9aadbf}
+.menu .coop-members li {background:#fff;border-color:#a6b7c9}
+.menu .class-tree {margin-top:12px;padding:0;background:var(--client-panel);border-color:var(--client-edge)}
+.menu .class-tree .tree-grid {padding:8px}
+.menu .tree-node {background:#f9fbfd;border-color:#adbdcf;color:#223b58;border-radius:3px}
+.menu .tree-node small {color:#465e73}
+.menu .tree-meta,.menu .tree-requirement {color:#5c5337}
+.menu .footer {color:#43576c;border-color:#9bafc1}
+.rebirth-dialog {background:#f1f4f7;color:#213c58;border-color:#8ba3c0}
+.rebirth-dialog h2 {color:#244065}
+
+/* In-match client windows */
+.arena {color-scheme:light}
+.classic-hud {top:10px;left:10px;right:10px}
+.arena .ro-window {border-color:#7189a6;border-radius:4px;background:#f2f4f6f7;box-shadow:inset 0 0 0 1px white,0 2px 6px #0e1c36a8}
+.arena .ro-title {
+  background:var(--client-title);color:#203a5a;border-bottom:1px solid #879fbd;
+  padding:4px 6px;min-height:20px;text-shadow:0 1px white;font-weight:800;font-size:11px;
+}
+.hud-player {width:204px}
+.hud-character {padding:5px 6px;gap:5px}
+.hud-emblem {background:radial-gradient(ellipse,#fff,#d5e5f2);border:1px solid #a0b3c8;border-radius:3px}
+.hud-emblem canvas {width:38px;height:38px}
+.vital>b {font-size:9px;color:#35506f}
+.vital .health {height:12px;border-color:#7290a7;background:#c4cfdb;box-shadow:inset 0 1px 1px #506e8960}
+.vital .health i {background:linear-gradient(#c7e8a6 0%,#8fc36f 47%,#5d9855 51%,#80ae6e 100%)}
+.vital .mana i {background:linear-gradient(#c6defc 0%,#8bb7ea 47%,#587fb9 51%,#89b0db 100%)}
+.vital .health span {line-height:10px;color:#142b49;text-shadow:0 1px 1px #ffffffce}
+.hud-level {color:#354f69;background:#e5edf5}
+.hud-actions {top:2px}
+.hud-actions button,.window-button {background:var(--client-button);border-color:#8ba1bc;color:#27476b}
+.map-window {width:168px}
+.map-titlebar {display:flex;align-items:center;gap:4px;justify-content:space-between}
+.map-titlebar h2 {margin:0;font:inherit;line-height:1.15}
+.window-button {min-width:16px;height:15px;padding:0 2px;font:800 12px/12px Arial,sans-serif;pointer-events:auto}
+#minimap {margin:3px;width:calc(100% - 6px);height:109px;border:1px solid #738598;border-radius:2px;background:#2e3f48}
+.map-stats {background:#e8eff7;padding:4px 5px;align-items:center}
+.map-stats strong {font-size:14px}
+.map-stats small,.map-stats span {font-size:10px;color:#2b4768}
+.quest-window p {color:#29425d}
+.shortcut-window .hotbar {padding:3px 4px}
+.shortcut-window .skill-slot {background:#e6edf7;border:1px solid #839bb7;box-shadow:inset 0 0 0 1px white}
+.shortcut-window .skill-slot[data-learned=false] {background:#d1dce8}
+.shortcut-window .tree-button {background:var(--client-button);color:#25466d}
+.xp {background:#e3edf7;border-color:#8da6c0;height:13px}
+.xp i {background:linear-gradient(#c4e2fc,#7aadda)}
+.xp span {line-height:11px}
+.arena .announcement {background:#eff5fcf4;color:#1c3c63;border-color:#819eba;box-shadow:0 2px 6px #13243a68;text-shadow:0 1px white}
+.arena .boss-hud {border-color:#ad7a66;background:#f6eee5f5;color:#7e362e;box-shadow:0 2px 7px #29191c82}
+.arena .boss-hud div {background:#d4b0a2;border:1px solid #aa756a}
+.arena .boss-hud i {background:linear-gradient(#f6b394,#b74546)}
+.arena .dialog {
+  background:linear-gradient(#f8fbff,#e5edf5);color:#243c57;border:1px solid #809bb9;
+  box-shadow:inset 0 0 0 3px #fff,0 10px 40px #0b182c9e;
+}
+.arena .dialog .eyebrow {color:#465d7a}
+.arena .dialog h2 {color:#213e62}
+.arena .dialog p {color:#435b72}
+.arena .level-offer,.arena .tree-node {background:#f6f9fd;border-color:#99afc7;color:#23405f}
+.arena .level-offer:hover,.arena .tree-node:hover {background:#e0edfc;border-color:#688fb9}
+.arena .level-offer strong,.arena .tree-node strong {color:#243f62}
+.arena .level-offer small,.arena .tree-node small {color:#405873}
+.arena .level-offer span,.arena .level-offer b,.arena .tree-meta,.arena .tree-requirement {color:#5f4a28}
+.arena .dialog .primary {color:#352b16}
+@media (max-width:940px) {
+  .menu .classes {grid-template-columns:repeat(2,minmax(0,1fr))}
+  .menu .launch {flex-wrap:wrap}
+}
+@media (max-width:680px) {
+  .site-head {min-height:52px}
+  .hero {height:246px;background-size:auto 100%;background-position:right center}
+  .hero:before {background:linear-gradient(90deg,#fff7e3 0%,#fff5def3 22%,#f8f0d9c9 56%,#f3e9c947 100%)}
+  .hero .intro {max-width:245px;font-size:13px}
+  .hero h1 {font-size:clamp(34px,8vw,47px)}
+  .lobby-columns {grid-template-columns:1fr}
+  .menu .classes .class {text-align:left;justify-items:stretch}
+  .menu .journey-path {grid-template-columns:repeat(3,minmax(0,1fr))}
+  .menu .class-tree .tree-grid {padding:5px}
+  .classic-hud {top:5px;left:5px;right:5px}
+  .hud-player {width:140px}
+  .hud-emblem canvas {width:25px;height:25px}
+  .map-window {width:114px}
+  .map-titlebar h2 {font-size:9px}
+  #minimap {height:64px}
+  .map-stats strong,.map-stats small,.map-stats span {font-size:9px}
+  .arena .announcement {top:130px}
+}
+@media (max-width:365px) {
+  .site-actions .sound {font-size:9px;padding:4px}
+  .brand {letter-spacing:0}
+  .brand img {width:20px;height:20px}
+  .menu .classes .class {grid-template-columns:42px minmax(0,1fr)}
+  .menu .portrait {width:42px;height:49px}
+  .menu .portrait canvas {width:40px;height:44px}
+}

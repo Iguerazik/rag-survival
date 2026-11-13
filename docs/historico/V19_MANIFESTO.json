@@ -1,0 +1,106 @@
+{
+  "version": "19.0.0",
+  "base": "V18",
+  "alteracoes": [
+    {
+      "arquivo": "midgard-survivors/.env.example",
+      "situacao": "alterado",
+      "sha256": "b1396351c1edbfd4322efc6bb1bccbdd4d54566895deae3c21269c4cfe9c7405"
+    },
+    {
+      "arquivo": "midgard-survivors/INICIAR_WINDOWS.bat",
+      "situacao": "alterado",
+      "sha256": "d44ca8f760b8478ee426cdd5d938a3c82280b2a7b3b783d041e7aac690a4de7d"
+    },
+    {
+      "arquivo": "midgard-survivors/INSTALAR_WINDOWS.cmd",
+      "situacao": "alterado",
+      "sha256": "21d6e490dedf1a659e7c7b82650643c998277e113baaf96a7f1def39b7eb1536"
+    },
+    {
+      "arquivo": "midgard-survivors/SERVIDOR_AUTORITATIVO_V19.md",
+      "situacao": "novo",
+      "sha256": "45876a47e7bbae8cb9d720b8dd73ddb964758fc55ee4d02c628d254f959f4ecb"
+    },
+    {
+      "arquivo": "midgard-survivors/accounts.mjs",
+      "situacao": "alterado",
+      "sha256": "b6572cf55fccb0d4f6523322868301026d343564fee18c2fed8d5bb6a446a625"
+    },
+    {
+      "arquivo": "midgard-survivors/authoritative-world.mjs",
+      "situacao": "novo",
+      "sha256": "beda0d26a87798145348f5ff5d2aa5357a56a5966012f8fbed6c34f7c870140b"
+    },
+    {
+      "arquivo": "midgard-survivors/compose.yaml",
+      "situacao": "alterado",
+      "sha256": "c98b75f5e84213652b486f91223f82f696af7472193c68afea14ddfb53b07dc7"
+    },
+    {
+      "arquivo": "midgard-survivors/coop.js",
+      "situacao": "alterado",
+      "sha256": "832c30999fedb64037bedb213712f146cb46bedf720b9fc1a7390ca0019f2713"
+    },
+    {
+      "arquivo": "midgard-survivors/game.js",
+      "situacao": "alterado",
+      "sha256": "ea4cec861628a92a2d497ef14ed35a7a9294eb373fb5a1b0c341029b11f3f8b2"
+    },
+    {
+      "arquivo": "midgard-survivors/index.html",
+      "situacao": "alterado",
+      "sha256": "8110396e26293aee366e440190a06f08aebd459c32b8a6c7b749a42aaf4e0693"
+    },
+    {
+      "arquivo": "midgard-survivors/package.json",
+      "situacao": "alterado",
+      "sha256": "6b79ad66556901e109740f36dee46330b15951a62138b40e3a1f660f393d1129"
+    },
+    {
+      "arquivo": "midgard-survivors/server-maps.json",
+      "situacao": "novo",
+      "sha256": "81234b3c17eed3edf653c492f8fd70071bea8be9d7f904c8d3a7c49e329cb606"
+    },
+    {
+      "arquivo": "midgard-survivors/server.mjs",
+      "situacao": "alterado",
+      "sha256": "4580d53b9b9ac49fb49dbaf11f493f68f5fb3612fc36becbdb28bd31d60316a9"
+    },
+    {
+      "arquivo": "midgard-survivors/tests/v14.test.cjs",
+      "situacao": "alterado",
+      "sha256": "5e385c36b9702632d88a48a566cff782855e729201f26ab5e74cb0ccf975107a"
+    },
+    {
+      "arquivo": "midgard-survivors/tests/v16-attack.test.cjs",
+      "situacao": "alterado",
+      "sha256": "00e2166c80add68504bd713b529518f5d25feef468f5f3b69c30bcd38ce63c42"
+    },
+    {
+      "arquivo": "midgard-survivors/tests/v17-coop.test.cjs",
+      "situacao": "alterado",
+      "sha256": "4294d568f4fadc222679f64677b62d54a8f808f3aaa4405cbab9fd0e87cb75aa"
+    },
+    {
+      "arquivo": "midgard-survivors/tests/v18-accounts.test.cjs",
+      "situacao": "alterado",
+      "sha256": "a69b262b267294fb4441520b6dfe3cf85d4dccc97d6b7760b2de3163ffc2516d"
+    },
+    {
+      "arquivo": "midgard-survivors/tests/v19-authority.test.cjs",
+      "situacao": "novo",
+      "sha256": "85a1450ee429d0f01a2febdc305dd45bb7c8b9caa8b0e74e041aa34b7c2dd697"
+    },
+    {
+      "arquivo": "midgard-survivors/tests/v19-ledger.test.cjs",
+      "situacao": "novo",
+      "sha256": "13d5914177443bcb90f72bbe0598c25644ee4d86b99dfcbedc0c6474d679961d"
+    },
+    {
+      "arquivo": "midgard-survivors/v19-authority.css",
+      "situacao": "novo",
+      "sha256": "752a14c862f62bb75f956ebed968b938fc4439ad2675851b444d138c56273618"
+    }
+  ]
+}

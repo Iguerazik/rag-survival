@@ -1,0 +1,7 @@
+/* V17: multiplayer lobby readable in both themes */
+.coop-match{margin:8px 0;padding:10px 12px;border:1px solid #a59770;border-radius:6px;background:var(--panel,#17283a);color:var(--ink,#ffe5b3);font-weight:700;}
+.coop-lobby-warning:empty{display:none}
+.coop-lobby-warning{margin:5px 0;padding:9px 12px;color:#f5ce91;background:#3b2425;border-radius:4px;}
+.coop-members li{padding:8px 10px;line-height:1.5;}
+.room-actions{display:flex;flex-wrap:wrap;gap:10px}
+[data-theme="light"] .coop-match{color:#24384c;background:#fff7e5}

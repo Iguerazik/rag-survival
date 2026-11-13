@@ -1,0 +1,723 @@
+{
+  "version": "12.0.0",
+  "base": "V11",
+  "baseArchivePreserved": true,
+  "selfExcludedFromChecksums": true,
+  "changes": [
+    {
+      "file": "FONTES_V12.md",
+      "status": "added",
+      "sha256": "631db08cd71f53695c9481a136b3e0af6f589a8ac2322db8e6949bbc559263ae"
+    },
+    {
+      "file": "INICIAR_WINDOWS.bat",
+      "status": "modified",
+      "sha256": "56ae072f185accd5962727827338d8a685b5c974defbf08bd7ea44c4cda9dd76"
+    },
+    {
+      "file": "LEIA-ME_V12.md",
+      "status": "added",
+      "sha256": "29a2aaf09f4738e498ece093196cf92f3d5dbf65aefee5919a7a09e6cf3ffbc0"
+    },
+    {
+      "file": "MUDANCAS_V12.md",
+      "status": "added",
+      "sha256": "9d1485209e8fb6d6a99b68809f44f94624dcf04c2b39c8bc6e0fa299202f57a4"
+    },
+    {
+      "file": "TABELA_DE_DROPS_V12.md",
+      "status": "added",
+      "sha256": "2c3fe7c404bfc6e4ae4e9f0a1ffe5468bf0536c592eeb3359988c7cbd3ed8b0c"
+    },
+    {
+      "file": "VALIDACAO_SPRITES/01_comparacao.png",
+      "status": "added",
+      "sha256": "56cbdd00245fe85a1b722caf177375de7e5fd868660347f23e6a1a9bf3c6043a"
+    },
+    {
+      "file": "VALIDACAO_SPRITES/02_comparacao.png",
+      "status": "added",
+      "sha256": "5f84420f5211bc74dddcf2de6baacb04d86b7af5e924537e78ccec24021a3b20"
+    },
+    {
+      "file": "VALIDACAO_V12.md",
+      "status": "added",
+      "sha256": "e1b269b5b7e21ba1ffb0655cb8bc98cd575537e8b06761916ea74f7f0c9ac1df"
+    },
+    {
+      "file": "ZONE_MONSTERS_V12.json",
+      "status": "added",
+      "sha256": "18261d811570ace21a42ab89f24d785402de03ccf25ab41b43ec289ce95a0d89"
+    },
+    {
+      "file": "art.js",
+      "status": "modified",
+      "sha256": "2332ddafd3e510e3973b80f77d9862a2a510ff783382ce16621092375a147f4b"
+    },
+    {
+      "file": "assets/items-ro/1101.png",
+      "status": "added",
+      "sha256": "4f5fddde6877c7c9fcd35f230aa2745c66aa2d63e5506b378ea6f5b6ab5b5ee4"
+    },
+    {
+      "file": "assets/items-ro/1104.png",
+      "status": "added",
+      "sha256": "b9638ec60e67b93241fd2b923bcb38f89e4c263acaade6a8b8e3f3e7ed92eb17"
+    },
+    {
+      "file": "assets/items-ro/1107.png",
+      "status": "added",
+      "sha256": "ee26660b1da4192bccc55cd61e19f08f6e5c4d109cfcac831ec154c450fca71c"
+    },
+    {
+      "file": "assets/items-ro/1110.png",
+      "status": "added",
+      "sha256": "4e8f6a55ecc69695c7b3cca4760eda5b0cd27777fb10d42ddf703260b34413bf"
+    },
+    {
+      "file": "assets/items-ro/1113.png",
+      "status": "added",
+      "sha256": "6c6c444d01ba87e197c0171267b276e6fcb01504e1223e0e7612af6a02e7c396"
+    },
+    {
+      "file": "assets/items-ro/1116.png",
+      "status": "added",
+      "sha256": "61c538c46c6abd3fce72a454a863bc501d80cc3a8d18a730ae04b3f8d0f7621e"
+    },
+    {
+      "file": "assets/items-ro/1163.png",
+      "status": "added",
+      "sha256": "68fbf18d18b9d466751d990a568b04bdb9b2c4c5fb21b93eae5544ba40030254"
+    },
+    {
+      "file": "assets/items-ro/1201.png",
+      "status": "added",
+      "sha256": "30ded31e71158e0498eacc4d2d7d16ef69be535eed6e5cc28f5271ba1ea38f0a"
+    },
+    {
+      "file": "assets/items-ro/1204.png",
+      "status": "added",
+      "sha256": "41507bcf5d2d114985448eb76991cedefb37646a7d00fd0b8f41f6b1d6e40604"
+    },
+    {
+      "file": "assets/items-ro/1207.png",
+      "status": "added",
+      "sha256": "a94966f35db25abf751a7042bd506d5bd77d58000bc96c77eb724b3c198a8925"
+    },
+    {
+      "file": "assets/items-ro/1210.png",
+      "status": "added",
+      "sha256": "7b069bc4ea2202fb290f843230ba6390f522d1c084b87dc9544f057aeb935493"
+    },
+    {
+      "file": "assets/items-ro/1213.png",
+      "status": "added",
+      "sha256": "beb0aae696174489a7b11c03f82b3ce0048f488cc5b268f2417d41f259c600ba"
+    },
+    {
+      "file": "assets/items-ro/1219.png",
+      "status": "added",
+      "sha256": "6cb8498bb563e5fed8056c260f5b143a1df0ac5c064de5aa8e84a014bbd2724e"
+    },
+    {
+      "file": "assets/items-ro/1250.png",
+      "status": "added",
+      "sha256": "15c3de1ca99790d7812307134c995a5540fbbbd5fee630d2bb732cc2809989d0"
+    },
+    {
+      "file": "assets/items-ro/1251.png",
+      "status": "added",
+      "sha256": "15c3de1ca99790d7812307134c995a5540fbbbd5fee630d2bb732cc2809989d0"
+    },
+    {
+      "file": "assets/items-ro/1301.png",
+      "status": "added",
+      "sha256": "e8dca4a8836de2795d6d02be8391e3e43b0801d642d4016ca4c29f50a6731b9a"
+    },
+    {
+      "file": "assets/items-ro/1351.png",
+      "status": "added",
+      "sha256": "55a8feb156decc9ab4333dec1d55919896e73cdebc93094e9193e93b94f5c456"
+    },
+    {
+      "file": "assets/items-ro/1354.png",
+      "status": "added",
+      "sha256": "6399d7af225967260e76a8e4d33a54a0d140fd2c4af0d99d686977cabece63bd"
+    },
+    {
+      "file": "assets/items-ro/1357.png",
+      "status": "added",
+      "sha256": "aadccbffc05337075066ecb9109d2d7283c0fd294d4b58bc61fbcf9f0c37b1e5"
+    },
+    {
+      "file": "assets/items-ro/1501.png",
+      "status": "added",
+      "sha256": "bc26daeb9c18f9673c145841f4d3683a39a187cb7cd10a0cab884b94953b39b9"
+    },
+    {
+      "file": "assets/items-ro/1504.png",
+      "status": "added",
+      "sha256": "ec99a32697462b09f3c15eeb0d5aef7a9c6cae8bf21d24932829b72916f845de"
+    },
+    {
+      "file": "assets/items-ro/1507.png",
+      "status": "added",
+      "sha256": "f6f8bfec7b6040bacd9b965bdf3bfbb64b064b70d94ae872b3e509164a23fac5"
+    },
+    {
+      "file": "assets/items-ro/1510.png",
+      "status": "added",
+      "sha256": "9295607e56ed1fa25ec749534f24e62a5a0247d18a8e5153b4a72e4769117dcd"
+    },
+    {
+      "file": "assets/items-ro/1513.png",
+      "status": "added",
+      "sha256": "2f6efff3626b5379391e4789fe1661b288c8f4be51824987542e746dbdecb132"
+    },
+    {
+      "file": "assets/items-ro/1601.png",
+      "status": "added",
+      "sha256": "b3abd1a46d6028f641b732fc8297c0e1a7e42c8602bc4601697fc2bec18d583e"
+    },
+    {
+      "file": "assets/items-ro/1604.png",
+      "status": "added",
+      "sha256": "2d1acb75954e7286cfcdca8fb8d28b276d3685430efca7472d138e13e012f78c"
+    },
+    {
+      "file": "assets/items-ro/1607.png",
+      "status": "added",
+      "sha256": "b0100bab58b14ad2beb13bd2762a17b1ef49e5fe37f0102cdf1c251e5e276beb"
+    },
+    {
+      "file": "assets/items-ro/1610.png",
+      "status": "added",
+      "sha256": "10a639c11003618c262d4792011bebae69d84cdccf4b668940bc6b1a5cdd55ca"
+    },
+    {
+      "file": "assets/items-ro/1701.png",
+      "status": "added",
+      "sha256": "4b7472abafddb6e3a4f30de6aba92609fdf3995460e90363982a34e703ab914d"
+    },
+    {
+      "file": "assets/items-ro/1704.png",
+      "status": "added",
+      "sha256": "135d152fc015ad4eeb6f3085bbd993e10973b9218e24f71a1e0b93df65488bbb"
+    },
+    {
+      "file": "assets/items-ro/1707.png",
+      "status": "added",
+      "sha256": "b71ef6fa8ee57d78fd7a4d8bccae1adb30efe413a4405430472802ff4aa2f9a3"
+    },
+    {
+      "file": "assets/items-ro/1710.png",
+      "status": "added",
+      "sha256": "27916f2ca2a6592afa920745a876d1213ca5ea27e120e304f7c79e8a1bc14a31"
+    },
+    {
+      "file": "assets/items-ro/1713.png",
+      "status": "added",
+      "sha256": "e0684a2f75ff3c07827f13bae0dbef97d833b7228117513078a64eafeda165a9"
+    },
+    {
+      "file": "assets/items-ro/1716.png",
+      "status": "added",
+      "sha256": "ad6174894fb139fc1918442510646af5013dba32bb5ca178ca9013fd6cc307ac"
+    },
+    {
+      "file": "assets/items-ro/2101.png",
+      "status": "added",
+      "sha256": "4204c8c799453a70c5ebf20b3b3bcd5b03abad58bedc435b3cb8b5797eb5b498"
+    },
+    {
+      "file": "assets/items-ro/2103.png",
+      "status": "added",
+      "sha256": "e6ff08ab69dcd7727dc2c7d84af4d45a0bf2f0202a90cf77f9e9e530544a86fb"
+    },
+    {
+      "file": "assets/items-ro/2105.png",
+      "status": "added",
+      "sha256": "87f15d67ed76d9d0b76575e3be604f1c7cfd546790974971c727f3cff0767e33"
+    },
+    {
+      "file": "assets/items-ro/2107.png",
+      "status": "added",
+      "sha256": "6242fe1a2281785ae197ccdd263f578578cedb424554342f37652d29c4c096dd"
+    },
+    {
+      "file": "assets/items-ro/2208.png",
+      "status": "added",
+      "sha256": "1df4f10aaae06432d612c3242cd03cc37cb85506decdf7a6d91f0bd34920a96f"
+    },
+    {
+      "file": "assets/items-ro/2220.png",
+      "status": "added",
+      "sha256": "0151a7bf47fd651fc25727d1d417dd0098b03a0b4a5d3039b787178564f680b9"
+    },
+    {
+      "file": "assets/items-ro/2226.png",
+      "status": "added",
+      "sha256": "6b12b086e86234ecd7760a4fc2bd9f362036f2c645e28e20e13edfe1adb48136"
+    },
+    {
+      "file": "assets/items-ro/2228.png",
+      "status": "added",
+      "sha256": "42a27ec68475ccd8852b9e9580427d14142e875c758775eb5161bba15444214c"
+    },
+    {
+      "file": "assets/items-ro/2301.png",
+      "status": "added",
+      "sha256": "f4f3410b338b15f7eb61a4e1e6aab1010165e07ad3ac07f4d1509a5ddcfd7439"
+    },
+    {
+      "file": "assets/items-ro/2303.png",
+      "status": "added",
+      "sha256": "50a5268a816a73e3aeaacbbe5e2deb49bd99496c4e1cf854cb15efa231385e10"
+    },
+    {
+      "file": "assets/items-ro/2307.png",
+      "status": "added",
+      "sha256": "506402bfdf548a4656b05512f26a681a20eda2879478d62d581de1825df13a19"
+    },
+    {
+      "file": "assets/items-ro/2309.png",
+      "status": "added",
+      "sha256": "68a323f3b232b7d86b1af336b35c0bffbfb865ee1afbbbcc9d5ba5760ae3cf06"
+    },
+    {
+      "file": "assets/items-ro/2313.png",
+      "status": "added",
+      "sha256": "e2ac834f6a727165f54a2c11f616af3a26ff5d1d6b0fa463ebb2d2d0b8527705"
+    },
+    {
+      "file": "assets/items-ro/2316.png",
+      "status": "added",
+      "sha256": "e4f6ce4c3c4f86ec539cd8bf918c626ca10444ab35024d24b5a04d4b73db1a26"
+    },
+    {
+      "file": "assets/items-ro/2319.png",
+      "status": "added",
+      "sha256": "2d1de0cab832861add2c50be284f6b05199080e7b554cc2bf9bad5a9acb27419"
+    },
+    {
+      "file": "assets/items-ro/2321.png",
+      "status": "added",
+      "sha256": "3f6b71c021a76044b3509a7a9e08aacda2a68a42c51b97b3d62a49a2eafb041a"
+    },
+    {
+      "file": "assets/items-ro/2325.png",
+      "status": "added",
+      "sha256": "0a57d41ded3b20aea5b72bebfe616e1aae6249a50a3f30b486fe38852f3054d0"
+    },
+    {
+      "file": "assets/items-ro/2339.png",
+      "status": "added",
+      "sha256": "94d8d170f6b0d0b6fbd3776d53e976b21c4e2bef20d7d2e7900ab16c6cdc9793"
+    },
+    {
+      "file": "assets/items-ro/2401.png",
+      "status": "added",
+      "sha256": "034e01a2e1db39edb2e72f1e2660ff7273755f739921b6ac6f51adb8865ede75"
+    },
+    {
+      "file": "assets/items-ro/2403.png",
+      "status": "added",
+      "sha256": "f50d4ad4302c6ce0e9bae6c9898354e16bbeb6cd24bb8ea094ff629408f4f55e"
+    },
+    {
+      "file": "assets/items-ro/2405.png",
+      "status": "added",
+      "sha256": "294530ec84005d8826a54ec72743396028cf217303a7268b74170487fb10cbbc"
+    },
+    {
+      "file": "assets/items-ro/2424.png",
+      "status": "added",
+      "sha256": "71d41f6aad1b40894ccdad65f00daa613767a9b3944042953618443fcf10eaf8"
+    },
+    {
+      "file": "assets/items-ro/2501.png",
+      "status": "added",
+      "sha256": "3126ededec0d1f17c71993a723ee881b625c68d4d919ccbe38203f1fbc093940"
+    },
+    {
+      "file": "assets/items-ro/2503.png",
+      "status": "added",
+      "sha256": "e422e5463e195b47df88be146326b464942604bb56a7f8bdf0c410267ee6b00d"
+    },
+    {
+      "file": "assets/items-ro/2505.png",
+      "status": "added",
+      "sha256": "46c6dd30745042a388c556ea4009a0d7ba1737b6af10db5098d29ba1e4095b02"
+    },
+    {
+      "file": "assets/items-ro/2522.png",
+      "status": "added",
+      "sha256": "f14c09299af4da747ae3ac44c3044bc58a95de8967323a53a8baf4d6ba8f88c0"
+    },
+    {
+      "file": "assets/items-ro/2526.png",
+      "status": "added",
+      "sha256": "89904896bf01b6f9faf2a24b564d20628caf9c86bd374e7349b59e59b7fa1728"
+    },
+    {
+      "file": "assets/items-ro/2601.png",
+      "status": "added",
+      "sha256": "09c6ea0fb938f265f805992c931634f457e917b85641e4f6cc8bf569ad865b32"
+    },
+    {
+      "file": "assets/items-ro/2602.png",
+      "status": "added",
+      "sha256": "f4bbe2f1b37c578f7f02fd42b882ee7ccfb64f6bbaf8b526da529a62b11424b0"
+    },
+    {
+      "file": "assets/items-ro/2603.png",
+      "status": "added",
+      "sha256": "6f83c76c46dfdb07b9f15ad4609b83dca8b6799a88cc9c7f3be65b5aa2a73d7c"
+    },
+    {
+      "file": "assets/items-ro/2604.png",
+      "status": "added",
+      "sha256": "f125b03271092d5819ce932c6f783e35a7f8208465ae15544cfacd8a9f89b7f7"
+    },
+    {
+      "file": "assets/items-ro/2605.png",
+      "status": "added",
+      "sha256": "cf9d864e4c37948078fa3d66369ab568337d2f66c8343f03bae04e885d6140d4"
+    },
+    {
+      "file": "assets/items-ro/2607.png",
+      "status": "added",
+      "sha256": "40c056543d67258ae768d5317a1867276f33133e833a6eb530dfc6a0a33eadfb"
+    },
+    {
+      "file": "assets/items-ro/2608.png",
+      "status": "added",
+      "sha256": "684b0e6df3186a095b8e962d3767991b581da69ef90fe72cc68909154c7df823"
+    },
+    {
+      "file": "assets/monsters/archer_skeleton.gif",
+      "status": "added",
+      "sha256": "a895091aaa1d17bc1cf00b4a1e4c1cb973e8deb2f4cbcdac17061e07a4b9a61b"
+    },
+    {
+      "file": "assets/monsters/beetle_king.gif",
+      "status": "added",
+      "sha256": "65f223528d284d2e4111b490610b2983204da209a05fbbff5f9447086168b4a3"
+    },
+    {
+      "file": "assets/monsters/deviruchi.gif",
+      "status": "added",
+      "sha256": "641aa43acdffd3aa3b6bfc8db1ac1ae14fdb34f4d66926660887ea9b2630ef16"
+    },
+    {
+      "file": "assets/monsters/dokebi.gif",
+      "status": "added",
+      "sha256": "1f78067d8e23875cfe500652074527743af6db232ad9a903727d227565f7fb11"
+    },
+    {
+      "file": "assets/monsters/greatestgeneral.gif",
+      "status": "added",
+      "sha256": "838d7110be566035e74d6926cec19012e4e8c66a025c1cfaa66c01772fa6f0b4"
+    },
+    {
+      "file": "assets/monsters/horong.gif",
+      "status": "added",
+      "sha256": "7cff055d1474b76ec48e7565b853cfcf662bd8fe2b41acc57ece1a412452dd52"
+    },
+    {
+      "file": "assets/monsters/marionette.gif",
+      "status": "added",
+      "sha256": "91632a36f2136898cd15d0f2ae220dd26eb4b1903c0c84124dfa5dea5da1985c"
+    },
+    {
+      "file": "assets/monsters/nightmare.gif",
+      "status": "added",
+      "sha256": "305f966c86051661678effa9ffbcc7a67fc0a86879560b3f2a60b71e4b5858af"
+    },
+    {
+      "file": "assets/monsters/orc_skeleton.gif",
+      "status": "added",
+      "sha256": "da9f200300fb489b96643c20d416a1a4369533d6953f11fa1e6203ced8187317"
+    },
+    {
+      "file": "assets/monsters/orc_zombie.gif",
+      "status": "added",
+      "sha256": "bb3c65c071df0b74d3fa3bf180063ce7c984b989dcf2bf56a3e112ef0d5cd970"
+    },
+    {
+      "file": "assets/monsters/savage.gif",
+      "status": "added",
+      "sha256": "7248d59811b7b6e6144798913eb6223fb90c3e883dddc0bc5a50a3f21f4a1827"
+    },
+    {
+      "file": "assets/monsters/steel_chonchon.gif",
+      "status": "added",
+      "sha256": "6297461ad4cf6b020025563b71cb054dd92b50f60c145f04f9b87008fbfaabba"
+    },
+    {
+      "file": "assets/monsters/thief_female.gif",
+      "status": "added",
+      "sha256": "073071046371e3fbfb8bc347669aa798f0ec0187c7ddabdaec8e36e6bb622d40"
+    },
+    {
+      "file": "assets/monsters/thief_male.gif",
+      "status": "added",
+      "sha256": "59bae1e07d375155f00096002a321766985a31d4e242d5399a124ad5a89ff04e"
+    },
+    {
+      "file": "assets/monsters/whisper.gif",
+      "status": "added",
+      "sha256": "2e120ee00191d6070ebfc98d95d9fae94ce22c2dd34756b0a7d7898bf7b809f5"
+    },
+    {
+      "file": "assets/ro/archer_skeleton.png",
+      "status": "added",
+      "sha256": "6ce31bd6bbf12dc4c7c8f524c27d01e99a7d5c088b7311b8c01319dd33bd0ca0"
+    },
+    {
+      "file": "assets/ro/beetle_king.png",
+      "status": "added",
+      "sha256": "a1aee1d4ea09bcfafdbcb1f70cd4e35917f0e4aec90f41edd557fd91cf4df4d8"
+    },
+    {
+      "file": "assets/ro/deviruchi.png",
+      "status": "added",
+      "sha256": "dfe2672304f2f239e640267adfad1ed2fadcfda605c5fabbadf326aca1ca5652"
+    },
+    {
+      "file": "assets/ro/dokebi.png",
+      "status": "added",
+      "sha256": "4e471c8bcb85f29b77772181df36fcc59410bcd56a8deef5f572b04a9b2b31b9"
+    },
+    {
+      "file": "assets/ro/doppelganger.png",
+      "status": "modified",
+      "sha256": "3894a35577edd34f58ed12f779c180b73a542f3387cd62e1a403f65737adf2c8"
+    },
+    {
+      "file": "assets/ro/eddga.png",
+      "status": "modified",
+      "sha256": "1bdbec954ac88eb35e5ed2c59bedde8e3ced7496f267749a1946088ac4bef0fe"
+    },
+    {
+      "file": "assets/ro/goldenbug.png",
+      "status": "modified",
+      "sha256": "c4dee98d7ef644ef67f7ba7de77341ae6a56290633a5365d84d7866b5af20977"
+    },
+    {
+      "file": "assets/ro/greatestgeneral.png",
+      "status": "added",
+      "sha256": "832c27f5cc5ddb6b5f6e5e748e44b4e511b89279f8fbe01309b21f6eea838f3e"
+    },
+    {
+      "file": "assets/ro/horong.png",
+      "status": "added",
+      "sha256": "63330be46ff1d4a1d6c55b439ee386a029dbb4a8d5ef6116ee875b1617779f21"
+    },
+    {
+      "file": "assets/ro/marionette.png",
+      "status": "added",
+      "sha256": "d8f092dc6a9a45ebfec6f429e30e0aa9d8671a9aed28c6a1504619b1964b1fb2"
+    },
+    {
+      "file": "assets/ro/moonlight.png",
+      "status": "modified",
+      "sha256": "fb18a0f217af5cd1cfa51c49c16e87c0c60d2fcdb01840faf5f196a605e2795d"
+    },
+    {
+      "file": "assets/ro/nightmare.png",
+      "status": "added",
+      "sha256": "db9dda39860362ce9a6dcfa43568281274c457d31d414fcf744245898247e268"
+    },
+    {
+      "file": "assets/ro/orc_hero.png",
+      "status": "modified",
+      "sha256": "64c6f70b4aba964d1dc470304c6d2978081f205da998afd4039f82e36613d6c1"
+    },
+    {
+      "file": "assets/ro/orc_skeleton.png",
+      "status": "added",
+      "sha256": "c4556176b86a46f8e08805928158d2b4af5b28172dfe4e4a7a076697895a80a0"
+    },
+    {
+      "file": "assets/ro/orc_zombie.png",
+      "status": "added",
+      "sha256": "f0331c57c21539b20d2bf6014764dcf5fd84b2fa026ab8a7bd269bdf232eab6f"
+    },
+    {
+      "file": "assets/ro/savage.png",
+      "status": "added",
+      "sha256": "331fcebdbfacce57c9644795a99523489303215ad4bd86f7bc029efe22677d22"
+    },
+    {
+      "file": "assets/ro/sources/eddga-original.png",
+      "status": "added",
+      "sha256": "ed794d8ffd098c978f4dfeafbed5911e92cd5049b4f92c9707e2159433770d5d"
+    },
+    {
+      "file": "assets/ro/steel_chonchon.png",
+      "status": "added",
+      "sha256": "85bb3d112d3c8edd480e87301f7bb6b1350b919745214e0422d18a2c812811aa"
+    },
+    {
+      "file": "assets/ro/thief_female.png",
+      "status": "added",
+      "sha256": "3e94fa98a59027826a513bb39d31c4590e21838d02517a78f1a62a4317d4c92a"
+    },
+    {
+      "file": "assets/ro/thief_male.png",
+      "status": "added",
+      "sha256": "ccd2b42efb5c5b22aa4f4c0d9f0539ff3d95fc3052883c7d899024bc289084c3"
+    },
+    {
+      "file": "assets/ro/v12-monsters.js",
+      "status": "added",
+      "sha256": "8d5208632c1f548c6f9367c7e7676d953f6ade29e0f7c7142d13f84a336fc87f"
+    },
+    {
+      "file": "assets/ro/v12-mvps.js",
+      "status": "added",
+      "sha256": "3f4e8b014f61d31e567ac11e5951101d70a5fd563fe81112e10cda81ca75ca0b"
+    },
+    {
+      "file": "assets/ro/whisper.png",
+      "status": "added",
+      "sha256": "83dbf697f539cdc3e0b015004497bf32466a874eb8bbfbbae6599c8231affc78"
+    },
+    {
+      "file": "assets/ui-v12/equip.svg",
+      "status": "added",
+      "sha256": "8d9ca9f1628b81162de62a67624f29ddfdc0ea2fe3324f7bceb6099fee84a371"
+    },
+    {
+      "file": "assets/ui-v12/items.svg",
+      "status": "added",
+      "sha256": "972c7a1bf23003307931cab39a6e34dd8611f3920c28719ed64e2c4afb6026a9"
+    },
+    {
+      "file": "assets/ui-v12/option.svg",
+      "status": "added",
+      "sha256": "fbb016ed0540ac89f4e080d0b7b2e451a020b23f5c8a38feaca36c8eb72ca13e"
+    },
+    {
+      "file": "assets/ui-v12/progression.svg",
+      "status": "added",
+      "sha256": "693e030f863a3bd75b9d32087f07e52c149a44065f58036807762e7237c80ee5"
+    },
+    {
+      "file": "assets/ui-v12/skill.svg",
+      "status": "added",
+      "sha256": "e3fc9c45e1775a044013e1ceb55cb861a85fe151c84af45180e6b904f0a76976"
+    },
+    {
+      "file": "assets/ui-v12/status.svg",
+      "status": "added",
+      "sha256": "f7c70e642de4c9f077caa68a55c5b7b326efb0c7ad0c86a6096285475e9b8c1c"
+    },
+    {
+      "file": "cards.js",
+      "status": "modified",
+      "sha256": "3e7dfa1efa7a03b252f5356a7946c3f7d880dcedc4dd32f2f118dd22e8a30562"
+    },
+    {
+      "file": "difficulty.js",
+      "status": "modified",
+      "sha256": "914fab2f58238206cc51a5306b3a4f8c710a9cb1ac1be6fd4d7666cab5ea0acb"
+    },
+    {
+      "file": "elements.js",
+      "status": "modified",
+      "sha256": "c17c08f92a0ff7208422bb59dc606b498da80d46ce773035a7e2877ba28bc419"
+    },
+    {
+      "file": "expedition.js",
+      "status": "modified",
+      "sha256": "72c0195528c4352971f9a8925b98872800efb9c05586b6b378e5c955f89447ba"
+    },
+    {
+      "file": "game.js",
+      "status": "modified",
+      "sha256": "e8b527ab27748b49326fca92936bb825332cf6fa5ed7f497dca276e41abadf62"
+    },
+    {
+      "file": "index.html",
+      "status": "modified",
+      "sha256": "d079ae254b5da7a80103fc34f9af4bd04b318c4c118fdebe00883ffbd606d724"
+    },
+    {
+      "file": "items.js",
+      "status": "modified",
+      "sha256": "ad663bbdd6d2fa1fa8bb1a0a7eec1588b0220c2313e438cda67bddc94e04f77f"
+    },
+    {
+      "file": "package.json",
+      "status": "modified",
+      "sha256": "5493d2c65e1f2e180c7fed5934220cc8925a7e3ac3e83bc29d62d796d5bb267d"
+    },
+    {
+      "file": "progression.js",
+      "status": "modified",
+      "sha256": "434fec59c3e9a6864fcec8b5fad910b642bd9b20221ff369379eec888d1198ad"
+    },
+    {
+      "file": "renewal.js",
+      "status": "modified",
+      "sha256": "cb7cf6c46334c8aff38a975f32dcb5b2a99c3e7d086b0d8b64ea962dcdfcb3ab"
+    },
+    {
+      "file": "roguelike.js",
+      "status": "modified",
+      "sha256": "993c75fe47ccc36d44ea583e4edb27af5ffda3ffd50a6a907c6be92174c5b708"
+    },
+    {
+      "file": "run-items.js",
+      "status": "modified",
+      "sha256": "0105fd267d01d9b8e2df78d678e911b85aad3db7a9175a45d15e64cb2da5e633"
+    },
+    {
+      "file": "server.mjs",
+      "status": "modified",
+      "sha256": "00b2ae7ceffc803929ce68ff96552fcbf261ae8971c209384865c852f2155b03"
+    },
+    {
+      "file": "tests/browser-v12.cjs",
+      "status": "added",
+      "sha256": "56e2e2db71bc497e9164d136516f0950b11880a7e8a0680010a9cb86cfe89cb4"
+    },
+    {
+      "file": "tests/monster-properties.json",
+      "status": "modified",
+      "sha256": "5ac034d16825b5072f0f56d71511ae6f1d34c65fa252d7cb90ee1fd965ef3e82"
+    },
+    {
+      "file": "tests/rules.test.cjs",
+      "status": "modified",
+      "sha256": "ac41c236137157ee6c6895431da15ab85ec12fa10e91c19c82118bf3156044a3"
+    },
+    {
+      "file": "tools/pack_eddga.py",
+      "status": "added",
+      "sha256": "1d201fe1a5ee92dca4d4c15d393421e75f8bc0be788382adc76822d5f838421d"
+    },
+    {
+      "file": "trials.js",
+      "status": "modified",
+      "sha256": "83b811ccd974717a0b8d6d1d8c7ab27eed079d2645de8ff9b41983c1aa8750f7"
+    },
+    {
+      "file": "v12-systems.js",
+      "status": "added",
+      "sha256": "92c793cb7eaf3ffd2862dada4f7d8f3b1adb181a8275a22cfe340bfd05b6eb50"
+    },
+    {
+      "file": "v12-ui.js",
+      "status": "added",
+      "sha256": "7c9e7b00a80fd2345e66afd85d419c25bba8e58a1fd0c232a6fe6b4a08ebfcad"
+    },
+    {
+      "file": "v12.css",
+      "status": "added",
+      "sha256": "1bc2f28f13278c46e852ab59f5a9827294e43193518150c8c4381017c1d96785"
+    }
+  ]
+}

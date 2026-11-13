@@ -1,0 +1,92 @@
+{
+  "thief_female": {
+    "id": 1053,
+    "element": "shadow",
+    "level": 1,
+    "spriteSource": "https://nn.ai4rei.net/dev/npclist/i/THIEF_BUG_FEMALE.gif"
+  },
+  "thief_male": {
+    "id": 1054,
+    "element": "shadow",
+    "level": 1,
+    "spriteSource": "https://nn.ai4rei.net/dev/npclist/i/THIEF_BUG_MALE.gif"
+  },
+  "archer_skeleton": {
+    "id": 1016,
+    "element": "undead",
+    "level": 1,
+    "spriteSource": "https://nn.ai4rei.net/dev/npclist/i/SKEL_ARCHER.gif"
+  },
+  "horong": {
+    "id": 1129,
+    "element": "fire",
+    "level": 4,
+    "spriteSource": "https://nn.ai4rei.net/dev/npclist/i/HORONG.gif"
+  },
+  "dokebi": {
+    "id": 1110,
+    "element": "shadow",
+    "level": 1,
+    "spriteSource": "https://nn.ai4rei.net/dev/npclist/i/DOKEBI.gif"
+  },
+  "orc_zombie": {
+    "id": 1153,
+    "element": "undead",
+    "level": 1,
+    "spriteSource": "https://nn.ai4rei.net/dev/npclist/i/ORC_ZOMBIE.gif"
+  },
+  "orc_skeleton": {
+    "id": 1152,
+    "element": "undead",
+    "level": 1,
+    "spriteSource": "https://nn.ai4rei.net/dev/npclist/i/ORC_SKELETON.gif"
+  },
+  "steel_chonchon": {
+    "id": 1042,
+    "element": "wind",
+    "level": 1,
+    "spriteSource": "https://nn.ai4rei.net/dev/npclist/i/STEEL_CHOCHO.gif"
+  },
+  "marionette": {
+    "id": 1143,
+    "element": "ghost",
+    "level": 3,
+    "spriteSource": "https://nn.ai4rei.net/dev/npclist/i/MARIONETTE.gif"
+  },
+  "whisper": {
+    "id": 1179,
+    "element": "ghost",
+    "level": 3,
+    "spriteSource": "https://nn.ai4rei.net/dev/npclist/i/WHISPER.gif"
+  },
+  "nightmare": {
+    "id": 1061,
+    "element": "ghost",
+    "level": 3,
+    "spriteSource": "https://nn.ai4rei.net/dev/npclist/i/NIGHTMARE.gif"
+  },
+  "deviruchi": {
+    "id": 1109,
+    "element": "shadow",
+    "level": 1,
+    "spriteSource": "https://nn.ai4rei.net/dev/npclist/i/DEVIRUCHI.gif"
+  },
+  "beetle_king": {
+    "id": 1494,
+    "element": "earth",
+    "level": 1,
+    "spriteSource": "https://nn.ai4rei.net/dev/npclist/i/KIND_OF_BEETLE.gif"
+  },
+  "greatestgeneral": {
+    "id": 1277,
+    "element": "fire",
+    "level": 2,
+    "spriteSource": "https://nn.ai4rei.net/dev/npclist/i/GREATEST_GENERAL.gif"
+  },
+  "savage": {
+    "id": 1166,
+    "element": "earth",
+    "level": 2,
+    "spriteSource": "https://nn.ai4rei.net/dev/npclist/i/SAVAGE.gif"
+  }
+}

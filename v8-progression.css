@@ -1,0 +1,39 @@
+/* V8: inventário compacto e hotkeys identificadas como no cliente Ragnarok. */
+.inventory-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.inventory-head-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.inventory-head-actions button{font-size:12px!important;min-height:34px;white-space:normal}
+.inventory-head-actions button:disabled{opacity:.45;cursor:not-allowed}
+.inventory-list .inventory-item{grid-template-columns:54px minmax(0,1fr);gap:8px;padding:8px 10px;align-items:start}
+.inventory-item .item-sprite{width:48px!important;height:48px!important;object-fit:contain;image-rendering:pixelated}
+.inventory-item-actions{gap:7px;align-items:center;flex-wrap:wrap}
+.inventory-item-actions .sell-item{background:#573b36!important;color:#ffeedc!important;border:1px solid #bf9071!important}
+.inventory-item-actions .sell-item:hover{background:#795049!important}
+.card-dialog form{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.card-dialog form button{min-height:32px}
+.arena .ro-quickbar button[data-label]{display:flex!important;flex-direction:column!important;align-items:center;justify-content:center;gap:0;
+  width:43px!important;min-width:43px!important;height:39px!important;min-height:39px!important;padding:2px!important;line-height:1.15!important}
+.arena .ro-quickbar button[data-label]::after{content:attr(data-label);font-size:8px!important;font-weight:800;white-space:nowrap;color:#2a3f58;display:block}
+.arena .ro-quickbar button[data-key]:not([data-key=""])::before{content:attr(data-key);position:absolute;top:-12px;left:50%;transform:translateX(-50%);
+  font:800 9px system-ui;color:#ffffff;background:#172f4a;border:1px solid #9eafbd;border-radius:3px;padding:0px 3px;white-space:nowrap;pointer-events:none}
+.arena .ro-quickbar{gap:3px!important;padding:14px 5px 4px!important}
+@media(max-width:780px){.arena .ro-quickbar{gap:2px!important;padding:11px 2px 3px!important;top:68px!important}
+  .arena .ro-quickbar button[data-label]{width:35px!important;min-width:35px!important;height:34px!important;min-height:34px!important}
+  .arena .ro-quickbar button[data-label]::after{font-size:7px!important}}
+@media(max-width:490px){.arena .ro-quickbar{top:150px!important}
+  .arena .ro-quickbar button[data-label]{width:31px!important;min-width:31px!important;height:31px!important;min-height:31px!important}
+  .arena .ro-quickbar button[data-label]::after{font-size:6px!important}}
+/* Garantir contraste em mensagens e upgrades em ambos os temas. */
+.arena .overlay .dialog{
+  background:linear-gradient(165deg,#2a4059,#142438 88%)!important;
+  border:2px solid #b89b67!important;box-shadow:0 18px 70px #071322e8,inset 0 0 0 2px #516984!important;
+  color:#f5eee0!important
+}
+.arena .overlay .dialog #dialog-title{
+  color:#fff0ce!important;text-shadow:0 2px 3px #050b16!important;
+}
+.arena .overlay .dialog #dialog-label,.arena .overlay .dialog .eyebrow{color:#e9cc85!important}
+.arena .overlay .dialog #dialog-body{color:#f5ead8!important;text-shadow:none!important;opacity:1!important}
+.arena .overlay .level-offer{color:#fff1d8!important}
+.arena .overlay .level-offer span,.arena .overlay .level-offer b{color:#f2c976!important}
+.arena .overlay .level-offer small{color:#e9f0f9!important}
+@media(max-width:490px){.arena .overlay .dialog{width:calc(100vw - 24px)!important;max-width:calc(100vw - 24px)!important}}

@@ -1,0 +1,7 @@
+/* Choices owned by server; distinct from offline leveling overlay. */
+.coop-server-upgrades{position:fixed;z-index:2100;right:18px;bottom:85px;max-width:min(345px,calc(100vw - 36px));display:flex;flex-direction:column;gap:8px;padding:14px;background:#142b41;color:#fff1d5;border:2px solid #bba266;box-shadow:0 5px 24px #000b;border-radius:9px;font:14px system-ui,sans-serif}
+.coop-server-upgrades[hidden]{display:none!important}
+.coop-server-upgrades strong{font:700 16px Georgia,serif;color:#ffe5a2}
+.coop-server-upgrades small{color:#e3e8ef;line-height:1.4}
+.coop-server-upgrades button{padding:9px 13px;text-align:left;color:#152638;background:#e7eff4;border:1px solid #afbfce;border-radius:5px;font-weight:700;cursor:pointer}
+.coop-server-upgrades button:hover,.coop-server-upgrades button:focus-visible{background:#ffdca0;outline:2px solid #7cb4ec;outline-offset:1px}

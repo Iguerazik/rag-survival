@@ -1,0 +1,53 @@
+/* V22 multiplayer readable, movable network indicator and nonblocking interaction. */
+.arena #party-status{display:flex!important;flex-direction:column;gap:4px;position:fixed!important;left:14px;right:auto;top:auto;bottom:100px;width:max-content;max-width:245px;padding:7px 9px!important;border:1px solid #adbcce;border-radius:5px;background:#1b2f43ee;color:#edf4ff;z-index:48!important;box-shadow:0 3px 13px #0008;pointer-events:auto!important;font:700 11px Tahoma,Arial,sans-serif;text-shadow:none!important}
+.arena #party-status[hidden]{display:none!important}
+.arena .ro-ping-grip{cursor:grab;user-select:none;touch-action:none;font:800 10px Tahoma,Arial;color:#ffe3a2;letter-spacing:.07em;border-bottom:1px solid #8297a6;padding-bottom:3px}
+.arena .ro-ping-grip:active{cursor:grabbing}
+.coop-server-rewards{left:18px!important;right:auto!important;border-color:#67b9be}
+.coop-server-upgrades[hidden],.coop-server-rewards[hidden]{display:none!important;pointer-events:none!important}
+.arena .online-death-overlay{pointer-events:none!important}
+.arena #online-revive-hint[hidden]{display:none!important}
+
+/* Full-screen HUD grids cannot catch pointer input meant for the dungeon. */
+.arena .hud-left,.arena .hud-right,.arena .classic-hud,.arena .run-bottom{pointer-events:none!important}
+.arena .hud-player,.arena .map-window,.arena .quest-window,.arena .shortcut-window,.arena .ro-quickbar,.arena .hud-customize{pointer-events:auto!important}
+
+/* V22.1 — a janela de música do menu era forçada a "position:relative" por .menu>* e saía da tela. */
+html .menu>.ro-music-popover{position:fixed;z-index:700;top:62px;right:20px;left:auto;bottom:auto;
+  width:min(350px,calc(100vw - 24px));max-height:calc(100vh - 80px);overflow:auto;box-sizing:border-box}
+html .menu>.ro-music-popover .ro-music-options{align-items:flex-start}
+html .menu>.ro-music-popover .ro-music-file{min-width:0}
+html .menu>.ro-music-popover .ro-music-file input{max-width:100%}
+
+/* V22.1 — dica das habilidades e descrição nas escolhas de nível */
+.skill-tip{position:fixed;z-index:950;max-width:250px;padding:7px 10px;border-radius:5px;pointer-events:none;
+  background:linear-gradient(#f5f8fb,#d9e4ee);border:1px solid #7f9bb8;box-shadow:0 6px 18px #0008;color:#1d3651;
+  font:12px/1.35 system-ui;display:flex;flex-direction:column;gap:2px}
+.skill-tip[hidden]{display:none}
+.skill-tip strong{font-size:13px;color:#16314f}
+.skill-tip small{color:#5a6f85;font-size:11px}
+html[data-theme="dark"] .skill-tip{background:linear-gradient(#26334a,#1b2536);border-color:#5b7699;color:#dfe8f3}
+html[data-theme="dark"] .skill-tip strong{color:#ffe7b0}
+html[data-theme="dark"] .skill-tip small{color:#a9b9cc}
+.coop-server-upgrades button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left}
+.coop-server-upgrades button .coop-offer-desc{font-weight:600;font-size:11.5px;color:#3a5470!important;opacity:1;line-height:1.3}
+html[data-theme="dark"] .coop-server-upgrades button .coop-offer-desc{color:#c3d3e6!important}
+
+/* V22.5 — passivas e imbuimentos da run online (ao lado da barra de habilidades) */
+.online-passives{position:fixed;z-index:34;left:50%;bottom:118px;transform:translateX(-50%);display:flex;flex-wrap:wrap;justify-content:center;gap:3px;
+  max-width:min(520px,92vw);padding:3px 5px;border-radius:4px;background:#e7edf5e6;border:1px solid #839bb7;box-shadow:0 2px 6px #0006;pointer-events:auto}
+.online-passives[hidden]{display:none}
+.online-passive{position:relative;width:24px;height:24px;border:1px solid #8a9db1;border-radius:3px;background:#d6dfea;display:grid;place-items:center;cursor:help}
+.online-passive img{width:20px;height:20px;image-rendering:pixelated}
+.online-passive b{position:absolute;right:0;bottom:-2px;font:800 9px system-ui;color:#16314f;text-shadow:0 0 2px #fff,0 0 2px #fff}
+html[data-theme="dark"] .online-passives{background:#1b2536e6;border-color:#4b6380}
+html[data-theme="dark"] .online-passive{background:#26334a;border-color:#4b6380}
+html[data-theme="dark"] .online-passive b{color:#ffe7b0;text-shadow:0 0 2px #000,0 0 2px #000}
+.skill-slot[data-skill=""]{opacity:.55}
+.coop-server-rewards button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left}
+.coop-relic{display:flex;flex-direction:column;gap:3px;padding:7px 8px;border-radius:5px;background:#eef3f8;color:#1d3651;margin-top:6px}
+.coop-relic>b{font-size:13px}.coop-relic button{margin-top:2px}
+html[data-theme="dark"] .coop-relic{background:#26334a;color:#dfe8f3}
+.coop-server-upgrades .coop-skip{margin-top:8px;opacity:.85;font-weight:600}
+.coop-server-upgrades .coop-relic .coop-offer-desc{color:#3a5470!important;opacity:1;font-weight:600;font-size:11.5px;line-height:1.3}
+html[data-theme="dark"] .coop-server-upgrades .coop-relic .coop-offer-desc{color:#c3d3e6!important}

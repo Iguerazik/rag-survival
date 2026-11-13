@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#dae7ee" id="theme-color">
+<meta name="description" content="RAG SURVIVAL — sobreviva às hordas de Rune-Midgard. Renasça em Juno, evolua até a terceira classe e enfrente os MVPs em expedições solo ou em grupo.">
+<meta name="application-name" content="RAG SURVIVAL">
+<meta name="apple-mobile-web-app-title" content="RAG SURVIVAL">
+<meta property="og:title" content="RAG SURVIVAL">
+<meta property="og:description" content="Sobrevivência contra hordas de monstros, inspirada em Ragnarok Online. Solo ou com até 6 amigos.">
+<meta name="theme-color" content="#1b1410">
+<title>RAG SURVIVAL</title>
+<link rel="icon" href="assets/mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css?v=12">
+<link rel="stylesheet" href="expedition.css?v=12">
+<link rel="stylesheet" href="renewal.css?v=12">
+<link rel="stylesheet" href="client.css?v=12">
+<link rel="stylesheet" href="features.css?v=12">
+<link rel="stylesheet" href="theme.css?v=12">
+<link rel="stylesheet" href="v4.css?v=12">
+<link rel="stylesheet" href="v5.css?v=12">
+<link rel="stylesheet" href="v6.css?v=12">
+<link rel="stylesheet" href="v7.css?v=12">
+<link rel="stylesheet" href="v8-ro-client.css?v=12">
+<link rel="stylesheet" href="v9-ro-hud.css?v=12">
+<link rel="stylesheet" href="v8-progression.css?v=12">
+<link rel="stylesheet" href="v9-ragnarok-hud.css?v=12">
+<link rel="stylesheet" href="v10-classic.css?v=12">
+<link rel="stylesheet" href="v11.css?v=12">
+<link rel="stylesheet" href="v12.css?v=12">
+<link rel="stylesheet" href="v13.css?v=13">
+<link rel="stylesheet" href="v14-roguelike.css?v=14">
+<link rel="stylesheet" href="v15-polish.css?v=15">
+<link rel="stylesheet" href="v17.css?v=17">
+<link rel="stylesheet" href="account.css?v=18">
+<link rel="stylesheet" href="v19-authority.css?v=19">
+<link rel="stylesheet" href="v20-online.css?v=20">
+<link rel="stylesheet" href="v21-coop.css?v=21">
+<link rel="stylesheet" href="v23.css?v=23.5">
+<!-- MIDGARD_AUTH_BOOTSTRAP -->
+<script>
+  // Apply the saved (or system) theme before the page paints.
+  (() => {
+    let theme;
+    try { theme = localStorage.getItem('midgard-theme'); } catch {}
+    if (theme !== 'dark' && theme !== 'light') theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.dataset.theme = theme;
+  })();
+</script>
+<script defer src="assets/ro/sprites.js?v=12"></script>
+<script defer src="assets/ro/renewal-sprites.js?v=12"></script>
+<script defer src="assets/ro/v17-cast-actions.js?v=17"></script>
+<script defer src="assets/ro/v4-bosses.js?v=12"></script>
+<script defer src="assets/ro/v12-mvps.js?v=12"></script>
+<script defer src="assets/ro/v12-monsters.js?v=12"></script>
+<script defer src="jobs.js?v=22.5"></script>
+<script defer src="renewal.js?v=22.5"></script>
+<script defer src="status.js?v=13"></script>
+<script defer src="art.js?v=12"></script>
+<script defer src="expedition.js?v=13"></script>
+<script defer src="cards.js?v=12"></script>
+<script defer src="assets/fx/manifest.js?v=12"></script>
+<script defer src="assets/fx/ro-catalog/manifest.js?v=12"></script>
+<script defer src="skillfx.js?v=15"></script>
+<script defer src="items.js?v=23.5"></script>
+<script defer src="difficulty.js?v=22.5"></script>
+<script defer src="progression.js?v=13"></script>
+<script defer src="encounters.js?v=12"></script>
+<script defer src="codex.js?v=23.2"></script>
+<script defer src="mapgen.js?v=13"></script>
+<script defer src="warps.js?v=12"></script>
+<script defer src="account.js?v=22.5"></script>
+<script defer src="coop.js?v=22.5"></script>
+<script defer src="bgm.js?v=13"></script>
+<script defer src="trials.js?v=12"></script>
+<script defer src="controls.js?v=12"></script>
+<script defer src="elements.js?v=12"></script>
+<script defer src="run-items.js?v=23.5"></script>
+<script defer src="roguelike.js?v=23.5"></script>
+<script defer src="run-loot.js?v=23.5"></script>
+<script defer src="v12-systems.js?v=23.5"></script>
+<script defer src="campaign.js?v=13"></script>
+<script defer src="combat-animations.js?v=21"></script>
+<script defer src="weapon-visual.js?v=21"></script>
+<script defer src="combat-v17.js?v=17"></script>
+<script type="module" src="engine/browser.mjs?v=23.5"></script>
+<script defer src="local-room.js?v=23.5"></script>
+<script defer src="game.js?v=23.5"></script>
+<script defer src="online-help-v20.js?v=20"></script>
+<script defer src="bestiary.js?v=12"></script>
+<script defer src="ro-windows.js?v=15"></script>
+<script defer src="ro-hud-layout.js?v=22"></script>
+<script defer src="v12-ui.js?v=12"></script>
+<link rel="stylesheet" href="v22-fixes.css?v=22.5">
+</head>
+<body>
+<main id="menu" class="menu">
+  <header class="site-head wrap">
+    <a class="brand" href="./"><img src="assets/mark.svg" alt="" width="34" height="34"><span>RAG <b>SURVIVAL</b></span></a>
+    <div class="site-actions"><span class="account-welcome" id="account-welcome"></span><button type="button" class="sound" id="account-open">Entrar / Criar conta</button><button type="button" class="sound" id="account-logout" hidden>Sair da conta</button><button type="button" class="sound" id="online-help-open">❔ Como jogar online</button><button class="sound theme-toggle" id="menu-theme" type="button" aria-pressed="false">Modo escuro</button><button class="sound" id="menu-sound" type="button" aria-pressed="false" title="Ativar efeitos e música">Som desligado</button><button class="sound ro-music-launch" type="button" id="menu-music-launch" aria-controls="menu-music-popover" aria-expanded="false" title="Controles de música">♫ Música</button></div>
+  </header>
+  <section id="menu-music-popover" class="ro-music-popover" aria-label="Ajustes de música" hidden>
+    <header><strong>♫ Música</strong><button type="button" id="music-popover-close" aria-label="Fechar configurações de música">✕</button></header>
+    <div class="music-pocket-controls"><button type="button" id="menu-music-play" aria-pressed="false" title="Pausar / tocar música">❚❚</button><label class="ro-music-level">Volume <input type="range" min="0" max="100" value="32" id="bgm-volume" aria-label="Volume da música"></label></div>
+    <label class="ro-music-select">Música <select id="menu-track" aria-label="Trocar música"><option value="menu">Prontera</option><option value="sewer">Esgotos</option><option value="payon">Payon</option><option value="maze">Labirinto</option><option value="orc">Orcs</option><option value="geffen">Geffen</option><option value="payonfield">Floresta de Payon</option><option value="glast">Prisão de Glast Heim</option><option value="mine">Mina Abandonada</option><option value="temple">Templo Esquecido</option><option value="shadow">Bosque das Sombras</option></select></label>
+    <div class="ro-music-options"><button type="button" id="menu-bgm-source" class="sound" aria-pressed="true">Usar arquivos do RO</button><label class="ro-music-file">Carregar áudio <input id="menu-music-file" type="file" accept="audio/mpeg,audio/mp3,audio/ogg,.mp3,.ogg"></label></div>
+    <p class="ro-audio-help">A faixa oficial de Prontera (08.mp3) não acompanha o pacote. Adicione seu arquivo autorizado em assets/bgm/ro/08.mp3. Sem ele, toca a composição alternativa.</p>
+  </section>
+  <div class="wrap">
+    <nav class="lobby-dock" aria-label="Menu do aventureiro">
+      <button type="button" id="nav-status"><img class="dock-ro-icon" src="assets/skin-v11/btn_status_off.png" alt=""><span>Status</span></button>
+      <button type="button" id="nav-equipment"><img class="dock-ro-icon" src="assets/skin-v11/btn_equip_off.png" alt=""><span>Equipamentos</span></button>
+      <button type="button" id="nav-inventory"><img class="dock-ro-icon" src="assets/skin-v11/btn_items_off.png" alt=""><span>Inventário</span></button>
+      <button type="button" id="nav-cards"><span class="ro-dock-glyph">♠</span><span>Cartas</span></button>
+      <button type="button" id="nav-codex"><span class="ro-dock-glyph">✧</span><span>Códex</span></button>
+      <button type="button" id="nav-bestiary"><img class="dock-ro-icon" src="assets/monsters/poring.gif" alt=""><span>Bestiário</span></button>
+      <button type="button" id="nav-pets"><span class="ro-dock-glyph">♣</span><span>Pets e loja</span></button>
+      <button type="button" id="nav-online"><span class="ro-dock-glyph">◇</span><span>Multiplayer</span></button>
+      <button type="button" id="nav-scores"><span class="ro-dock-glyph">♛</span><span>Recordes</span></button>
+      <button type="button" id="nav-settings" class="ro-settings-link"><img class="dock-ro-icon" src="assets/skin-v11/btn_option_off.png" alt=""><span>Opções</span></button>
+    </nav>
+    <section class="hero" aria-labelledby="title">
+      <div class="hero-content">
+        <p class="eyebrow"><span></span> RAGNAROK ONLINE · RENEWAL</p>
+        <h1 id="title">RAG <em>SURVIVAL</em></h1>
+        <p class="intro">Escolha sua linhagem, evolua até a terceira classe e enfrente os MVPs de Rune-Midgard.</p>
+        <div class="hero-meta"><span>◆</span> Solo ou co-op para até 6 jogadores</div>
+      </div>
+    </section>
+    <section class="online-hub" id="online-hub" aria-label="Partida com amigos">
+      <div class="online-hub-banner"><div><small>◈ COMPANHIA DE RUNE-MIDGARD</small><h2>Jogue com seus amigos</h2><p>Contas individuais · Salas privadas · Combate cooperativo para até 6 aventureiros</p></div><button type="button" id="online-hub-help" class="sound">❔ Como entrar</button></div>
+      <section id="coop-panel" class="coop-panel" aria-labelledby="coop-title">
+        <div class="section-head"><h3 id="coop-title">🏰 Lobby cooperativo</h3><span>ATÉ 6 JOGADORES</span></div><p class="online-lobby-description">Crie uma sala, entre com o código de um amigo ou escolha uma das salas abertas. Escolha sua classe e a expedição antes de confirmar.</p>
+        <div id="coop-setup" class="coop-setup">
+          <label>Nick da conta <input id="coop-name" maxlength="24" placeholder="Entre na sua conta" readonly></label>
+          <button id="coop-create" type="button" class="primary">Criar sala</button>
+          <form id="coop-join"><label>Código <input id="coop-code" maxlength="6" placeholder="ABC123" autocomplete="off" autocapitalize="characters"></label><button type="submit" class="sound">Entrar</button></form>
+          <div id="coop-open" class="coop-open"><div class="coop-open-head"><strong>Salas abertas</strong><button id="coop-open-refresh" class="sound" type="button">Atualizar</button></div><ul id="coop-open-list" class="coop-open-list"><li class="coop-open-empty">Carregando…</li></ul></div>
+        </div>
+        <div id="coop-room" hidden>
+          <div class="room-code"><strong id="coop-room-code"></strong><button id="coop-copy" class="sound" type="button">Copiar convite</button></div>
+          <p class="coop-match" id="coop-lobby-map" aria-live="polite">Escolhendo mapa…</p>
+          <p class="coop-lobby-warning" id="coop-lobby-warning" role="status"></p>
+          <ul id="coop-members" class="coop-members"></ul>
+          <div class="room-actions"><button id="coop-ready" class="primary" type="button">Estou pronto</button><button id="coop-start" class="primary" type="button">Iniciar com o grupo</button><button id="coop-leave" class="sound" type="button">Sair da sala</button></div>
+        </div>
+        <p id="coop-status" role="status"></p>
+      </section>
+    </section>
+    <section class="roster" aria-labelledby="roster-title">
+      <div class="lobby-columns">
+        <div class="character-window client-window">
+      <div class="section-head client-title"><h2 id="roster-title">Escolha sua linhagem</h2><span id="record">RECORDE · 00:00</span></div>
+      <div class="client-content">
+      <fieldset class="journey-mode">
+        <legend>Progressão</legend>
+        <label><input type="radio" name="journey-mode" value="career" checked><span>Jornada Renewal</span></label>
+        <label><input type="radio" name="journey-mode" value="training"><span>Treino de 3ª classe</span></label>
+      </fieldset>
+      <div id="classes" class="classes" aria-label="Classes disponíveis"></div>
+      <section id="journey" class="journey" aria-label="Evolução da classe"></section>
+      </div>
+      </div>
+      <div class="expedition-window client-window">
+        <div class="section-head client-title"><h3 id="maps-heading">Expedição</h3></div>
+        <div class="client-content">
+      <!-- O controle de música fica recolhido na barra superior. -->
+      <fieldset class="difficulty-choice"><legend>Dificuldade da expedição</legend>
+  <label for="difficulty"><span>Desafio</span><select id="difficulty">
+    
+    <option value="easy" selected>Fácil — indicado solo</option>
+    <option value="normal">Normal — clássico</option>
+    <option value="hard" disabled>🔒 Difícil — conclua todos os mapas no Normal</option>
+    <option value="nightmare" disabled>🔒 Pesadelo — conclua todos os mapas no Difícil</option>
+  </select></label><small id="difficulty-hint">Os inimigos se adaptam ao tamanho da equipe.</small>
+</fieldset>
+<section class="expeditions" aria-labelledby="maps-heading">
+        <div id="expedition-options" class="expedition-options"></div>
+      </section>
+      <div class="launch">
+        <fieldset class="combat-mode">
+          <legend>Habilidades</legend>
+          <label><input type="radio" name="combat-mode" value="auto" checked> <span>Automáticas</span></label>
+          <label><input type="radio" name="combat-mode" value="manual"> <span>Manuais</span></label>
+        </fieldset>
+        <div class="launch-actions"><button id="menu-character-status" class="sound" type="button">✧ Status</button><button id="menu-character-equipment" class="sound" type="button">⚔ Equipamentos</button><button id="menu-inventory" class="sound" type="button">🎒 Inventário</button><button id="menu-cards" class="sound" type="button">▣ Cartas</button><button id="menu-codex" class="sound" type="button">📖 Códex</button><button id="menu-pets" class="sound" type="button">🐾 Pets & Loja</button><button id="coop-toggle" class="sound" type="button" aria-expanded="false">Jogar online</button><button id="start" class="primary">Jogar solo <span aria-hidden="true">→</span></button></div>
+      </div>
+
+      <p id="controls-help" class="controls-help"></p>
+      </div>
+      </div>
+      </div>
+      <section id="class-tree" class="class-tree client-window" aria-labelledby="class-tree-title"></section>
+    </section>
+    <footer class="footer">RAG SURVIVAL · V24 · Jogo de fã sem fins lucrativos. Ragnarok Online e seus recursos gráficos pertencem à Gravity.</footer>
+  </div>
+</main>
+<dialog id="online-help-dialog" class="online-help-dialog" aria-labelledby="online-help-title">
+  <header class="online-help-head"><div><small>GUIA DO AVENTUREIRO</small><h2 id="online-help-title">Como jogar online</h2></div><button type="button" id="online-help-close" aria-label="Fechar ajuda">✕</button></header>
+  <div class="online-help-content"><p>Você não precisa instalar nem baixar arquivos para jogar com seus amigos pelo navegador.</p>
+    <ol><li><strong>Abra o mesmo link HTTPS</strong> que o anfitrião enviou.</li><li><strong>Crie sua conta ou faça login.</strong> Cada jogador precisa usar sua própria conta.</li><li>Escolha sua <strong>classe</strong> no menu principal.</li><li>Em <strong>Lobby cooperativo</strong>, clique em <em>Criar sala</em> ou digite o <strong>código de 6 caracteres</strong> recebido.</li><li>O líder escolhe mapa e dificuldade. Os convidados clicam em <strong>Estou pronto</strong>.</li><li>O líder clica em <strong>Iniciar com o grupo</strong>. Durante a partida, aproxime-se de um aliado caído e segure <kbd>R</kbd> para ressuscitá-lo.</li></ol>
+    <p class="online-help-note">O servidor fica sempre online na nuvem: ninguém precisa deixar o computador ligado. A sala é limitada a seis pessoas.</p>
+    <button type="button" class="primary" id="online-help-to-lobby">Entendi · Ir para o lobby →</button>
+  </div>
+</dialog>
+<dialog id="account-dialog" class="account-dialog" aria-labelledby="account-dialog-title">
+  <header class="account-head"><div><small>AVENTUREIROS DE RUNE-MIDGARD</small><h2 id="account-dialog-title">Conta online</h2></div><button type="button" id="account-close" aria-label="Fechar">✕</button></header>
+  <p class="account-description">Crie sua identidade para jogar em salas de até 6 pessoas e salvar o progresso no servidor.</p>
+  <div class="account-tabs"><button type="button" id="account-tab-login" aria-pressed="true">Entrar</button><button type="button" id="account-tab-register" aria-pressed="false">Criar conta</button></div>
+  <form id="account-login-form" class="account-form">
+    <label>Usuário <input name="username" required minlength="3" maxlength="20" autocomplete="username"></label>
+    <label>Senha <input name="password" type="password" required autocomplete="current-password"></label>
+    <button class="primary" type="submit">Entrar na conta</button>
+  </form>
+  <form id="account-register-form" class="account-form" hidden>
+    <label>Usuário <input name="username" required minlength="3" maxlength="20" autocomplete="username" pattern="[a-zA-Z][a-zA-Z0-9_]{2,19}"></label>
+    <label>E-mail <input name="email" type="email" required autocomplete="email"></label>
+    <label>Nick no jogo <input name="nickname" required minlength="3" maxlength="24" autocomplete="nickname"></label>
+    <label>Senha (mínimo 8 caracteres) <input name="password" type="password" required minlength="8" maxlength="128" autocomplete="new-password"></label>
+    <label>Confirmar senha <input name="confirm" type="password" required minlength="8" maxlength="128" autocomplete="new-password"></label>
+    <button class="primary" type="submit">Criar meu aventureiro</button>
+  </form>
+  <p class="account-feedback" id="account-feedback" role="status" aria-live="polite"></p>
+</dialog>
+<dialog id="account-profile-dialog" class="account-dialog" aria-labelledby="account-profile-title"><header class="account-head"><h2 id="account-profile-title">Meu aventureiro</h2><button type="button" id="account-profile-close">✕</button></header><p id="account-profile-info"></p><p id="account-cloud-status"></p><button id="account-import-local" class="sound" type="button">Importar progresso de visitante (uma vez)</button><p class="account-import-note">A importação substitui o progresso online desta conta. Use apenas se você jogava antes de criar a conta.</p></dialog>
+<dialog id="bestiary-dialog" class="rebirth-dialog catalogue-dialog" aria-labelledby="bestiary-heading"><header class="inventory-head"><h2 id="bestiary-heading">Bestiário de Rune-Midgard</h2><button id="bestiary-close" type="button">Fechar ✕</button></header><div id="bestiary-list" class="bestiary-grid"></div></dialog>
+  <dialog id="codex-dialog" class="rebirth-dialog catalogue-dialog" aria-labelledby="codex-heading">
+  <header class="inventory-head"><h2 id="codex-heading">Códex de Combinações</h2><button id="codex-close" class="sound" type="button">Fechar ✕</button></header>
+  <p id="codex-summary"></p><p class="codex-hint">As combinações ainda não descobertas mostram silhuetas das habilidades e dos equipamentos. Combine uma habilidade de nível 2 com o item correto para revelar a evolução.</p><div id="codex-list" class="codex-grid"></div>
+</dialog>
+<dialog id="pets-dialog" class="rebirth-dialog catalogue-dialog" aria-labelledby="pets-heading">
+  <header class="inventory-head"><h2 id="pets-heading">Estábulo & Loja do Códex</h2><button id="pets-close" class="sound" type="button">Fechar ✕</button></header>
+  <p id="pets-summary"></p><div id="pets-list" class="codex-grid"></div><h3>Melhorias do pet</h3><div id="pet-upgrades-list" class="codex-grid"></div>
+</dialog>
+<dialog id="inventory-dialog" class="rebirth-dialog inventory-dialog" aria-labelledby="inventory-title">
+  <div class="inventory-head"><div><p class="eyebrow">ARMAZÉM DE MIDGARD</p><h2 id="inventory-title">Inventário de equipamentos</h2></div><div class="inventory-head-actions"><button id="inventory-sell-extras" class="sound" type="button">Vender sobras</button><button id="inventory-close" class="sound" type="button">Fechar ✕</button></div></div>
+  <p id="inventory-summary" class="inventory-summary"></p><div id="inventory-tabs" class="inventory-tabs"></div>
+  <div id="inventory-list" class="inventory-list"></div>
+</dialog>
+<dialog id="card-dialog" class="rebirth-dialog card-dialog" aria-labelledby="card-dialog-title">
+    <h2 id="card-dialog-title">Álbum de cartas</h2>
+    <p id="card-dialog-note"></p>
+    <div id="card-list" class="card-list"></div>
+    <form method="dialog"><button type="button" class="sound" id="card-back-to-inventory" hidden>← Voltar ao inventário</button><button class="primary" value="close">Fechar ✕</button></form>
+  </dialog>
+  <dialog id="rebirth-dialog" class="rebirth-dialog" aria-labelledby="rebirth-title">
+    <h2 id="rebirth-title">Livro de Ymir</h2>
+    <p>Você vai renascer em Juno como Aprendiz T., no nível base 1 e de classe 1. Seus atributos e pontos de atributo serão reiniciados.</p>
+    <form method="dialog"><button class="sound" value="cancel">Cancelar</button><button class="primary" value="rebirth">Confirmar renascimento</button></form>
+  </dialog>
+
+  <dialog id="character-dialog" class="ro-character-dialog" aria-labelledby="character-dialog-heading">
+    <header class="ro-dialog-bar"><h2 id="character-dialog-heading">Equipamentos do personagem</h2><button type="button" id="character-dialog-close" aria-label="Fechar janela">✕</button></header>
+    <div id="character-dialog-body"></div>
+  </dialog>
+<dialog id="controls-dialog" class="rebirth-dialog ro-options-dialog" aria-labelledby="controls-title">
+  <header class="ro-options-head"><div><small>CONFIGURAÇÕES · CLIENTE RAG SURVIVAL</small><h2 id="controls-title">⌨ Teclas & Controles</h2></div><button type="button" id="controls-close" aria-label="Fechar configurações">✕</button></header>
+  <p class="ro-options-intro">Clique numa tecla para remapear. As setas também movimentam o personagem. Teclas de movimento não podem abrir menus.</p>
+  <div class="controls-bindings" id="controls-bindings"></div>
+  <p class="controls-warning" id="controls-message" role="status" aria-live="polite"></p>
+  <footer><button type="button" id="controls-reset">↺ Restaurar padrão</button><button type="button" id="controls-done">Salvar e voltar</button></footer>
+</dialog>
+<section id="arena" class="arena" aria-label="Expedição" hidden>
+  <canvas id="field" aria-label="Arena de combate"></canvas>
+  <div id="online-death-overlay" class="online-death-overlay" role="status" aria-live="polite" hidden><div class="online-death-symbol">✝</div><strong>VOCÊ CAIU!</strong><p>Seu personagem está incapacitado. Um aliado pode reviver você ficando perto do seu personagem por alguns segundos.</p><div id="online-revive-progress" class="online-revive-progress"></div></div>
+  <div id="online-revive-hint" class="online-revive-hint" role="status" hidden><strong>✚ Aliado caído por perto</strong><span>Permaneça próximo para ressuscitar automaticamente</span><meter id="online-revive-meter" min="0" max="3.25" value="0"></meter></div>
+  <div class="hud classic-hud">
+    <section class="ro-window hud-player" aria-label="Informações do personagem">
+      <h2 class="ro-title"><span class="ro-panel-heading"><img src="assets/skin-v11/btn_status_off.png" alt="" aria-hidden="true"> Informações básicas</span><span class="ro-panel-chrome" aria-hidden="true">─ ◇</span></h2>
+      <div class="hud-character">
+        <div class="hud-emblem" id="hud-emblem"></div>
+        <div class="char-info">
+          <strong id="hud-class"></strong>
+          <div class="vital"><b>HP</b><div class="health" aria-label="Vida"><i id="hp-fill"></i><span id="hp-text"></span></div></div>
+          <div class="vital" id="sp-row"><b>SP</b><div class="health mana" aria-label="Pontos de habilidade"><i id="sp-fill"></i><span id="sp-text"></span></div></div>
+        </div>
+      </div>
+      <div class="hud-level"><span class="ro-level-chip" id="hud-level">Nv. base 1</span><span id="hud-combat-mode">Automático</span><span id="hud-gold" aria-label="Zeny recolhidos">0 z</span><span id="hud-pet"></span></div>
+      
+    </section>
+    <div class="hud-right">
+      <section class="ro-window map-window" aria-label="Minimapa e partida">
+        <div class="ro-title map-titlebar">
+          <div><h2 id="map-title">Mapa</h2></div>
+          <button id="minimap-toggle" class="window-button" type="button" aria-expanded="true" aria-controls="minimap" aria-label="Recolher minimapa">−</button>
+        </div>
+        <canvas id="minimap" width="132" height="112" aria-label="Minimapa"></canvas>
+        <div class="map-stats"><strong id="time">00:00</strong><small id="kills">0 abates</small><span id="stage">ONDA 1</span><small id="mvp-countdown">MVP 05:00</small></div>
+      </section>
+      <div id="party-status" class="party-status" hidden><div class="ro-ping-grip" title="Arraste para mover o ping">⠿ REDE</div><span id="ping-text">Conectando…</span></div>
+      <section class="ro-window quest-window" aria-label="Missão">
+        <h2 class="ro-title ro-quest-title"><span id="quest-title">Missão da expedição</span><button type="button" class="ro-panel-min" id="quest-toggle" aria-expanded="true" aria-label="Recolher ou expandir missão">−</button></h2>
+        <p id="quest-text">Derrote 40 monstros · 0/40</p>
+        <progress id="quest-progress" value="0" max="40"></progress>
+      </section>
+    </div>
+  </div>
+  <nav class="hud-actions ro-quickbar" aria-label="Menu rápido da expedição">
+    <div class="ro-toolbar-grip" title="Arraste este menu para mudar de posição">
+      <span>❖ MENU <small>RAG SURVIVAL</small></span>
+      <button type="button" id="quickbar-collapse" aria-expanded="true" aria-label="Recolher painel de atalhos">−</button>
+    </div>
+    <div class="ro-toolbar-buttons">
+      <button type="button" class="sound hud-ro-status" data-label="Status" data-key="Alt+S" id="hud-status" title="Status do personagem · Alt+S" aria-label="Status do personagem (Alt+S)"><img src="assets/skin-v11/btn_status_off.png" alt=""><span>Status</span><kbd>Alt S</kbd></button>
+      <button type="button" class="sound hud-ro-equip" data-label="Equip." data-key="Alt+E" id="hud-equipment" title="Equipamentos · Alt+E" aria-label="Equipamentos (Alt+E)"><img src="assets/skin-v11/btn_equip_off.png" alt=""><span>Equip.</span><kbd>Alt E</kbd></button>
+      <button type="button" class="sound" data-label="Itens" data-key="I" id="run-inventory" title="Inventário · I" aria-label="Abrir inventário (I)"><img src="assets/skin-v11/btn_items_off.png" alt=""><span>Itens</span><kbd>I</kbd></button>
+      <button type="button" class="sound" data-label="Build" id="run-build-button" title="Abrir a construção temporária desta run"><img src="assets/ro/skill-mastery.png" alt=""><span>Build</span><kbd>✦</kbd></button>
+      <button type="button" class="sound" data-label="Cartas" data-key="C" id="run-cards" title="Álbum de cartas · C" aria-label="Abrir álbum de cartas (C)"><img src="assets/ro/skill-spirit.png" alt=""><span>Cartas</span><kbd>C</kbd></button>
+      <button type="button" class="sound" data-label="Códex" data-key="K" id="run-codex" title="Códex · K" aria-label="Abrir códex (K)"><img src="assets/ro/skill-mastery.png" alt=""><span>Códex</span><kbd>K</kbd></button>
+      <button type="button" class="sound" data-label="Pets" data-key="P" id="run-pets" title="Pets e loja · P" aria-label="Abrir pets (P)"><img src="assets/ro/poring.png" alt=""><span>Pets</span><kbd>P</kbd></button>
+      <button type="button" class="sound theme-toggle" data-label="Tema" data-key="" id="game-theme" title="Alternar entre modo claro e escuro" aria-label="Alternar tema" aria-pressed="false"><img src="assets/ro/skill-blessing.png" alt=""><span>Tema</span><kbd>◐</kbd></button>
+      <button type="button" class="sound" data-label="Som" data-key="" id="game-sound" title="Ativar ou desativar efeitos sonoros" aria-label="Som desligado" aria-pressed="false"><img src="assets/ro/skill-agiup.png" alt=""><span>Som</span><kbd>♪</kbd></button>
+      <button type="button" class="sound" data-label="Pausa" data-key="Esc" id="pause" title="Pausar a partida · Esc" aria-label="Pausar partida (Esc)"><img src="assets/ro/skill-endure.png" alt=""><span>Pausa</span><kbd>Esc</kbd></button>
+      <button type="button" class="sound ro-game-config" data-label="Opções" id="run-settings" title="Configurar os controles"><img src="assets/skin-v11/btn_option_off.png" alt=""><span>Opções</span><kbd>⚙</kbd></button>
+    </div>
+  </nav>
+  <div id="hud-customize" class="hud-customize"><span class="hud-drag-tip">⠿ Arraste pelo título</span><button type="button" id="hud-layout-reset" title="Restaurar posições das janelas">↺ HUD</button><button type="button" id="hud-layout-lock" aria-pressed="false" title="Travar ou liberar janelas">🔓</button></div>
+  <div id="game-music-panel" class="ro-music-in-game" aria-label="Controles da música durante a partida"><div class="ro-music-game-caption" title="Arraste este painel">♫</div><button type="button" id="game-music-play" title="Pausar/tocar música" aria-pressed="false">❚❚</button><input id="game-music-volume" type="range" min="0" max="100" value="32" aria-label="Volume da música durante a partida"></div>
+  <div class="ro-hud-hint" id="hud-hint" aria-hidden="true">Alt+S · Status &nbsp; Alt+E · Equipamentos &nbsp; I · Inventário &nbsp; Esc · Pausa</div>
+  <div id="combat-note" class="combat-note" role="status" hidden></div><div id="game-diagnostic" class="game-diagnostic" role="alert" hidden></div>
+  <div id="announcement" class="announcement" role="status" hidden></div>
+  <div class="boss-hud" id="boss-hud" hidden><strong id="boss-name"></strong><div><i id="boss-fill"></i></div></div>
+  <button id="portal-button" class="portal-button primary" type="button" hidden>Entrar no portal <kbd>E</kbd></button>
+  <div id="joystick" class="joystick" hidden><i></i></div>
+  <div class="run-bottom"><div class="ro-window shortcut-window"><div class="ro-title"><span><img class="ro-skill-title-icon" src="assets/skin-v11/btn_skill_off.png" alt="" aria-hidden="true"> Atalhos de habilidades</span><span id="skill-count"></span></div><div class="hotbar"><div id="skills" class="skill-bar"></div><button id="tree-button" class="tree-button" type="button">Árvore <kbd>T</kbd></button></div></div><div class="xp"><i id="xp-fill"></i><span id="xp-text">NÍVEL DA PARTIDA 1</span></div></div>
+  <div id="overlay" class="overlay" hidden>
+    <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
+      <p class="eyebrow" id="dialog-label"></p><h2 id="dialog-title"></h2><p id="dialog-body"></p><div id="dialog-actions"></div>
+    </section>
+  </div>
+</section>
+</body>
+</html>

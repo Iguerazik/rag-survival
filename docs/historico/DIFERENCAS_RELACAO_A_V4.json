@@ -1,0 +1,31 @@
+{
+  "version": "5.2.0",
+  "base": "Ecos_de_Rune_Midgard_V4_EXPANSAO_COMPLETA.zip",
+  "base_sha256": "7516a40ec5c2fc34b1982b5bd690953d34912dc40317e4b71db6d0168cd0492f",
+  "original_preserved": true,
+  "added": [
+    "COMO_JOGAR_ONLINE.md",
+    "LEIA-ME_V5_2.md",
+    "assets/bgm/ambient/geffen.ogg",
+    "assets/bgm/ambient/maze.ogg",
+    "assets/bgm/ambient/orc.ogg",
+    "assets/bgm/ambient/payon.ogg",
+    "assets/bgm/ambient/payonfield.ogg",
+    "assets/bgm/ambient/sewer.ogg",
+    "assets/bgm/ro/COLOQUE_AS_SUAS_MUSICAS_AQUI.txt",
+    "bgm.js",
+    "trials.js",
+    "v6.css",
+    "v7.css"
+  ],
+  "changed": [
+    "game.js",
+    "index.html",
+    "package.json",
+    "renewal.js",
+    "server.mjs",
+    "skillfx.js"
+  ],
+  "removed_in_v5": [],
+  "build_notes": "Download as new directory. Do not overwrite a concurrently edited project. Audio RO originals are not included."
+}

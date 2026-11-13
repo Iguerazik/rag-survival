@@ -1,0 +1,32 @@
+ECOS DE RUNE-MIDGARD V19 - TESTE MULTIPLAYER PELA INTERNET
+
+1) Extraia o ZIP COMPLETO DA V19 em uma pasta nova.
+2) Abra a pasta midgard-survivors, onde estao server.mjs e package.json.
+3) COPIE 01_SERVIDOR_ONLINE_V19.cmd e 02_PUBLICAR_LINK_PARA_AMIGOS.cmd para essa pasta.
+4) Instale Node.js 22.13+ em https://nodejs.org/ caso ainda nao tenha.
+5) Baixe cloudflared para Windows 64-bit no site oficial:
+   https://developers.cloudflare.com/tunnel/downloads/
+   Renomeie o executavel baixado como cloudflared.exe e coloque-o na mesma pasta
+   (alternativa: instalar cloudflared e adiciona-lo ao PATH).
+6) Feche as janelas antigas do servidor das versoes anteriores para liberar a porta 3001.
+7) Execute 01_SERVIDOR_ONLINE_V19.cmd. MANTENHA A JANELA ABERTA.
+8) Execute 02_PUBLICAR_LINK_PARA_AMIGOS.cmd. MANTENHA A JANELA ABERTA.
+9) Copie o link https://xxxxx.trycloudflare.com que aparecer na janela do tunel.
+10) TODOS acessam esse link, inclusive quem esta hospedando. Cada um cria a propria conta.
+11) Anfitriao: Multijogador -> Criar sala -> Compartilhar codigo da sala.
+12) Amigos: Multijogador -> Entrar com codigo -> Selecionar classe -> Pronto.
+13) Anfitriao seleciona mapa/dificuldade e inicia. O jogo admite 2 a 6 participantes.
+
+ATENCAO:
+- Os arquivos .cmd NAO sao o jogo completo; sao apenas inicializadores para a V19.
+- O banco de contas fica na pasta data da copia que voce esta rodando. Faça backup seguro.
+- No navegador, abra o endereco HTTPS PUBLICO, nao http://localhost:3001,
+  pois este modo exige HTTPS para o login.
+- Nao compartilhe o link do tunel publicamente. Quem tem o link alcanca o servidor.
+- Quick Tunnels sao somente para testes temporarios. O endereco muda se o tunel reiniciar.
+- O computador do anfitriao deve permanecer ligado, com ambas as janelas abertas.
+- O multiplayer da V19 e beta: ja ha simulacao autoritativa principal, mas ainda
+  faltam testes completos de latencia e a migracao de varias mecanicas do modo solo.
+- Se quiser hospedar continuamente, use VPS com dominio e Cloudflare Tunnel nomeado.
+- Se o firewall perguntar sobre Node.js, evite liberar em redes publicas; o servidor
+  deste kit escuta apenas em 127.0.0.1 e o acesso externo e pelo tunel.

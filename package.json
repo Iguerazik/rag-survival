@@ -1,0 +1,17 @@
+{
+  "name": "rag-survival",
+  "version": "24.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test tests/*.test.cjs",
+    "test:fast": "node --test tests/rules.test.cjs tests/v2*.test.cjs",
+    "bench:tps": "node tools/bench-tps.mjs",
+    "dev": "node --watch server.mjs"
+  },
+  "engines": {
+    "node": ">=22.13"
+  },
+  "description": "RAG SURVIVAL — sobrevivência contra hordas inspirada em Ragnarok Online (solo e multiplayer autoritativo a 60 TPS)."
+}

@@ -1,0 +1,28 @@
+/* Account panels: RO-inspired frame, readable in both color themes. */
+.account-welcome{font-size:12px;color:var(--ink,#dce9ff);opacity:.8;margin-right:4px}
+.account-dialog{border:2px solid #869db2;border-radius:10px;background:#162637;color:#e8eef7;width:min(460px,calc(100vw - 24px));max-height:calc(100dvh - 35px);padding:22px;box-shadow:0 30px 90px #0009;font:500 14px/1.5 system-ui,sans-serif}
+.account-dialog::backdrop{background:#060d19b9;backdrop-filter:blur(3px)}
+.account-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;border-bottom:1px solid #52738d;padding-bottom:12px;margin-bottom:12px}
+.account-head small{display:block;color:#dfbd78;font-size:10px;letter-spacing:.15em;font-weight:750}
+.account-head h2{font-size:25px;color:#f5edd9;margin:3px 0}
+.account-head button,.account-tabs button{border:1px solid #7393ad;border-radius:5px;background:#253e55;color:#fff;padding:8px 13px;cursor:pointer}
+.account-description,.account-import-note{color:#b9cad9;line-height:1.5;font-size:13px}
+.account-tabs{display:flex;gap:8px;margin:15px 0}
+.account-tabs button[aria-pressed="true"]{background:#f4da9c;color:#182738;font-weight:800;border-color:#f8e2b9}
+.account-form{display:grid;gap:11px}.account-form[hidden]{display:none}
+.account-form label{display:grid;gap:4px;font-weight:700;color:#f3e9d0}
+.account-form input{width:100%;border:1px solid #7695b1;border-radius:5px;background:#0b1d2d;color:#f6faff;padding:10px 12px;outline-offset:2px;min-height:42px}
+.account-form input:focus-visible{outline:2px solid #e5c37c}
+.account-form button.primary{padding:12px 16px;background:#d8aa58;color:#1b2534;font-weight:800;border:1px solid #e9cc8d;border-radius:5px;cursor:pointer}
+.account-form button:disabled{opacity:.6;cursor:progress}
+.account-feedback{min-height:20px;color:#bcebc0;font-weight:650}.account-feedback[data-error="true"],#account-cloud-status[data-error="true"]{color:#ffada5}
+#account-cloud-status{font-weight:700;color:#a9efc5}
+#account-import-local{border:1px solid #d6b774;padding:10px 13px;border-radius:5px}
+html[data-theme="light"] .account-dialog{background:#edf3fa;color:#1e334a;border-color:#8da7bf}
+html[data-theme="light"] .account-dialog .account-head h2{color:#223b50}
+html[data-theme="light"] .account-dialog .account-description,html[data-theme="light"] .account-dialog .account-import-note{color:#3c556b}
+html[data-theme="light"] .account-form label{color:#273c52}
+html[data-theme="light"] .account-form input{background:#fff;color:#182d46}
+html[data-theme="light"] .account-tabs button{background:#d7e4f1;color:#182d46}
+html[data-theme="light"] .account-tabs button[aria-pressed="true"]{background:#c79b58;color:#10243a}
+@media(max-width:680px){.account-welcome{display:none}.account-dialog{padding:14px}.site-actions #account-open{font-size:12px}}

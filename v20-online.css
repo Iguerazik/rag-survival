@@ -1,0 +1,58 @@
+/* V20 — browser-first multiplayer lobby and clearer recovery feedback */
+.menu .online-hub{margin:16px 0 24px;padding:14px;border:2px solid #d6b36c;border-radius:9px;
+ background:linear-gradient(135deg,#182b40,#0e1b2b);box-shadow:0 12px 36px #0004;color:#f6e8c7}
+.online-hub-banner{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:9px 10px 13px;border-bottom:1px solid #9e8659}
+.online-hub-banner small{font:700 11px system-ui;letter-spacing:.16em;color:#e5bd75}
+.online-hub-banner h2{margin:6px 0;font:700 clamp(22px,3vw,30px) Georgia,serif;color:#ffe5a9}
+.online-hub-banner p{margin:0;color:#dfebf4;line-height:1.45}
+.menu .online-hub .coop-panel{margin:13px 0 0!important;padding:16px!important;border:1px solid #a58a5c!important;border-radius:6px;background:#203449!important;color:#f0e4c9!important}
+.online-hub .coop-panel h3{color:#ffebc5!important;font:700 21px Georgia,serif!important}
+.online-hub .coop-panel .section-head span{color:#ecd39c!important}
+.online-lobby-description{color:#d9e6f3;margin:4px 0 15px}
+.menu .online-hub .coop-setup{display:flex;flex-wrap:wrap;gap:13px;align-items:end}
+.menu .online-hub label{color:#f0e4c9!important}
+.online-hub input{padding:10px!important;background:#142537!important;color:#fff9e8!important;border:1px solid #829ab6!important;border-radius:5px}
+.online-hub .coop-setup>label{min-width:175px;flex:1}
+.online-hub #coop-join{display:flex;align-items:end;gap:9px;flex-wrap:wrap}
+.online-hub .room-code{font:700 19px system-ui;color:#fff0c8}
+.online-hub #coop-members{margin:14px 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;list-style:none;padding:0}
+.online-hub #coop-members li{padding:12px 10px;background:#14253b;color:#f5e6cc;border:1px solid #8797a9;border-radius:6px;min-height:48px;overflow-wrap:anywhere;font-weight:600}
+.online-hub #coop-members .online-empty-slot{opacity:.55;border-style:dashed;font-weight:400}
+.online-hub #coop-status{color:#f4dba8!important;min-height:1.2em}
+html[data-theme=light] .online-hub{background:linear-gradient(135deg,#e6f0f5,#cbdce7);color:#23384c}
+html[data-theme=light] .online-hub-banner h2{color:#213e56}
+html[data-theme=light] .online-hub-banner p{color:#354958}
+html[data-theme=light] .online-hub .coop-panel{background:#edf3f5!important;color:#26394a!important}
+html[data-theme=light] .online-hub .coop-panel h3,html[data-theme=light] .online-hub .coop-panel label,html[data-theme=light] .online-hub #coop-status{color:#1c394d!important}
+html[data-theme=light] .online-hub .online-lobby-description{color:#31475d}
+html[data-theme=light] .online-hub #coop-members li{background:#fff;color:#19364b}
+.online-help-dialog{width:min(620px,calc(100vw - 20px));max-height:88vh;overflow:auto;padding:0;background:#182a3f;color:#f7ebd4;
+ border:2px solid #e3bf78;border-radius:9px;box-shadow:0 20px 60px #000b}
+.online-help-dialog::backdrop{background:#0009;backdrop-filter:blur(3px)}
+.online-help-head{display:flex;align-items:center;justify-content:space-between;background:#2b435d;padding:15px 19px;border-bottom:2px solid #cda75f}
+.online-help-head h2{margin:4px 0;font:700 26px Georgia,serif;color:#f9e0a8}
+.online-help-head small{font:700 11px system-ui;letter-spacing:.15em;color:#f0c681}
+.online-help-head button{cursor:pointer;background:#e0e9ed;border:1px solid #a4b6c5;border-radius:4px;padding:7px 12px;color:#182a3f}
+.online-help-content{padding:20px 23px;font:15px/1.55 system-ui,sans-serif}
+.online-help-content li{margin:10px 0;padding-left:4px}
+.online-help-content strong{color:#ffe6a9}
+.online-help-note{background:#30445a;padding:11px 14px;border-radius:5px}
+.online-help-content kbd,.online-revive-hint kbd,.online-death-overlay kbd{border:1px solid #eed29a;background:#2c3548;padding:1px 5px;border-radius:3px;color:#ffe4a5}
+html[data-theme=light] .online-help-dialog{background:#edf3f8;color:#233c53}
+html[data-theme=light] .online-help-content strong{color:#243f5b}
+html[data-theme=light] .online-help-note{background:#d5e3ee}
+.online-death-overlay{position:absolute;z-index:950;top:43%;left:50%;transform:translate(-50%,-50%);max-width:min(420px,90vw);
+ text-align:center;border:3px solid #e8c48c;border-radius:10px;box-shadow:0 0 0 9999px #18091166,0 12px 35px #0009;
+ background:#281b2b;color:#fff2de;padding:20px 23px;pointer-events:none}
+.online-death-overlay[hidden],.online-revive-hint[hidden]{display:none!important}
+.online-death-symbol{font-size:43px;color:#ffb3a8}
+.online-death-overlay strong{display:block;font:900 26px Georgia,serif;color:#ffd7c9}
+.online-death-overlay p{line-height:1.55}
+.online-revive-progress{background:#493a42;padding:8px;border-radius:5px;color:#ffe6a6}
+.online-revive-hint{position:absolute;z-index:850;left:50%;bottom:130px;transform:translateX(-50%);
+ display:grid;gap:5px;text-align:center;padding:12px 18px;background:#173f39;border:2px solid #b4ead0;border-radius:8px;color:#edfff7}
+.online-revive-hint meter{width:220px}
+@media(max-width:700px){.online-hub-banner{align-items:start;flex-direction:column}.online-hub #coop-members{grid-template-columns:repeat(2,minmax(0,1fr))}.menu .online-hub .coop-setup{display:grid}.online-hub #coop-join{display:flex}.online-death-overlay{padding:15px;top:47%}}
+
+.menu .online-hub #coop-setup[hidden],.menu .online-hub #coop-room[hidden]{display:none!important}
+

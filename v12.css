@@ -1,0 +1,63 @@
+/* V12: readable navigation, distinct run inventory, comparison and tier hierarchy. */
+html body .menu .lobby-dock .readable-icon,html body .arena .ro-toolbar-buttons .readable-icon{width:27px!important;height:27px!important;min-width:27px!important;object-fit:contain!important;image-rendering:auto!important;filter:none!important;background:none!important;border:0!important}
+html body .menu .lobby-dock{display:flex!important;flex-wrap:wrap!important;gap:5px!important;padding:7px!important}
+html body .menu .lobby-dock button{min-height:43px!important;min-width:95px!important;gap:7px!important;display:flex!important;align-items:center!important;justify-content:center!important;font:600 12px Tahoma,sans-serif!important;padding:5px 8px!important}
+html body .menu .lobby-dock button span{font-size:12px!important;color:inherit!important}
+html body dialog #inventory-list.run-item-grid{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:12px!important;padding:14px!important}
+.run-help{grid-column:1/-1;margin:0;padding:12px;background:var(--r10-window2);border:1px solid var(--r10-edge);border-radius:5px;font:13px/1.6 Tahoma,sans-serif}
+html body dialog .run-item{min-width:0;display:grid;grid-template-columns:minmax(0,1fr) 136px;gap:14px;align-items:center;padding:16px;border:1px solid var(--r10-edge);border-radius:6px;background:var(--r10-card);color:var(--r10-ink);font:13px/1.6 Tahoma,sans-serif}
+html body dialog .run-item strong{display:block;font-size:15px!important;margin-bottom:7px;color:var(--r10-ink)!important}
+html body dialog .run-item p{font:13px/1.6 Tahoma,sans-serif!important;margin:5px 0;color:var(--r10-muted)!important}
+html body dialog .run-item button{width:100%;min-height:40px;font:600 12px Tahoma!important;white-space:normal}
+.run-wing-settings{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid var(--r10-edge)}
+.run-wing-settings label{display:flex;align-items:center;gap:7px}.run-wing-settings input[type=number]{width:70px;padding:6px;font:14px Tahoma}
+html body #inventory-list .inventory-item{min-width:0;grid-template-columns:48px minmax(0,1fr)!important;font:13px Tahoma}
+html body #inventory-list .inventory-item p{font:12px/1.55 Tahoma!important}
+html body #inventory-list .inventory-item strong{font-size:14px!important}
+.tier-filter-label{display:flex;align-items:center;gap:8px;padding:9px 14px;font:12px Tahoma}.tier-filter-label[hidden]{display:none}.tier-filter-label select{padding:6px;background:var(--r10-card);color:var(--r10-ink);border:1px solid var(--r10-edge)}
+[data-tier="1"]{--tier-color:#aeb7c4}[data-tier="2"]{--tier-color:#6ebf8b}[data-tier="3"]{--tier-color:#70b8f4}[data-tier="4"]{--tier-color:#c5a0ff}
+html body #inventory-list .inventory-item[data-tier],.loot-owned-list article[data-tier]{border-left:4px solid var(--tier-color)!important}
+html body .card-dialog .card-entry{display:grid!important;grid-template-columns:54px minmax(0,1fr)!important;align-items:center;gap:12px!important;padding:12px!important;text-align:left!important}
+html body .card-dialog .card-entry strong{font:600 14px Tahoma!important}html body .card-dialog .card-entry em{font:12px/1.5 Tahoma!important;white-space:normal!important}
+html body .dialog:has(.loot-dual){max-width:min(1200px,96vw)!important;width:1200px!important;padding:20px!important}
+.loot-dual{width:100%;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;text-align:left}
+.loot-dual h3{font:600 15px Tahoma;margin:0 0 12px;color:var(--r10-ink,#f2e6ca)}
+.loot-inventory,.loot-offers{min-width:0;padding:14px;background:var(--r10-window,#263a50);border:1px solid var(--r10-edge,#8f9db0);border-radius:6px}
+.loot-owned-list{max-height:52vh;overflow:auto;display:grid;gap:8px;padding-right:5px}
+.loot-owned-list article{display:grid;grid-template-columns:42px 1fr;gap:5px 9px;padding:9px;border:1px solid var(--r10-edge);border-radius:4px}
+.loot-owned-list img{width:40px;height:40px;grid-row:span 2;image-rendering:pixelated}.loot-owned-list strong{font:600 12px/1.4 Tahoma}.loot-owned-list p{font:11px/1.5 Tahoma;margin:0;color:var(--r10-muted,#ccd6e4)}
+html body .loot-dual .chest-choices{display:flex!important;flex-direction:column!important;gap:9px!important;max-height:52vh;overflow:auto;width:100%!important}
+html body .loot-dual .chest-choice{width:100%!important;min-height:100px!important;display:grid!important;grid-template-columns:50px minmax(0,1fr)!important;text-align:left!important;padding:12px!important;gap:5px 12px!important;font:13px/1.5 Tahoma!important}
+html body .loot-dual .chest-choice img{width:45px;height:45px;grid-row:span 3}
+html body .loot-dual .chest-choice strong,html body .loot-dual .chest-choice p,html body .loot-dual .chest-choice button{grid-column:1/-1}
+html body .loot-dual .chest-choice:has(img) strong,html body .loot-dual .chest-choice:has(img) small,html body .loot-dual .chest-choice:has(img) em{grid-column:2}
+html body .loot-dual .chest-choice em,html body .loot-dual .chest-choice small{font:12px/1.45 Tahoma!important;white-space:normal!important}
+.loot-offers>button{margin:6px 3px;min-height:35px}.loot-offers>p{font:13px/1.6 Tahoma}.loot-back{width:100%;min-height:38px}
+.progression-guide{max-width:820px!important;width:92vw!important;max-height:87vh;overflow:auto}.progression-guide>p{padding:12px;font:13px/1.6 Tahoma}.progression-step{margin:12px;padding:14px;border:1px solid var(--r10-edge);background:var(--r10-card);border-radius:5px}.progression-step h3{font:600 15px Tahoma}.progression-step ul{padding-left:20px;font:13px/1.8 Tahoma}
+.service-actions{display:flex;gap:12px;padding:8px}.service-row{display:grid;grid-template-columns:40px minmax(0,1fr) 140px;gap:10px;padding:12px;border:1px solid var(--r10-edge);background:var(--r10-card);border-radius:5px}.service-row img{width:40px;height:40px}.service-row p{font:12px/1.5 Tahoma}
+@media(max-width:720px){.loot-dual{grid-template-columns:1fr}.loot-owned-list{max-height:22vh}.loot-offers .chest-choices{max-height:35vh!important}html body dialog .run-item{grid-template-columns:minmax(0,1fr)}.service-row{grid-template-columns:40px 1fr}.service-row button{grid-column:1/-1}}
+html body .dialog .loot-dual,html body .dialog .loot-dual *{font-family:Tahoma,Arial,sans-serif!important}
+html body .dialog .loot-owned-list strong,html body .dialog .loot-dual h3,html body .dialog .loot-offers>p,html body dialog .run-help{color:var(--r10-ink,#f3f1df)!important}
+html body .dialog .loot-owned-list p{color:var(--r10-muted,#c4d5e7)!important}
+html body .dialog .loot-offers>button{color:var(--r10-ink)!important;background:var(--r10-card)!important;border:1px solid var(--r10-edge)!important;padding:9px!important}
+html body .dialog .loot-offers .chest-choice:not(:has(img)){display:block!important}
+html body .dialog .loot-dual .item-sprite{display:block!important;object-fit:contain!important;image-rendering:pixelated!important;opacity:1!important;background:transparent!important}
+html body .dialog .loot-offers .chest-choice{font:13px/1.5 Tahoma!important}
+html body dialog .run-item-grid .run-help{color:var(--r10-ink)!important;font:13px/1.6 Tahoma!important}
+html body .item-stat-list{margin:6px 0!important;padding-left:16px!important;font:12px/1.6 Tahoma!important;white-space:normal!important;list-style:disc!important;color:inherit!important;text-align:left!important}
+html body .item-stat-list li{margin:2px 0!important;font:12px/1.5 Tahoma!important;color:inherit!important}
+html body .item-stat-list .item-option{font-weight:600!important;color:var(--tier-color,#7092d5)!important}
+html body .loot-owned-list .item-stat-list{grid-column:2;min-width:0}
+html body .dialog .loot-offers .chest-choice[data-tier]{border-left:4px solid var(--tier-color)!important}
+html body .loot-dual .chest-choice:has(img)>.item-stat-list{grid-column:2}
+html body .loot-dual .chest-choice:has(img)>img{grid-row:1/span 4}
+html body .loot-owned-list article{color:var(--r10-ink)!important}
+html body .dialog .loot-dual{color:var(--r10-ink)!important}
+html body .dialog .loot-dual .chest-choice{background:var(--r10-card)!important;color:var(--r10-ink)!important;border-color:var(--r10-edge)!important}
+html body .dialog .loot-dual .chest-choice strong,html body .dialog .loot-dual .chest-choice .item-stat-list,html body .dialog .loot-dual .chest-choice li{color:var(--r10-ink)!important}
+html body .item-stat-list .item-option{color:var(--r10-ink)!important;font-weight:700!important}
+html body .dialog .loot-dual .chest-choice small{color:var(--r10-muted)!important}
+html[data-theme=light] [data-tier="2"]{--tier-color:#39784f}html[data-theme=light] [data-tier="3"]{--tier-color:#2b69a8}html[data-theme=light] [data-tier="4"]{--tier-color:#7b4aaa}
+html body .dialog .loot-dual .chest-choices>.chest-choice{flex:none!important;height:auto!important;min-height:150px!important;overflow:visible!important}
+html body .dialog .loot-dual .chest-choices>.chest-choice:not(:has(img)){min-height:55px!important;font:600 13px/1.5 Tahoma!important}
+html body .loot-owned-list article{overflow:visible!important}

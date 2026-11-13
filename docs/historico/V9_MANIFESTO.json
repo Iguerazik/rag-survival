@@ -1,0 +1,14 @@
+{
+  "version": "9.0",
+  "base": "V8_COMPLETO_COPIA_SEGURA",
+  "user_sources_preserved": true,
+  "site_published_unchanged": true,
+  "changed_files": [
+    "LEIA-ME_V9.md",
+    "index.html",
+    "ro-hud-layout.js",
+    "v9-ragnarok-hud.css",
+    "V9_MANIFESTO.json"
+  ],
+  "notes": "Nova HUD Ragnarok-style, janelas, toolbar draggable, menus classicizados; progressão e eventos V8 mantidos."
+}

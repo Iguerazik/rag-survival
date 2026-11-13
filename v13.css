@@ -1,0 +1,41 @@
+/* V13: Keep all art inside its click area, including at narrow viewports. */
+html body .menu .lobby-dock button,html body .arena .ro-toolbar-buttons button{min-width:0;overflow:hidden;box-sizing:border-box;isolation:isolate}
+html body .menu .lobby-dock button img,html body .menu .lobby-dock button .readable-icon,html body .arena .ro-toolbar-buttons button img{display:block;flex:0 0 auto;width:25px!important;height:25px!important;max-width:25px!important;max-height:25px!important;object-fit:contain!important;object-position:center!important;image-rendering:auto!important;filter:none!important}
+html body .menu .lobby-dock button span,html body .arena .ro-toolbar-buttons button span{overflow-wrap:anywhere;min-width:0;max-width:100%;font-size:11px!important;line-height:1.2!important}
+html body .menu .lobby-dock{max-width:100%;width:auto;box-sizing:border-box;justify-content:center;align-items:stretch}
+html body .menu .lobby-dock button{flex:0 1 auto;min-height:48px;max-width:175px;min-width:99px!important}
+html body .menu .lobby-dock button img:not(.readable-icon){margin:0}
+html body .menu .expedition-card{overflow:hidden;min-width:0;min-height:90px!important}
+html body .menu .expedition-card canvas{flex-shrink:0;max-width:96px!important;height:66px!important;object-fit:contain}
+html body .menu .expedition-card .mvp-preview{width:35px!important;height:42px!important;max-width:35px!important;object-fit:contain!important;top:8px;right:5px}
+html body .menu .expedition-card strong,html body .menu .expedition-card small{overflow-wrap:anywhere}
+html body .menu .expedition-card[data-locked=true]{opacity:.73}
+html body .menu .difficulty-choice select option:disabled{color:#777}
+html body dialog .codex-recipe-icons{display:flex;gap:12px;align-items:center;justify-content:center;min-height:70px;margin:8px 0 12px}
+html body dialog .codex-recipe-icons .codex-icon{width:58px!important;height:58px!important;min-width:58px!important;max-width:58px!important;object-fit:contain!important;image-rendering:pixelated!important;background:linear-gradient(155deg,#233d55,#14283d);border:1px solid #7e99b5;border-radius:7px;padding:6px;box-sizing:border-box}
+html[data-theme=light] body dialog .codex-recipe-icons .codex-icon{background:#e8f1f8}
+html body dialog .catalogue-card.locked .codex-recipe-icons .codex-icon{filter:grayscale(1) brightness(.72) blur(2px);opacity:.72}
+html body dialog .catalogue-card.locked .codex-recipe-icons::after{content:'?';position:absolute;font-size:20px;color:#ffe4a5;text-shadow:0 2px 3px #000}
+html body dialog .catalogue-card{position:relative;overflow:hidden}
+html body dialog .codex-recipe-icons .codex-plus{font-weight:900;font-size:19px;color:var(--r10-ink,#f6dfaf)}
+html body dialog .codex-icon--fallback{image-rendering:auto!important}
+html body #inventory-list .inventory-compare{margin:7px 0;padding:7px 9px;background:var(--r10-window2,#243950);border-radius:5px;border:1px solid var(--r10-edge,#4a627f);line-height:1.5;font-size:11px!important;display:block}
+html[data-theme=light] body #inventory-list .inventory-compare{background:#e8f0f8}
+html body #inventory-list .inventory-compare.good{color:#62db98!important}
+html body #inventory-list .inventory-compare.bad{color:#ff9d96!important}
+html body #inventory-list .inventory-compare.equal{color:var(--r10-ink)!important}
+html[data-theme=light] body #inventory-list .inventory-compare.good{color:#116a35!important}
+html[data-theme=light] body #inventory-list .inventory-compare.bad{color:#9c2f32!important}
+html body #inventory-list .inventory-compare span{display:block;font-size:11px!important}
+html body #inventory-list .inventory-compare strong{font-size:12px!important}
+html body .journey-points-note{font-size:12px;line-height:1.4;display:block;color:var(--r10-muted,#bad0e7)}
+@media(max-width:720px){html body .menu .lobby-dock button{min-width:84px!important;flex:1 0 88px;max-width:150px;padding:7px!important}html body dialog .codex-recipe-icons .codex-icon{width:48px!important;height:48px!important;min-width:48px!important;max-width:48px!important}html body #inventory-list .inventory-compare{grid-column:1/-1}}
+/* Nav row V13: each label/icon has actual space instead of being clipped by the V10 94px button. */
+html body .menu .lobby-dock button{width:auto!important;min-width:112px!important;max-width:162px!important;height:48px!important;min-height:48px!important;padding:5px 9px!important;white-space:normal!important;gap:6px!important;flex-wrap:nowrap!important}
+html body .menu .lobby-dock button span:last-child{white-space:normal!important;overflow-wrap:normal!important;word-break:normal!important;font:700 11px/1.2 Tahoma,Arial,sans-serif!important}
+html body .menu .lobby-dock .ro-dock-glyph{display:grid!important;place-items:center!important;min-width:24px!important;width:24px!important;height:26px!important;line-height:1!important;font-size:19px!important;flex:none}
+html body .arena .ro-toolbar-buttons button{overflow:hidden!important;max-width:100%;}
+html body .arena .ro-toolbar-buttons button img{max-width:24px!important;max-height:24px!important;object-fit:contain!important}
+html body .menu .class-card .portrait,html body .menu .class-card .portrait img{overflow:hidden;object-fit:contain;max-width:100%}
+html body #inventory-list .inventory-item>img,html body .loot-owned-list img,html body .dialog .chest-choice>img{object-fit:contain!important;max-width:100%!important;max-height:100%!important}
+@media(max-width:720px){html body .menu .lobby-dock button{min-width:0!important;width:100%!important;max-width:none!important;height:54px!important;padding:4px!important;flex-direction:column!important;gap:2px!important}html body .menu .lobby-dock button span:last-child{text-align:center!important;font-size:10px!important}}

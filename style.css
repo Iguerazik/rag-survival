@@ -1,0 +1,76 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=DM+Sans:wght@400;500;600;700;800&display=swap');
+:root{color-scheme:dark;--bg:#0c1814;--panel:#15241d;--line:#344539;--muted:#b0bcad;--cream:#fff0ce;--gold:#f1cb83;--display:Cinzel,Georgia,serif;font-family:"DM Sans",system-ui,sans-serif;color:#f5efdd;background:var(--bg)}
+*{box-sizing:border-box}body{margin:0;min-width:300px}button,a{-webkit-tap-highlight-color:transparent}button{font:inherit;color:inherit;cursor:pointer}button:focus-visible,a:focus-visible{outline:2px solid #ffe4a6;outline-offset:4px}a{color:inherit;text-decoration:none}[hidden]{display:none!important}
+.menu{min-height:100svh;background:radial-gradient(ellipse at 50% 40%,#17281e 0,transparent 72%),#0c1814}.wrap{width:min(1216px,calc(100% - 72px));margin:auto}.site-head{height:76px;display:flex;justify-content:space-between;align-items:center}.brand{display:inline-flex;align-items:center;gap:11px;font-family:var(--display);font-weight:800;font-size:15px;letter-spacing:.10em}.brand b{color:var(--gold);font-weight:700}.sound{border:1px solid #455348;background:#18251f;border-radius:6px;padding:8px 13px;color:#d6decf;font-size:13px}.sound[aria-pressed=true]{color:var(--gold);border-color:#8f753f}
+.hero{height:clamp(340px,42vw,448px);border:1px solid #54644a;border-radius:10px;overflow:hidden;position:relative;display:flex;align-items:center;background:#253f2b url('assets/forest.webp') 50% 54%/cover no-repeat;box-shadow:0 16px 45px #0003}.hero:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#091711f7 0%,#0b1912df 27%,#101f16a6 44%,#0d1a1222 73%),linear-gradient(0deg,#0d1a1280,transparent 45%)}.hero:after{content:"";position:absolute;inset:8px;border:1px solid #e8d19528;border-radius:6px;pointer-events:none}.hero-content{z-index:1;padding:32px clamp(26px,5vw,66px)}.eyebrow{color:var(--gold);font-size:11px;font-weight:800;letter-spacing:.22em;margin:0 0 17px}.eyebrow span{display:inline-block;width:9px;height:9px;background:var(--gold);transform:rotate(45deg);margin-right:12px}.hero h1{font:800 clamp(46px,7.2vw,91px)/.99 var(--display);letter-spacing:-.052em;margin:0;color:#fff0cc;text-shadow:0 4px 20px #0005}.hero h1 em{display:block;color:#f6cb80;font-style:normal}.intro{color:#e2e5d4;font-size:16px;line-height:1.6;max-width:370px;margin:18px 0}.hero-meta{display:flex;align-items:center;gap:9px;color:#c8cfb9;font-size:12px}.hero-meta span{color:var(--gold);font-size:9px}.hero-meta i{width:3px;height:3px;background:#9fac8d;border-radius:50%;margin:0 3px}
+.roster{padding-top:26px}.section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px}.section-head h2{font:700 clamp(18px,2.2vw,26px) var(--display);color:var(--cream);margin:0}.section-head span{font-size:11px;color:#c0c9b5;font-weight:800;letter-spacing:.1em;white-space:nowrap}.classes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.class{--accent:#e5a780;position:relative;text-align:left;display:grid;grid-template-columns:76px 1fr;align-items:center;gap:13px;padding:11px 14px 11px 10px;border:1px solid #3c4b3f;border-radius:8px;background:#17251f;min-height:108px;transition:background .17s,border-color .17s,transform .17s}.class:hover{border-color:var(--accent);transform:translateY(-2px)}.class[aria-pressed=true]{background:#2b2c20;border-color:#e1b96f;box-shadow:inset 0 0 20px #9c713123}.class[aria-pressed=true]::after{content:"◆";color:var(--gold);position:absolute;top:9px;right:11px;font-size:10px}.portrait{height:76px;width:76px;display:grid;place-items:center;background:radial-gradient(circle at 50% 63%,var(--accent),transparent 70%),#111e19;border:1px solid #aabc9638;border-radius:5px;isolation:isolate;position:relative;overflow:hidden}.portrait:before{content:"";position:absolute;inset:0;background:linear-gradient(0deg,#121b18dd,#18211f70);z-index:-1}.portrait canvas{width:65px;height:65px;image-rendering:pixelated}.class strong{font:700 17px var(--display);display:block;color:#fff2d4}.class small{display:block;color:#c5cdbd;margin:3px 0 6px;font-size:12px}.class .starter{color:var(--accent);font-size:11px;font-weight:800;letter-spacing:.03em}.launch{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-top:17px}.launch p{color:#bfcab9;font-size:13px;margin:0}.launch p span{margin:0 5px}kbd{display:inline-block;min-width:19px;text-align:center;font:700 11px system-ui;border:1px solid #586254;border-radius:4px;background:#233229;padding:2px;margin-right:3px;color:#e4e9dc}.primary{color:#241b0d;border:1px solid #ffdd9a;background:linear-gradient(#f7d897,#d7a44f);min-height:48px;border-radius:6px;padding:10px 19px;font-weight:800;box-shadow:inset 0 0 0 2px #ffd99450,0 5px 14px #0004;white-space:nowrap}.primary span{margin-left:18px}.primary:hover{background:#ffe3a9}.footer{padding:17px 0 18px;margin-top:19px;border-top:1px solid #354239;color:#a1ae9f;font-size:11px}
+.arena{position:fixed;inset:0;background:#213c28;overflow:hidden;touch-action:none}.arena>canvas{width:100%;height:100%;display:block;image-rendering:pixelated}.hud{position:absolute;top:16px;left:18px;right:18px;display:grid;grid-template-columns:1fr auto 1fr;align-items:start;gap:8px;pointer-events:none}.hud-player,.clock,.hud-actions button,.skill-slot,.boss-hud{background:#101e18ed;border:1px solid #807b50;border-radius:6px;box-shadow:0 2px 9px #0007}.hud-player{display:flex;align-items:center;gap:8px;width:max-content;max-width:100%;padding:6px 10px 6px 5px}.hud-player strong{font:700 13px var(--display);color:var(--cream)}.hud-emblem canvas{height:33px;width:33px;image-rendering:pixelated;display:block}.health{width:clamp(62px,12vw,165px);position:relative;overflow:hidden;height:13px;background:#472921;border-radius:3px;margin-top:3px;text-align:center}.health i,.xp i,.boss-hud i{display:block;height:100%;width:0;transition:width .16s}.health i{background:linear-gradient(#e47364,#a03735)}.health span,.xp span{position:absolute;inset:0;color:white;font-size:10px;font-weight:800;text-shadow:0 1px 2px black;line-height:13px}.clock{text-align:center;padding:6px 13px;display:grid;min-width:125px}.clock span{font-size:9px;letter-spacing:.1em;color:var(--gold);font-weight:800}.clock strong{font:700 26px var(--display);font-variant-numeric:tabular-nums}.clock small{color:#d1dbc9;font-size:11px}.hud-actions{justify-self:end;display:flex;gap:5px;pointer-events:auto}.hud-actions button{height:40px;min-width:36px;padding:4px 8px;font-size:16px}.announcement{position:absolute;top:113px;left:50%;transform:translateX(-50%);width:max-content;max-width:85%;text-align:center;background:#101c15ed;border:1px solid #c8a660;color:#ffe5ad;border-radius:4px;padding:10px 18px;font:700 15px var(--display);pointer-events:none}.boss-hud{position:absolute;top:103px;left:50%;transform:translateX(-50%);width:min(420px,75vw);text-align:center;padding:5px 10px;color:#ffccaf;font:700 13px var(--display)}.boss-hud div{height:6px;background:#432a34;margin-top:3px}.boss-hud i{background:#df716c}.boss-hud:not([hidden])~.announcement{top:155px}
+.run-bottom{position:absolute;bottom:max(14px,env(safe-area-inset-bottom));left:16px;right:16px;pointer-events:none}.skill-bar{display:flex;justify-content:center;gap:6px;margin-bottom:7px}.skill-slot{display:grid;place-items:center;width:41px;height:39px;font-size:17px;position:relative;color:var(--skill-color);border-color:var(--skill-color)}.skill-slot b{position:absolute;bottom:1px;right:3px;font-size:9px;color:#f9edd4}.xp{height:17px;border:1px solid #6c947a;background:#102119;position:relative;border-radius:4px;overflow:hidden;text-align:center}.xp i{background:linear-gradient(#92e1a6,#3c9d72)}.xp span{line-height:15px;letter-spacing:.14em}.joystick{position:absolute;width:100px;height:100px;border:2px solid #f7e6bc88;border-radius:50%;background:#17241c66;transform:translate(-50%,-50%);pointer-events:none}.joystick i{position:absolute;left:29px;top:29px;width:38px;height:38px;background:#efd49a99;border-radius:50%}
+.overlay{position:absolute;inset:0;display:grid;place-items:center;background:#090f0bc9;padding:18px;overflow:auto}.dialog{width:min(670px,100%);max-height:100%;overflow:auto;text-align:center;background:linear-gradient(145deg,#28382a,#131f19);border:1px solid #ae925a;box-shadow:inset 0 0 0 5px #0e19137a,0 10px 60px #000a;padding:29px 23px 24px;border-radius:9px}.dialog .eyebrow{margin-bottom:7px}.dialog h2{font:700 clamp(23px,4vw,41px) var(--display);color:var(--cream);margin:0}.dialog>p:not(.eyebrow){color:#d1dacb;margin:9px 0 20px}.dialog-actions,.choices{display:flex;justify-content:center;gap:10px}.choice,.secondary{background:#182820;border:1px solid #718269;border-radius:6px;padding:10px 13px}.choice{flex:1;min-width:0;min-height:121px}.choice:hover,.secondary:hover{border-color:var(--gold);background:#2c3b2b}.choice .glyph{color:var(--skill-color);font-size:23px;display:block}.choice strong,.choice small{display:block}.choice strong{color:#ffedca;font-size:14px;margin:4px 0}.choice small{font-size:12px;color:#cad5c4}.choice .choice-level{color:var(--skill-color);font-size:10px;font-weight:800}.dialog .secondary{font-weight:700}
+@media(max-width:760px){.wrap{width:calc(100% - 30px)}.site-head{height:61px}.hero{height:350px;background-position:58% center}.hero:before{background:linear-gradient(90deg,#091711ee,#0b1912a0 60%,#0d1a1222)}.classes{gap:7px}.class{grid-template-columns:1fr;justify-items:center;text-align:center;gap:6px;padding:8px 4px}.class strong{font-size:clamp(11px,2.8vw,16px)}.class small{font-size:10px}.class .starter{font-size:10px}.portrait{width:58px;height:54px}.portrait canvas{width:51px;height:51px}.launch{align-items:flex-end}.launch p{font-size:11px;line-height:1.7}.primary{padding-inline:12px}.primary span{margin-left:6px}.hud{left:8px;right:8px;top:8px}.clock{min-width:95px;padding:5px}.clock span{font-size:7px}.clock strong{font-size:22px}.hud-player{gap:4px;padding-right:5px}.hud-player strong{font-size:10px}.hud-emblem canvas{width:26px;height:26px}.hud-actions button{height:33px;min-width:27px}.choices{flex-direction:column}.choice{min-height:0;padding:6px 10px}.choice .glyph{font-size:17px}.dialog{padding:17px 12px}.announcement{top:97px}.boss-hud{top:74px}}
+@media(pointer:coarse){.launch p{font-size:0}.launch p>*{display:none}.launch p:after{content:"Arraste na arena para mover";font-size:12px}}@media(prefers-reduced-motion:reduce){*,*::after,*::before{transition:none!important}}
+
+/* Class selection and the in-game skill tree */
+.hero{height:clamp(290px,34vw,366px)}
+.hero h1{font-size:clamp(44px,6.7vw,78px)}
+.class-tree{margin-top:14px;padding:12px 13px;background:#111e18;border:1px solid #34483c;border-radius:7px}
+.class-tree h3{font:700 14px var(--display);color:var(--cream);margin:0 0 9px}
+.tree-grid{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;text-align:left}
+.tree-node{min-width:0;display:grid;grid-template-columns:29px 1fr;grid-template-rows:auto auto auto auto;column-gap:8px;align-items:start;padding:8px 9px;background:#1d2b23;border:1px solid #445749;border-radius:5px;text-align:left;color:#f5ecd7}
+.tree-node .tree-glyph{grid-column:1;grid-row:1 / 4;display:block;width:27px;height:27px;padding:1px;border-radius:4px;background:#d3cab1;image-rendering:pixelated}
+.tree-node strong,.tree-node small,.tree-meta,.tree-requirement{grid-column:2}
+.tree-node strong{font-size:13px;line-height:1.2}
+.tree-node small{font-size:11px;line-height:1.24;color:#cad4c5;margin-top:3px}
+.tree-meta,.tree-requirement{font-size:9px;font-weight:800;color:#ddc990;line-height:1.3}
+.tree-meta{letter-spacing:.05em;margin-bottom:2px}
+.tree-requirement:not(:empty){margin-top:3px}
+.tree-node[data-locked=true] .tree-glyph,.skill-slot[aria-disabled=true] .skill-icon{filter:grayscale(.9);opacity:.72}
+button.tree-node[aria-disabled=false]{border-color:#bd9d62}
+button.tree-node[aria-disabled=false]:hover{background:#354435;border-color:#ffe2a1}
+button.tree-node[aria-disabled=true]{cursor:default}
+.dialog:has(.tree-grid){width:min(790px,100%)}
+.dialog #dialog-actions:has(.tree-grid){display:grid;justify-items:center;gap:13px}
+.dialog .tree-node{min-height:80px}
+.tree-resume{min-width:180px}
+.primary:disabled{opacity:.66;cursor:wait}
+
+/* Compact HP/SP and shortcut panels over the map. */
+.hud-player,.clock,.hud-actions button,.skill-slot,.boss-hud,.tree-button{background:#e7e8dbf5;color:#263a37;border:1px solid #75887e;box-shadow:0 2px 7px #202b286b}
+.hud-player strong,.clock strong{color:#283e40}
+.clock span{color:#35615c}.clock small{color:#40554e}
+.health{height:10px;width:clamp(66px,13vw,165px);margin-top:3px;background:#b99294;border:1px solid #9b7b7e}
+.health span{line-height:8px;font-size:8px}
+.mana{background:#a1adc1;border-color:#8397ad}
+.mana i{background:linear-gradient(#94cbf6,#547fb1)}
+.hud-actions button[aria-pressed=true]{color:#3a5b72}
+.boss-hud{color:#783a3c}.boss-hud div{background:#ad8587}
+.hotbar{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:7px}
+.skill-bar{margin-bottom:0}
+.skill-slot,.tree-button{pointer-events:auto}
+.skill-slot{width:46px;height:44px;position:relative;overflow:hidden;padding:4px;color:#1c3035}
+.skill-slot:hover,.tree-button:hover{border-color:#f6e7ad}
+.skill-icon{width:27px;height:27px;image-rendering:pixelated}
+.skill-slot .skill-key,.skill-slot b{position:absolute;z-index:2;font:800 10px system-ui;color:#243943;text-shadow:0 1px 1px white}
+.skill-slot .skill-key{left:2px;top:1px}.skill-slot b{right:2px;bottom:1px}
+.skill-slot i{position:absolute;inset:auto 0 0;height:0;background:#243a547a;pointer-events:none}
+.skill-slot[aria-disabled=true]{background:#c0c7bf}
+.tree-button{border-radius:5px;padding:7px 8px;font-size:12px;font-weight:800}
+.tree-button kbd{background:#526662;color:white;margin:0}
+.tree-button b{color:#694f24}
+.combat-note{position:absolute;bottom:89px;left:50%;transform:translateX(-50%);max-width:90%;background:#eef0e2ed;color:#314646;padding:5px 10px;border-radius:4px;border:1px solid #718a79;font-size:12px;font-weight:700;pointer-events:none}
+
+@media(max-width:760px){
+  .hero{height:300px}
+  .tree-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tree-node{padding:6px;column-gap:6px;grid-template-columns:23px 1fr}
+  .tree-node .tree-glyph{width:22px;height:22px}
+  .tree-node strong{font-size:11px}
+  .tree-node small{font-size:10px}
+  .tree-meta,.tree-requirement{font-size:8px}
+  .dialog .tree-node{min-height:65px}
+  .skill-slot{width:37px;height:39px}
+  .skill-icon{width:22px;height:22px}
+  .skill-bar{gap:3px}
+  .tree-button{padding:7px 5px}
+}
+@media(pointer:coarse){.launch p:after{content:"Arraste para mover e toque nos atalhos para usar habilidades"}}

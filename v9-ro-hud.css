@@ -1,0 +1,122 @@
+/* V7: compact, readable, Ragnarok-like UI — separate panels, no overlap. */
+:root{--ro-window-edge:#7291b0;--ro-label:#122a48}
+.menu .lobby-dock{
+  display:flex;align-items:center;justify-content:center;flex-wrap:wrap;
+  width:max-content;max-width:100%;gap:2px;margin:8px auto 14px;padding:5px 8px;
+  background:linear-gradient(#e8eef4,#aebed0 55%,#dbe3e9);border:1px solid #6581a0;
+  box-shadow:0 2px 8px #0009,inset 0 0 0 1px #fff;border-radius:4px;
+}
+.menu .lobby-dock button{
+  width:86px;min-width:74px;min-height:53px;padding:3px;gap:3px;
+  background:linear-gradient(#fff,#bfd0e1);color:#21374b;border:1px solid #8ba5bd;
+  box-shadow:inset 0 1px white;transform:none;border-radius:3px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font:800 10px/1.2 system-ui;text-shadow:0 1px #fff;
+}
+.menu .lobby-dock button:hover,.menu .lobby-dock button:focus-visible{background:linear-gradient(#fff9d4,#d4c39a);outline:2px solid #e4b366;transform:none}
+.menu .lobby-dock .dock-ro-icon{width:36px;height:24px;filter:drop-shadow(0 1px #7776)}
+.menu .lobby-dock .ro-dock-glyph{font:900 23px/24px Georgia,serif;color:#586d8a;text-shadow:1px 1px white}
+.menu .lobby-dock span{white-space:nowrap}
+/* Music is hidden until opened, not printed in the launcher/game. */
+.ro-music-popover[hidden],.music-controls,.map-bgm,#menu-bgm-info,.ro-menu-track-tag{display:none!important}
+.ro-music-launch{min-width:80px}
+.ro-music-popover{
+  position:fixed;z-index:700;top:62px;right:20px;width:min(350px,calc(100vw - 24px));
+  padding:0 14px 12px;background:linear-gradient(#edf2f7,#cfdce6);
+  color:#243c57;border:2px solid #839bb6;border-radius:5px;
+  box-shadow:0 12px 44px #000a,inset 0 0 0 2px #fff;
+  font:12px system-ui;pointer-events:auto;
+}
+.ro-music-popover>header{display:flex;align-items:center;justify-content:space-between;background:linear-gradient(#7298b8,#466a93);color:white;margin:0 -14px 12px;padding:7px 11px;text-shadow:0 1px #243f62}
+.ro-music-popover button,.ro-music-in-game button,.hud-customize button{border:1px solid #7393b4;border-radius:3px;background:linear-gradient(#fefefe,#c6d3df);color:#1b3958;padding:5px 8px;cursor:pointer;font:800 12px system-ui}
+.ro-music-popover button:hover,.ro-music-in-game button:hover,.hud-customize button:hover{background:linear-gradient(#fff5d4,#e8d8b5)}
+.ro-music-select,.ro-music-level{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#243c57;font-weight:700}
+.ro-music-select{margin:12px 0}
+.ro-music-select select{max-width:200px;color:#233b54;background:#fdfdfb;border:1px solid #829bb5;padding:5px}
+.ro-music-level input{width:154px;accent-color:#547fb0}
+.music-pocket-controls{display:flex;gap:9px;align-items:center}
+.ro-music-options{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:11px}
+.ro-music-file{display:flex;flex-direction:column;gap:5px;max-width:175px;font-size:11px}
+.ro-music-file input{max-width:175px;font-size:10px;color:#263b51}
+.ro-audio-help{font:10px/1.45 system-ui;color:#4b6075;margin:11px 0 0}
+/* The HUD no longer uses a single flex row that piles the player, map, quests, and tools on top of one another. */
+.arena .classic-hud{position:static!important;display:contents!important;pointer-events:none!important}
+.arena .hud-right{display:contents!important}
+.arena .hud-player,.arena .map-window,.arena .quest-window,.arena .shortcut-window,
+.arena .ro-music-in-game{position:fixed!important;z-index:35!important;pointer-events:auto!important;transform:none!important;max-width:calc(100vw - 8px)!important}
+.arena .hud-player{left:12px;top:10px;width:222px;min-width:180px;border:1px solid var(--ro-window-edge)}
+.arena .hud-player>.ro-title,.arena .map-window>.ro-title,.arena .quest-window>.ro-title,.arena .shortcut-window>.ro-title{
+  color:#193658!important;text-shadow:0 1px white!important;
+  background:linear-gradient(#eef5fb,#aec7e1 46%,#92b3d2 48%,#dae6ef)!important;
+  border-bottom:1px solid #7c9bb7!important;min-height:23px!important;padding:5px 9px!important;
+  font:800 11px/1.2 system-ui!important;
+}
+.arena .hud-player strong{color:#193855!important}
+.arena .hud-player .hud-character{padding:7px}
+.arena .hud-player .hud-level{padding:5px 7px;font-size:10px}
+.arena .map-window{top:10px;right:12px;width:179px}
+.arena .quest-window{top:236px;right:12px;width:215px;display:block}
+.arena .shortcut-window{bottom:44px;left:50%;transform:translateX(-50%)!important;width:max-content;background:#e5edf6}
+.arena .run-bottom{position:static!important;pointer-events:none!important}
+.arena .run-bottom>.xp{position:fixed!important;left:16px;right:16px;bottom:12px;z-index:30;pointer-events:none}
+.arena .ro-quickbar{position:fixed!important;top:10px;left:50%;transform:translateX(-50%);width:max-content;max-width:calc(100vw - 20px);height:auto;
+  display:flex;flex-wrap:wrap;justify-content:center;gap:3px;padding:4px;background:#dfebf5ed;
+  border:1px solid #829bb6;border-radius:4px;box-shadow:0 3px 9px #091e3188;z-index:43;pointer-events:auto!important}
+.arena .ro-quickbar button{position:relative!important;background:linear-gradient(#fff,#c3d3e3)!important;color:#203a5a!important;border:1px solid #8aa6bc!important;
+  min-width:29px!important;width:30px;height:27px!important;min-height:27px!important;padding:2px!important;font:900 12px system-ui!important;box-shadow:inset 0 1px white!important;text-shadow:0 1px white!important}
+.arena .ro-quickbar button:hover{border-color:#ad814d!important;background:#fff0c5!important}
+.arena .ro-title{cursor:grab;user-select:none;touch-action:none}
+.arena .ro-drag-handle:not(:has(button)){cursor:grab}
+.arena .ro-being-dragged{z-index:75!important;box-shadow:0 6px 22px #000a,0 0 0 2px #e5be72!important}
+.arena.ro-hud-locked .ro-drag-handle{cursor:default}
+.arena .hud-customize{position:fixed;right:12px;top:66px;display:flex;gap:3px;z-index:46;pointer-events:auto}
+.arena .hud-customize button{font-size:10px;padding:3px 5px}
+.arena .ro-music-in-game{left:auto;right:12px;top:auto;bottom:53px;display:flex;align-items:center;gap:6px;width:178px;padding:3px 5px;
+  background:linear-gradient(#f0f4f7,#b9cddd);border:1px solid #7897b8;border-radius:3px;box-shadow:0 2px 7px #0009}
+.arena .ro-music-in-game .ro-music-game-caption{font:900 13px Georgia,serif;color:#345878;cursor:grab;padding:3px 2px;touch-action:none;user-select:none}
+.arena .ro-music-in-game button{padding:3px 5px;line-height:14px}
+.arena .ro-music-in-game input{min-width:0;width:90px;accent-color:#557da8;cursor:pointer}
+/* The screenshot's overlapping dark blue buttons and unreadable art are replaced by light RO-style controls. */
+.arena .ro-window{color:#183550!important;border:1px solid #8ba4be!important;background:#e9f0f7f2!important}
+.arena .hud-actions button,.arena .skill-slot,.arena .tree-button{color:#17365a}
+.arena .skill-slot{background:#eef4fa!important;border-color:#91a9bf!important}
+.arena .skill-slot b,.arena .skill-slot .skill-key{color:#fffdf1!important;background:#112037db!important;text-shadow:0 1px 2px #000!important}
+@media(max-width:780px){
+  .menu .lobby-dock button{width:66px;min-width:60px;min-height:48px;font-size:9px}
+  .menu .lobby-dock .dock-ro-icon{width:31px;height:19px}
+  .arena .ro-quickbar{left:50%;top:68px;max-width:calc(100vw - 12px)}
+  .arena .ro-quickbar button{width:27px;min-width:26px!important}
+  .arena .hud-player{width:170px}
+  .arena .map-window{width:128px}
+  .arena .quest-window{top:175px;width:150px}
+  .arena .shortcut-window{max-width:calc(100vw - 10px)}
+  .arena .hud-customize{top:108px}
+  .arena .ro-music-in-game{width:140px;bottom:42px}
+  .arena .ro-music-in-game input{width:55px}
+}
+@media(max-width:490px){
+  .menu .lobby-dock{gap:1px;padding:3px}
+  .menu .lobby-dock button{width:55px;min-width:49px;font-size:8px}
+  .arena .hud-player{width:149px;min-width:130px}
+  .arena .map-window{width:112px}
+  .arena .quest-window{display:none}
+  .arena .hud-customize{top:118px}
+  .arena .ro-quickbar{top:150px}
+}
+/* Keep the top control strip clear of the minimap even with inherited right/top rules. */
+.arena .ro-quickbar{right:auto!important;left:50%!important;top:10px!important;bottom:auto!important;transform:translateX(-50%)!important}
+@media(max-width:780px){.arena .ro-quickbar{top:68px!important}}
+@media(max-width:490px){.arena .ro-quickbar{top:150px!important}}
+@media(max-width:580px){
+  .menu .lobby-dock{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));width:calc(100% - 4px);max-width:100%;gap:3px;padding:5px}
+  .menu .lobby-dock button{min-width:0;width:100%;max-width:none;min-height:47px;white-space:normal}
+  .menu .lobby-dock button span:last-child{white-space:normal;word-break:normal;font-size:9px}
+}
+
+/* Dedicated touch layout: no overlap between the minimap, window controls and music. */
+@media(max-width:490px){
+  .arena .ro-quickbar{top:208px!important}
+  .arena .hud-customize{top:172px!important}
+  .arena .quest-window{display:block!important;width:171px!important}
+  .arena .ro-music-in-game{width:142px!important}
+}

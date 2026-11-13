@@ -1,0 +1,150 @@
+{
+  "drainliar": {
+    "element": "shadow",
+    "level": 2
+  },
+  "bongun": {
+    "element": "undead",
+    "level": 1
+  },
+  "spore": {
+    "element": "water",
+    "level": 1
+  },
+  "thiefbug": {
+    "element": "neutral",
+    "level": 3
+  },
+  "nine_tail": {
+    "element": "fire",
+    "level": 3
+  },
+  "cramp": {
+    "element": "poison",
+    "level": 2
+  },
+  "fabre": {
+    "element": "earth",
+    "level": 1
+  },
+  "hunterfly": {
+    "element": "wind",
+    "level": 2
+  },
+  "mantis": {
+    "element": "earth",
+    "level": 1
+  },
+  "tarou": {
+    "element": "shadow",
+    "level": 1
+  },
+  "lunatic": {
+    "element": "neutral",
+    "level": 3
+  },
+  "munak": {
+    "element": "undead",
+    "level": 1
+  },
+  "baphometjr": {
+    "element": "shadow",
+    "level": 1
+  },
+  "poring": {
+    "element": "water",
+    "level": 1
+  },
+  "sohee": {
+    "element": "water",
+    "level": 1
+  },
+  "sidewinder": {
+    "element": "poison",
+    "level": 1
+  },
+  "baphomet": {
+    "element": "shadow",
+    "level": 3
+  },
+  "moonlight": {
+    "element": "fire",
+    "level": 3
+  },
+  "goldenbug": {
+    "element": "fire",
+    "level": 2
+  },
+  "orc_hero": {
+    "element": "earth",
+    "level": 2
+  },
+  "doppelganger": {
+    "element": "shadow",
+    "level": 3
+  },
+  "eddga": {
+    "element": "fire",
+    "level": 1
+  },
+  "thief_female": {
+    "element": "shadow",
+    "level": 1
+  },
+  "thief_male": {
+    "element": "shadow",
+    "level": 1
+  },
+  "archer_skeleton": {
+    "element": "undead",
+    "level": 1
+  },
+  "horong": {
+    "element": "fire",
+    "level": 4
+  },
+  "dokebi": {
+    "element": "shadow",
+    "level": 1
+  },
+  "orc_zombie": {
+    "element": "undead",
+    "level": 1
+  },
+  "orc_skeleton": {
+    "element": "undead",
+    "level": 1
+  },
+  "steel_chonchon": {
+    "element": "wind",
+    "level": 1
+  },
+  "marionette": {
+    "element": "ghost",
+    "level": 3
+  },
+  "whisper": {
+    "element": "ghost",
+    "level": 3
+  },
+  "nightmare": {
+    "element": "ghost",
+    "level": 3
+  },
+  "deviruchi": {
+    "element": "shadow",
+    "level": 1
+  },
+  "beetle_king": {
+    "element": "earth",
+    "level": 1
+  },
+  "greatestgeneral": {
+    "element": "fire",
+    "level": 2
+  },
+  "savage": {
+    "element": "earth",
+    "level": 2
+  }
+}

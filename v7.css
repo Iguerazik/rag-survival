@@ -1,0 +1,50 @@
+/* V5.2: clear music panel, readable map BGM, priority for selection popups */
+.music-controls{padding:9px 12px;margin:0 0 14px;background:linear-gradient(#263c51,#15263a);border:1px solid #8f754d;border-radius:5px;color:#f6e8d0;box-shadow:inset 0 1px #ffffff24}
+.music-controls p{margin:0 0 6px;font:800 12px system-ui;color:#fbe5b7}
+.music-controls>div{display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap}
+.music-controls label{display:flex;gap:7px;align-items:center;font-size:11px;font-weight:700;color:#e9dfce}
+.music-controls input{width:110px;accent-color:#d9ab5c;cursor:pointer}
+.music-controls code{color:#f8d6a1}
+.music-controls small{display:block;margin-top:6px;line-height:1.4;color:#d2d7da;font-size:10px}
+.expedition-bgm{display:block;color:#e5bd78!important;margin-top:3px;font-size:10px!important}
+.map-titlebar>div{min-width:0}.map-bgm{display:block;color:#f9d992;font:700 10px system-ui;white-space:normal}
+.arena .overlay[hidden]{display:none!important}
+.arena .overlay{z-index:9999!important}
+.arena #dialog-title{color:#fff2c9!important;text-shadow:0 2px 3px #000}
+.arena .level-offer{background:linear-gradient(#273e59,#15283e)!important;border:2px solid #7f95ae!important;box-shadow:0 2px 9px #0008;min-height:168px}
+.arena .level-offer strong{color:#fff0bd!important;font-size:15px}
+.arena .level-offer small{color:#e2e5ef!important}
+.arena .level-offer:hover,.arena .level-offer:focus-visible{border-color:#f4c071!important;background:linear-gradient(#4a5871,#243a4f)!important;outline:3px solid #f2d398}
+.arena #dialog-body{color:#f6e8ca!important}
+@media(max-width:600px){.music-controls>div{justify-content:center}.music-controls input{width:80px}.arena .level-offer{min-height:144px}.arena .level-offer strong{font-size:12px}}
+
+/* The client-style overhaul must preserve the user's selectable light theme. */
+html[data-theme="light"] body{background:#e4e2dc}
+html[data-theme="light"] .menu{background:radial-gradient(ellipse at top,#e3e4dd 0%,#c5d2d5 85%);color:#21313e;color-scheme:light}
+html[data-theme="light"] .menu .site-head{background:#dde3e4;border-bottom-color:#ac8c52}
+html[data-theme="light"] .menu .brand,html[data-theme="light"] .menu .brand b{color:#2d4052;text-shadow:none}
+html[data-theme="light"] .menu .site-actions .sound{background:linear-gradient(#fff9e9,#c5d0d9);color:#23394e;border-color:#9d855e}
+html[data-theme="light"] .lobby-dock{background:#b9c9d1;border-color:#9a7c48;box-shadow:inset 0 0 0 2px #e5e8e6,0 5px 19px #1830442b}
+html[data-theme="light"] .lobby-dock button{background:linear-gradient(#f7f6ea,#c8d9df);color:#294154;border-color:#728897;box-shadow:inset 0 1px #fff}
+html[data-theme="light"] .lobby-dock button:hover{background:linear-gradient(#fff,#b4cfe0)}
+html[data-theme="light"] .menu .client-window{background:#d4dfe3;border-color:#9a7e4d;box-shadow:inset 0 0 0 1px #f1f4f5,0 8px 22px #12344b38}
+html[data-theme="light"] .menu .client-title{background:linear-gradient(#738ca0,#435e78 47%,#344e68 49%,#7790a3)}
+html[data-theme="light"] .menu .journey,html[data-theme="light"] .menu .ro-status,html[data-theme="light"] .menu .expeditions,html[data-theme="light"] .menu .class-tree{background:#eaf0ed;color:#33475b;border-color:#8c9aa5}
+html[data-theme="light"] .menu .journey h3,html[data-theme="light"] .menu .journey-note,html[data-theme="light"] .menu .journey-title p,html[data-theme="light"] .menu .journey-meter,html[data-theme="light"] .menu .journey-stats{color:#294359}
+html[data-theme="light"] .menu .journey-path li,html[data-theme="light"] .menu .attribute-grid div,html[data-theme="light"] .menu .tree-node{background:#ecf2f5;color:#294459;border-color:#a2b2c0}
+html[data-theme="light"] .menu .journey-path li[aria-current=true]{background:#f4edd4;border-color:#bf9955;color:#2e3b42}
+html[data-theme="light"] .menu .journey-path li small,html[data-theme="light"] .menu .class small,html[data-theme="light"] .menu .tree-node small,html[data-theme="light"] .menu .tree-meta{color:#40556a}
+html[data-theme="light"] .menu .class strong{color:#1d3548}
+html[data-theme="light"] .menu .classes .class,html[data-theme="light"] .menu .expedition-card{background:linear-gradient(#f7f8f5,#d9e5e9);color:#283d4f;border-color:#94a9b6}
+html[data-theme="light"] .menu .classes .class[aria-pressed=true],html[data-theme="light"] .menu .expedition-card[aria-pressed=true]{background:linear-gradient(#f8ebc8,#d8d1b7);border-color:#bd9352}
+html[data-theme="light"] .menu .classes .class:hover,html[data-theme="light"] .menu .expedition-card:hover{background:#ebf6fa}
+html[data-theme="light"] .menu .expedition-card strong,html[data-theme="light"] .menu .expedition-card small{color:#2c4457}
+html[data-theme="light"] .menu select,html[data-theme="light"] .menu input{background:#f5f5ed;color:#253e52;border-color:#8b9eaa}
+html[data-theme="light"] .menu .launch .sound,html[data-theme="light"] .menu .sound{background:linear-gradient(#f8f7ed,#c6d9e2);color:#243c50;border-color:#9e895e}
+html[data-theme="light"] .menu .launch .primary{background:linear-gradient(#ffedbf,#c99043 53%,#9f661f);color:#28211a;border-color:#cc9947}
+html[data-theme="light"] .menu .coop-panel{background:#e6edf0;border-color:#a58c63}
+html[data-theme="light"] .menu .coop-setup input,html[data-theme="light"] .menu .coop-members li{background:#f3f7f7;color:#334759;border-color:#a5b6bc}
+html[data-theme="light"] .menu .footer{color:#445767}
+html[data-theme="light"] .music-controls{background:linear-gradient(#fdf6e5,#e1e9ec);border-color:#ad925f;color:#324a5d}
+html[data-theme="light"] .music-controls p,html[data-theme="light"] .music-controls label,html[data-theme="light"] .music-controls small{color:#2f455a}
+html[data-theme="light"] .music-controls code{color:#825a20}

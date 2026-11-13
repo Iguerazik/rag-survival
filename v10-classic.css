@@ -1,0 +1,181 @@
+/* V10 — full client interface, dark and light; overrides V9's hard-coded parchment. */
+:root{
+  --r10-bg:#dde5ea;--r10-window:#e7edf0;--r10-window2:#d2dfe7;--r10-card:#f4f7f7;
+  --r10-ink:#263f55;--r10-muted:#526b7c;--r10-edge:#718ca4;--r10-emboss:#f9fffe;
+  --r10-gold:#bf9147;--r10-title-top:#7d9eba;--r10-title-bottom:#4e7397;--r10-button:#d2dfe9;
+  --r10-hover:#fff2cb;--r10-shadow:#233e5588;
+}
+html[data-theme="dark"]{
+  color-scheme:dark;
+  --r10-bg:#0f1723;--r10-window:#1b2939;--r10-window2:#26384c;--r10-card:#213247;
+  --r10-ink:#f0f4f4;--r10-muted:#bacbd7;--r10-edge:#5b7590;--r10-emboss:#4b6480;
+  --r10-gold:#e1b974;--r10-title-top:#324c68;--r10-title-bottom:#1b3049;--r10-button:#2b4058;
+  --r10-hover:#405773;--r10-shadow:#020912be;
+}
+/* MAIN MENU: Ragnarok login/lobby client, rather than website-style promotional cards. */
+html .menu{background:radial-gradient(ellipse at 50% -12%,#556c7a40,transparent 55%),url('assets/forest.webp') center top / cover fixed,#101b29!important;min-height:100dvh;font-family:Tahoma,'Trebuchet MS',Arial,sans-serif!important}
+html .menu:before{content:'';position:fixed;inset:0;background:linear-gradient(#07111ad2,#0c1927d9);pointer-events:none;z-index:0}
+html[data-theme="light"] .menu:before{background:linear-gradient(#12233386,#152a3aaa)}
+html .menu>*,html .menu .wrap{position:relative;z-index:1}
+html .menu .site-head{height:auto;min-height:54px;display:flex;align-items:center;background:linear-gradient(#182a3ded,#0b1829ee)!important;border:1px solid #a99164;border-top:0;border-radius:0 0 7px 7px;box-shadow:0 7px 30px #0008,inset 0 -1px #dfbe7d3b!important;padding:6px 14px}
+html .menu .brand{font:bold 15px Georgia,serif;letter-spacing:.08em}
+html .menu .site-actions{gap:5px;flex-wrap:wrap;justify-content:flex-end}
+html .menu .site-actions .sound{padding:6px 10px;font-size:11px;box-shadow:inset 0 1px #dce6f133!important}
+html .menu .lobby-dock{display:flex!important;flex-wrap:wrap;gap:2px;width:fit-content;max-width:100%;margin:11px auto 8px!important;padding:5px!important;border:1px solid #bca47c!important;border-radius:3px!important;background:linear-gradient(var(--r10-title-top),var(--r10-title-bottom))!important;box-shadow:0 4px 15px #030e189c,inset 0 0 0 1px #e2d2b368!important}
+html .menu .lobby-dock button{width:94px!important;min-width:0!important;min-height:38px!important;height:40px!important;padding:3px 6px!important;flex-direction:row!important;gap:5px!important;white-space:nowrap!important;box-shadow:inset 0 1px var(--r10-emboss)!important;border:1px solid var(--r10-edge)!important;border-radius:2px!important;background:linear-gradient(var(--r10-card),var(--r10-button))!important;color:var(--r10-ink)!important;text-shadow:none!important;font:800 10px/1.1 Tahoma,Arial,sans-serif!important}
+html .menu .lobby-dock button:hover,html .menu .lobby-dock button:focus-visible{background:var(--r10-hover)!important;border-color:var(--r10-gold)!important;color:var(--r10-ink)!important}
+html .menu .lobby-dock .dock-ro-icon{width:27px!important;height:19px!important;object-fit:contain;image-rendering:pixelated;filter:none!important;flex-shrink:0}
+html .menu .lobby-dock .ro-dock-glyph{font-size:17px!important;line-height:20px;color:var(--r10-gold)!important;text-shadow:0 1px 2px #0008}
+html .menu .lobby-dock button span:last-child{font-size:10px!important;white-space:nowrap!important}
+html .menu .hero{margin-top:8px;height:clamp(210px,23vw,276px)!important;border:4px solid #5f7590!important;outline:2px solid #d2b986;outline-offset:-7px;border-radius:3px!important;background-position:center 59%!important;box-shadow:0 11px 30px #000a,inset 0 0 0 2px #080f19!important}
+html .menu .hero:before{background:linear-gradient(90deg,#0b1825fc 0%,#172b3aea 36%,#14273965 67%,transparent 92%)!important}
+html .menu .hero h1{font:800 clamp(34px,4.6vw,62px)/.99 Georgia,serif!important;color:#fff5de!important;text-shadow:0 3px 2px #000d,0 0 16px #090c19}
+html .menu .hero h1 em{display:block;color:#e0b877!important}
+html .menu .hero .hero-content{padding-top:26px;padding-bottom:20px}
+html .menu .hero .intro{font-size:12px;max-width:400px;line-height:1.7;color:#e3e9f3!important}
+html .menu .hero .hero-meta{font-size:10px;color:#ffda90!important}
+html .menu .lobby-columns{gap:12px!important}
+html .menu .client-window,html .menu .class-tree{border:2px solid var(--r10-edge)!important;border-radius:3px!important;background:linear-gradient(120deg,var(--r10-window),var(--r10-window2))!important;color:var(--r10-ink)!important;box-shadow:inset 0 0 0 1px var(--r10-emboss),0 8px 26px #0009!important;overflow:visible}
+html .menu .client-title,html .menu .class-tree>h3{background:linear-gradient(var(--r10-title-top),var(--r10-title-bottom)),url('assets/ro-skin/titlebar_mid.png') center / auto 100%!important;border-bottom:1px solid var(--r10-edge)!important;min-height:28px!important;padding:6px 10px!important}
+html .menu .client-title h2,html .menu .client-title h3,html .menu .class-tree>h3,html .menu .client-title span{color:#fffaed!important;text-shadow:0 1px 2px #111d29!important;font:bold 12px Tahoma,Arial,sans-serif!important}
+html .menu .client-content{padding:10px!important}
+html .menu .classes{gap:6px!important}
+html .menu .classes .class,html .menu .expedition-card{background:linear-gradient(var(--r10-card),var(--r10-window2))!important;color:var(--r10-ink)!important;border:1px solid var(--r10-edge)!important;box-shadow:inset 0 1px var(--r10-emboss)!important;min-height:67px!important;border-radius:2px!important}
+html .menu .classes .class:hover,html .menu .expedition-card:hover{background:var(--r10-hover)!important}
+html .menu .classes .class[aria-pressed=true],html .menu .expedition-card[aria-pressed=true]{background:linear-gradient(var(--r10-hover),var(--r10-window2))!important;border:2px solid var(--r10-gold)!important;box-shadow:inset 0 0 0 1px #deb77f77,0 0 8px #daa66044!important}
+html .menu .class strong,html .menu .expedition-card strong,html .menu .class small,html .menu .expedition-card small{color:var(--r10-ink)!important;text-shadow:none!important}
+html .menu .class .starter,html .menu .expedition-card small{color:var(--r10-gold)!important}
+html .menu .journey,html .menu .ro-status,html .menu .expeditions,html .menu .class-tree,html .menu .tree-node,html .menu .journey-path li,html .menu .attribute-grid div{background:var(--r10-window)!important;color:var(--r10-ink)!important;border-color:var(--r10-edge)!important}
+html .menu .journey h3,html .menu .journey-note,html .menu .journey-title p,html .menu .journey-meter,html .menu .journey-stats,html .menu .journey-stats summary,html .menu .difficulty-choice label,html .menu .difficulty-choice label span,html .menu .difficulty-choice legend,html .menu .difficulty-choice small,html .menu #difficulty-hint,html .menu .combat-mode legend,html .menu .combat-mode label span,html .menu .journey-mode legend,html .menu .controls-help{color:var(--r10-ink)!important;text-shadow:none!important}
+html .menu .journey-path li small,html .menu .tree-node small,html .menu .journey-note{color:var(--r10-muted)!important}
+html .menu .journey-path li[aria-current=true]{background:var(--r10-hover)!important;border-color:var(--r10-gold)!important;color:var(--r10-ink)!important}
+html .menu .journey-mode label span,html .menu .combat-mode label span,html .menu .sound,html .menu select,html .menu input:not([type=radio]){background:var(--r10-card)!important;border:1px solid var(--r10-edge)!important;color:var(--r10-ink)!important}
+html .menu .journey-mode input:checked+span,html .menu .combat-mode input:checked+span{background:var(--r10-hover)!important;color:var(--r10-ink)!important;border-color:var(--r10-gold)!important}
+html .menu .launch-actions{border-top:1px solid var(--r10-edge);padding-top:10px;gap:6px!important;justify-content:flex-end}
+/* Dock already provides quick menu: avoid the duplicated row of eight oversized web buttons. */
+html .menu .launch-actions>[id^="menu-"]{display:none!important}
+html .menu .launch-actions .primary{font:bold 15px Georgia,serif!important;padding:9px 22px!important;border:2px solid #e3bb70!important;background:linear-gradient(#ffedb6,#d7a55a 49%,#b77d31)!important;color:#2b2415!important;box-shadow:inset 0 1px #fff8d9,0 4px 12px #3d291555!important}
+html .menu .coop-panel{background:var(--r10-window)!important;color:var(--r10-ink)!important;border-color:var(--r10-edge)!important}
+html .menu .coop-panel h3,html .menu .coop-setup label{color:var(--r10-ink)!important}
+/* IN-GAME HUD: a classic RO system menu with caption and readable labels. */
+html .arena .ro-window,html .arena .ro-quickbar,html .arena .ro-music-in-game{
+  color:var(--r10-ink)!important;background:linear-gradient(130deg,var(--r10-window),var(--r10-window2))!important;
+  border:1px solid var(--r10-edge)!important;outline:1px solid var(--r10-emboss)!important;
+  box-shadow:inset 0 0 0 1px var(--r10-emboss),0 4px 14px var(--r10-shadow)!important
+}
+html .arena .ro-window .ro-title,html .arena .ro-quickbar .ro-toolbar-grip{
+  background:linear-gradient(var(--r10-title-top),var(--r10-title-bottom))!important;
+  border-bottom:1px solid var(--r10-edge)!important;color:#fff8e8!important;text-shadow:0 1px 2px #051726!important;
+}
+html .arena .hud-player strong#hud-class,html .arena .hud-player .vital>b,html .arena .hud-player .hud-level,html .arena .map-window .map-stats,html .arena .map-window .map-stats span,html .arena .map-window .map-stats small,html .arena .map-window .map-stats strong,html .arena .quest-window p,html .arena .hud-player #hud-gold{color:var(--r10-ink)!important}
+html .arena .hud-player .hud-level,html .arena .map-window .map-stats{background:var(--r10-window2)!important;border-top-color:var(--r10-edge)!important}
+html .arena .hud-player .hud-emblem,html .arena .hud-player .ro-level-chip{background:var(--r10-card)!important;color:var(--r10-ink)!important;border-color:var(--r10-edge)!important}
+html .arena .ro-quickbar{width:340px!important;max-width:calc(100vw - 12px)!important;padding:4px 6px 6px!important;border-radius:3px!important}
+html .arena .ro-quickbar .ro-toolbar-grip{height:22px!important;margin-bottom:4px!important;padding:2px 6px!important;border-radius:1px!important}
+html .arena .ro-toolbar-buttons{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px!important}
+html .arena .ro-toolbar-buttons button{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;position:relative!important;width:100%!important;height:43px!important;min-width:0!important;min-height:43px!important;padding:2px!important;border:1px solid var(--r10-edge)!important;border-radius:2px!important;background:linear-gradient(var(--r10-card),var(--r10-button))!important;color:var(--r10-ink)!important;text-shadow:none!important;box-shadow:inset 0 1px var(--r10-emboss)!important}
+html .arena .ro-toolbar-buttons button:hover{background:var(--r10-hover)!important;border-color:var(--r10-gold)!important}
+html .arena .ro-toolbar-buttons button img,html .arena .ro-toolbar-buttons button.hud-ro-status img,html .arena .ro-toolbar-buttons button.hud-ro-equip img,html .arena .ro-toolbar-buttons button#run-inventory img{width:22px!important;height:20px!important;object-fit:contain!important;image-rendering:pixelated;flex:0 0 20px}
+html .arena .ro-toolbar-buttons button span,html .arena .ro-toolbar-buttons button.hud-ro-status span,html .arena .ro-toolbar-buttons button.hud-ro-equip span,html .arena .ro-toolbar-buttons button#run-inventory span{display:inline!important;font:bold 9px/11px Tahoma,Arial,sans-serif!important;color:var(--r10-ink)!important}
+html .arena .ro-toolbar-buttons button kbd{position:absolute!important;right:1px!important;top:0!important;padding:0 2px!important;font-size:8px!important;line-height:10px!important;background:var(--r10-title-bottom)!important;color:#fff4d8!important;border:0!important;border-radius:1px!important;text-shadow:none!important}
+html .arena .hud-customize button,html .arena .ro-music-in-game button,html .arena .window-button,html .arena .quest-window .ro-panel-min{background:var(--r10-button)!important;color:var(--r10-ink)!important;border-color:var(--r10-edge)!important}
+html .arena .ro-music-in-game .ro-music-game-caption{color:var(--r10-ink)!important}
+html .arena .skill-slot,html .arena .tree-button{background:var(--r10-card)!important;color:var(--r10-ink)!important;border-color:var(--r10-gold)!important}
+/* All internal game windows follow theme, not just the main HUD. */
+html dialog.ro-character-dialog,html dialog.inventory-dialog,html dialog.catalogue-dialog,html dialog.card-dialog,html dialog.rebirth-dialog,html dialog.ro-options-dialog{
+  color:var(--r10-ink)!important;background:linear-gradient(145deg,var(--r10-window),var(--r10-window2))!important;
+  border:2px solid var(--r10-edge)!important;box-shadow:inset 0 0 0 1px var(--r10-emboss),0 13px 40px #000a!important;color-scheme:inherit!important
+}
+html dialog.ro-character-dialog .ro-dialog-bar,html dialog.inventory-dialog .inventory-head,html dialog.catalogue-dialog .inventory-head,
+html dialog.ro-options-dialog .ro-options-head{background:linear-gradient(var(--r10-title-top),var(--r10-title-bottom))!important;color:#f8f9f3!important;border-bottom:1px solid var(--r10-edge)!important}
+html dialog.ro-character-dialog .ro-dialog-bar h2,html dialog.inventory-dialog .inventory-head h2,html dialog.catalogue-dialog .inventory-head h2,
+html dialog.ro-options-dialog .ro-options-head h2{color:#fff9e8!important;text-shadow:0 1px 3px #071528!important}
+html dialog.inventory-dialog .inventory-head .eyebrow,html dialog.ro-options-dialog .ro-options-head small{color:#f7dbab!important}
+html dialog.ro-character-dialog .ro-client-tabs .ro-client-button,html dialog.ro-character-dialog .ro-client-button,
+html dialog.inventory-dialog button,html dialog.catalogue-dialog button,html dialog.card-dialog button,
+html dialog.ro-options-dialog button,html dialog.ro-character-dialog .ro-slot{
+  color:var(--r10-ink)!important;background:linear-gradient(var(--r10-card),var(--r10-button))!important;
+  border:1px solid var(--r10-edge)!important;box-shadow:inset 0 1px var(--r10-emboss)!important
+}
+html dialog.ro-character-dialog button:hover,html dialog.inventory-dialog button:hover,html dialog.catalogue-dialog button:hover,
+html dialog.card-dialog button:hover,html dialog.ro-options-dialog button:hover{background:var(--r10-hover)!important;border-color:var(--r10-gold)!important}
+html dialog.ro-character-dialog .ro-client-tabs .selected,html dialog.inventory-dialog #inventory-tabs button.active{background:var(--r10-hover)!important;border-color:var(--r10-gold)!important;color:var(--r10-ink)!important}
+html dialog.ro-character-dialog .ro-client-heading,html dialog.ro-character-dialog .ro-gear-details,html dialog.ro-character-dialog .ro-stats-panel,
+html dialog.ro-character-dialog .ro-derived,html dialog.ro-character-dialog .ro-paper-doll,html dialog.ro-character-dialog .ro-attr,
+html dialog.ro-character-dialog .ro-gear-row,html dialog.ro-character-dialog .ro-vitals,html dialog.ro-character-dialog .ro-client-footer,
+html dialog.ro-character-dialog .ro-status-art,html dialog.ro-character-dialog .ro-paper-avatar{
+  color:var(--r10-ink)!important;background:var(--r10-window)!important;border-color:var(--r10-edge)!important
+}
+html dialog.ro-character-dialog h3,html dialog.ro-character-dialog b,html dialog.ro-character-dialog strong,html dialog.ro-character-dialog span,
+html dialog.ro-character-dialog .ro-gear-row strong,html dialog.ro-character-dialog .ro-vital-text,
+html dialog.ro-character-dialog .ro-derived .ro-gear-row span,html dialog.ro-character-dialog .ro-client-heading small,html dialog.ro-character-dialog .ro-attr abbr{color:var(--r10-ink)!important}
+html dialog.ro-character-dialog .ro-hint,html dialog.ro-character-dialog .ro-gear-row span{color:var(--r10-muted)!important}
+html dialog.inventory-dialog .inventory-summary,html dialog.inventory-dialog .inventory-tabs,html dialog.card-dialog p,
+html dialog.catalogue-dialog #codex-summary,html dialog.catalogue-dialog #pets-summary,html dialog.catalogue-dialog .codex-hint,
+html dialog.catalogue-dialog .catalogue-card p{color:var(--r10-muted)!important;border-color:var(--r10-edge)!important}
+html dialog.inventory-dialog .inventory-list .inventory-item,html dialog.catalogue-dialog .catalogue-card,html dialog.card-dialog .card-entry,
+html dialog.inventory-dialog .inventory-card-buffs span{background:var(--r10-card)!important;color:var(--r10-ink)!important;border-color:var(--r10-edge)!important;box-shadow:inset 0 1px var(--r10-emboss)!important}
+html dialog.inventory-dialog .inventory-item strong,html dialog.inventory-dialog .inventory-item small,html dialog.inventory-dialog .inventory-item p,
+html dialog.catalogue-dialog h2,html dialog.catalogue-dialog h3,html dialog.catalogue-dialog .catalogue-card strong,
+html dialog.card-dialog h2,html dialog.card-dialog .card-entry strong,html dialog.card-dialog .card-entry small{color:var(--r10-ink)!important;text-shadow:none!important}
+html dialog.catalogue-dialog .catalogue-card.locked{background:var(--r10-window2)!important}
+html dialog.catalogue-dialog .catalogue-card.found{background:var(--r10-hover)!important;border-color:var(--r10-gold)!important}
+html dialog.catalogue-dialog .codex-recipe-icons{background:var(--r10-window2)!important}
+html dialog.inventory-dialog .inventory-item .item-sprite{background:var(--r10-window2)!important;border-color:var(--r10-edge)!important}
+html dialog.card-dialog,html dialog.rebirth-dialog{max-width:min(790px,94vw)}
+html dialog.card-dialog form{display:flex;gap:7px;justify-content:flex-end;align-items:center;flex-wrap:wrap}
+/* Controls popup looks like a settings window from a game client. */
+.ro-options-dialog{width:min(650px,calc(100vw - 20px));max-width:min(690px,calc(100vw - 20px));max-height:88dvh;padding:0!important;overflow:auto;border-radius:4px;font-family:Tahoma,Arial,sans-serif}
+.ro-options-dialog::backdrop{background:#040913b9;backdrop-filter:blur(3px)}
+.ro-options-head{display:flex;align-items:center;justify-content:space-between;gap:7px;padding:12px 15px!important}
+.ro-options-head h2{font:bold 19px Georgia,serif;margin:4px 0 0!important}
+.ro-options-head small{font:bold 9px Tahoma,Arial,sans-serif;letter-spacing:.13em}
+.ro-options-dialog .ro-options-intro{margin:12px 17px 6px;font:12px/1.5 Tahoma,Arial,sans-serif;color:var(--r10-ink)!important}
+.ro-options-dialog .controls-bindings{padding:8px 16px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.ro-options-dialog .controls-section h3{font:bold 12px Tahoma,Arial,sans-serif;color:var(--r10-gold);border-bottom:1px solid var(--r10-edge);padding:8px 0;margin:0 0 5px}
+.ro-options-dialog .controls-line{display:flex;align-items:center;justify-content:space-between;gap:4px;margin:3px 0;padding:2px 0;font:11px Tahoma,Arial,sans-serif;border-bottom:1px dotted var(--r10-edge)}
+.ro-options-dialog .controls-key{width:125px;min-height:27px;flex-shrink:0;font:bold 10px Tahoma,Arial,sans-serif!important;border-radius:2px}
+.ro-options-dialog .controls-warning{color:var(--r10-gold)!important;font:bold 11px Tahoma,Arial,sans-serif;min-height:2em;padding:0 16px}
+.ro-options-dialog footer{display:flex;gap:9px;justify-content:flex-end;padding:11px 15px;border-top:1px solid var(--r10-edge);background:var(--r10-window2)}
+.ro-options-dialog button:focus-visible{outline:2px solid var(--r10-gold)!important;outline-offset:1px}
+@media(max-width:860px){html .menu .lobby-dock button{width:83px!important}html .menu .lobby-dock .dock-ro-icon{width:21px!important}html .menu .hero{height:236px!important}}
+@media(max-width:610px){
+  html .menu .site-head{flex-wrap:wrap;justify-content:center;gap:5px}
+  html .menu .site-actions{justify-content:center}
+  html .menu .lobby-dock{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));width:100%!important}
+  html .menu .lobby-dock button{width:100%!important;height:36px!important;min-height:36px!important;padding:3px!important}
+  html .menu .lobby-dock button span:last-child{font-size:9px!important}
+  html .menu .hero{height:210px!important;background-position:65% center!important}
+  html .menu .hero .hero-content{padding:14px 12px!important}
+  html .menu .hero h1{font-size:clamp(32px,9vw,44px)!important}
+  html .menu .hero .intro{font-size:11px}
+  html .arena .ro-quickbar{width:min(340px,calc(100vw - 16px))!important}
+  html .arena .ro-toolbar-buttons button{height:35px!important;min-height:35px!important}
+  html .arena .ro-toolbar-buttons button img{width:16px!important;height:15px!important;flex:0 0 15px}
+  html .arena .ro-toolbar-buttons button span{font-size:8px!important}
+  .ro-options-dialog .controls-bindings{grid-template-columns:1fr;gap:5px}
+  .ro-options-dialog .controls-key{width:115px}
+}
+/* The V9 client styles used extra data-label selectors on buttons, override those too. */
+html .arena .ro-quickbar .ro-toolbar-buttons button[data-label],
+html .arena .ro-quickbar .ro-toolbar-buttons button.hud-ro-status,
+html .arena .ro-quickbar .ro-toolbar-buttons button.hud-ro-equip{
+  background:linear-gradient(var(--r10-card),var(--r10-button))!important;
+  border-color:var(--r10-edge)!important;
+  color:var(--r10-ink)!important;
+}
+html .arena .ro-quickbar .ro-toolbar-buttons button[data-label]:hover,
+html .arena .ro-quickbar .ro-toolbar-buttons button.hud-ro-status:hover,
+html .arena .ro-quickbar .ro-toolbar-buttons button.hud-ro-equip:hover{
+  background:var(--r10-hover)!important;border-color:var(--r10-gold)!important
+}
+html .menu .site-head .brand,html .menu .site-head .brand b{color:#ffe8b0!important;opacity:1!important;text-shadow:0 2px 4px #000!important}
+html .menu .site-head .site-actions .sound{background:linear-gradient(#344c64,#1b3047)!important;color:#fff1d6!important;border:1px solid #977b50!important;box-shadow:inset 0 1px #b9cddd4d!important}
+html .menu .site-head .site-actions .sound:hover{background:linear-gradient(#52718a,#30445b)!important}
+/* Special compact mode for mobile: hides 10-button menu until explicitly expanded. */
+html .arena .ro-quickbar.ro-quickbar-collapsed {width:min(226px,calc(100vw - 18px))!important;padding:3px 5px!important;}
+html .arena .ro-quickbar.ro-quickbar-collapsed .ro-toolbar-buttons{display:none!important}
+@media(max-width:510px){
+  html .arena .ro-quickbar.ro-quickbar-collapsed{width:226px!important}
+  html .arena .ro-quickbar .ro-toolbar-buttons button[data-label]{height:35px!important;min-height:35px!important}
+}

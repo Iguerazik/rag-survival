@@ -1,0 +1,19 @@
+A versão V5.2 NÃO contém a trilha sonora comercial do Ragnarok Online.
+
+Para ouvir as músicas oficiais, obtenha os arquivos de fonte que você tem
+permissão para usar e copie nesta pasta, mantendo exatamente estes nomes:
+
+08.mp3  — Menu inicial / Prontera — Theme of Prontera
+19.mp3  — Esgotos de Prontera  — Under the Ground
+47.mp3  — Payon Cave 4         — Welcome Mr. Hwang
+16.mp3  — Labirinto da Floresta — Labyrinth
+48.mp3  — Calabouço dos Orcs — Help Yourself
+21.mp3  — Torre de Geffen 2F  — Through the Tower
+03.mp3  — Floresta de Payon 11 — Peaceful Forest
+
+No menu, clique em "Usar arquivos do RO" e depois em "Jogar".
+O áudio alterna sozinho ao mudar de mapa. Caso o arquivo esteja ausente,
+reproduz uma faixa ALTERNATIVA composta para este protótipo.
+
+IMPORTANTE: confira a permissão de uso e redistribuição das músicas antes de
+publicar o site em domínio público. O pacote aqui não redistribui a OST.

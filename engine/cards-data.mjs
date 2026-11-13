@@ -1,0 +1,7 @@
+/** Monstros que TÊM carta (mesma lista de cardDb em cards.js; o teste v23-engine confere).
+ * O motor só sorteia carta para estes: antes o online sorteava "carta" até de monstro sem carta. */
+export const CARD_MONSTERS=Object.freeze(["lunatic","spore","baphometjr","hunterfly","mantis","sidewinder","munak","bongun","sohee","nine_tail","thiefbug","tarou","drainliar","cramp","baphomet","moonlight","goldenbug","orc_hero","doppelganger","eddga"]);
+
+/** Propriedade (elemento) de cada monstro: mesma tabela mobElements de cards.js (o teste v23-engine confere).
+ * Usada pelos efeitos de carta que dependem do elemento (Carta Drainliar, Carta Munak). */
+export const MOB_ELEMENTS=Object.freeze({"poring":"water","fabre":"earth","lunatic":"neutral","spore":"water","baphometjr":"shadow","hunterfly":"wind","mantis":"earth","sidewinder":"poison","munak":"undead","bongun":"undead","sohee":"water","nine_tail":"fire","thiefbug":"neutral","tarou":"shadow","drainliar":"shadow","cramp":"poison","baphomet":"shadow","moonlight":"fire","goldenbug":"fire","orc_hero":"earth","doppelganger":"shadow","eddga":"fire","thief_female":"shadow","thief_male":"shadow","archer_skeleton":"undead","horong":"fire","dokebi":"shadow","orc_zombie":"undead","orc_skeleton":"undead","steel_chonchon":"wind","marionette":"ghost","whisper":"ghost","nightmare":"ghost","deviruchi":"shadow","beetle_king":"earth","greatestgeneral":"fire","savage":"earth"});

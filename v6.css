@@ -1,0 +1,73 @@
+/* Rune-Midgard V5.1 — denser classic-client launcher, readable Codex, skill labels and HUD */
+:root{--ui-gold:#d5b47c;--ui-ink:#f6ecd1;--ui-navy:#172637;--ui-edge:#8d734b}
+body{background:#0a1722}
+.menu{background:radial-gradient(ellipse at 50% 0%,#31465b 0%,#0e1825 65%);color:#ebddc2;min-height:100vh;color-scheme:dark}
+.menu .wrap{max-width:1320px}
+.menu .site-head{background:#111d2de8;border-bottom:2px solid #947249;box-shadow:0 5px 24px #0009}
+.menu .brand,.menu .brand b{color:#f8e8bf;text-shadow:0 2px 3px #000}
+.menu .site-actions .sound{background:linear-gradient(#3a4f63,#1c2939);color:#f9e9cd;border:1px solid #887250}
+.lobby-dock{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:14px 0 10px;padding:8px;border:1px solid #a0834c;background:#111c2bed;box-shadow:inset 0 0 0 2px #273b51,0 5px 20px #0007;border-radius:5px}
+.lobby-dock button{display:flex;align-items:center;justify-content:center;gap:12px;min-height:51px;padding:8px 12px;color:#f0e1c5;font:800 14px system-ui;border:1px solid #566e82;background:linear-gradient(#34495c,#1c2a39);border-radius:4px;box-shadow:inset 0 1px #ffffff17;cursor:pointer;transition:background .13s,transform .13s}
+.lobby-dock button:hover,.lobby-dock button:focus-visible{background:linear-gradient(#5c6f7e,#30455a);transform:translateY(-1px);outline:2px solid #e7b76b}
+.dock-icon{font-size:22px;color:#f5d38d;filter:drop-shadow(0 1px #000)}
+.menu .hero{margin-top:6px;height:clamp(240px,27vw,325px);border:2px solid #b29258;border-radius:5px;box-shadow:inset 0 0 0 4px #111f2a,0 10px 30px #0009;background-size:cover;background-position:65% center}
+.menu .hero:before{background:linear-gradient(90deg,#141e2cef 0%,#192637e8 26%,#1e3043ce 49%,transparent 78%)}
+.menu .hero:after{border:1px solid #ad884e86;inset:7px}
+.menu .hero h1{color:#fff0cc;text-shadow:0 3px 10px #000,0 0 32px #000;font-size:clamp(42px,5.6vw,78px)}
+.menu .hero h1 em{color:#efba6b;text-shadow:0 2px 6px #000}
+.menu .hero .intro,.menu .hero .hero-meta{color:#f5ead5;text-shadow:0 2px 5px #000;max-width:480px}
+.menu .hero .eyebrow{color:#f5cc7c;text-shadow:0 2px 6px #000}
+.menu .client-window{background:#1e2d3d;border:2px solid #826c4c;border-radius:4px;box-shadow:inset 0 0 0 1px #3d5267,0 9px 23px #0009;overflow:visible}
+.menu .client-title{background:linear-gradient(#586b7d,#2e4258 44%,#1a2b3c 49%,#354a5e);border-bottom:2px solid #98764a;min-height:38px;padding:8px 13px}
+.menu .client-title h2,.menu .client-title h3,.menu .client-title span{color:#fff0d5!important;text-shadow:0 2px 3px #000;font-size:14px}
+.menu .client-content{padding:13px}
+.menu .journey,.menu .ro-status,.menu .expeditions,.menu .class-tree{background:#233448;color:#fff0db;border-color:#665b4a}
+.menu .journey h3,.menu .journey-note,.menu .journey-title p,.menu .journey-meter,.menu .journey-stats{color:#ecddc5}
+.menu .journey-path li,.menu .attribute-grid div,.menu .tree-node{background:#31465a;color:#eee1ce;border-color:#69798a}
+.menu .journey-path li[aria-current=true]{background:#4a5e69;border-color:#e3b773;color:#fff1cb}
+.menu .journey-path li small,.menu .class small,.menu .tree-node small,.menu .tree-meta{color:#c9d5dd}
+.menu .class strong{color:#fff1d6}
+.menu .classes .class,.menu .expedition-card{background:linear-gradient(#3b5267,#233449);border:1px solid #6a7e8e;color:#f7e7cf;min-height:77px}
+.menu .classes .class[aria-pressed=true],.menu .expedition-card[aria-pressed=true]{background:linear-gradient(#6c654d,#393b38);border:2px solid #e9bc75;box-shadow:inset 0 0 0 1px #fff2c135}
+.menu .classes .class:hover,.menu .expedition-card:hover{background:linear-gradient(#506980,#354a5e)}
+.menu .expedition-card strong,.menu .expedition-card small{color:#f8e7cf}
+.menu .portrait{background:radial-gradient(#556c78,#1c2a35)}
+.menu .journey-mode legend,.menu .difficulty-choice legend,.menu .combat-mode legend,.menu .journey-mode label span,.menu .combat-mode label span{color:#f5e7d0}
+.menu .journey-mode label span,.menu .combat-mode label span{background:#32485c;border-color:#8290a0}
+.menu .journey-mode input:checked+span,.menu .combat-mode input:checked+span{background:#6f5e41;color:#fff1cc;border-color:#e1b771}
+.menu .difficulty-choice label,.menu .difficulty-choice small,.menu .controls-help,.menu .coop-panel h3,.menu #coop-status{color:#ebdfcc}
+.menu select,.menu input{color:#f7e9d5;background:#172637;border:1px solid #7e93a2}
+.menu .launch-actions{display:flex;justify-content:flex-end;flex-wrap:wrap}
+.menu .launch .sound,.menu .sound{background:linear-gradient(#4d6376,#2b4055);color:#f6e9ce;border-color:#9b835d}
+.menu .launch .primary,.menu .primary{background:linear-gradient(#ffedbf,#c99043 53%,#9f661f);color:#28211a;border-color:#ffda83;box-shadow:inset 0 1px #fff4d2}
+.menu .coop-panel{background:#223549;border:1px solid #a48656}
+.menu .coop-setup input,.menu .coop-members li{background:#122132;color:#f7e7c9;border-color:#6c8094}
+.menu .footer{color:#c2b79e}
+.catalogue-dialog,.inventory-dialog{background:linear-gradient(#26374a,#142233)!important;color:#f7ead2!important;border:2px solid #c8a16c!important;box-shadow:inset 0 0 0 4px #415265,0 25px 100px #000c}
+.catalogue-dialog h2,.catalogue-dialog h3,.inventory-dialog h2,.inventory-dialog p{color:#f7ebd2!important}
+.catalogue-dialog #codex-summary,.catalogue-dialog #pets-summary,.codex-hint{color:#e2d6c5!important;line-height:1.45}
+.codex-grid{grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
+.catalogue-card{background:linear-gradient(145deg,#34495f,#223246)!important;color:#f3e4c9;border:1px solid #677e8f!important;opacity:1!important;min-height:182px}
+.catalogue-card p,.catalogue-card strong{color:#ebdcc7!important;text-shadow:none!important}
+.catalogue-card.locked{border-color:#697b91!important;background:linear-gradient(145deg,#304157,#1a2a3d)!important}
+.catalogue-card.found{border-color:#e4b86e!important;background:linear-gradient(145deg,#4c4b3e,#2b3542)!important}
+.codex-recipe-icons{display:flex;gap:10px;align-items:center;justify-content:center;height:90px;padding:8px;background:radial-gradient(ellipse,#586a7d88,transparent 80%);border-radius:6px}
+.codex-recipe-icons img{display:block;object-fit:contain;image-rendering:pixelated;width:64px;height:64px;filter:drop-shadow(0 2px 7px #0008)}
+.codex-recipe-icons img.item-sprite{width:70px;height:70px}
+.codex-recipe-icons span{font:900 25px Georgia,serif;color:#f7dc9d}
+.catalogue-card.locked .codex-recipe-icons img{filter:grayscale(1) blur(3.1px) brightness(.68) drop-shadow(0 0 3px #000b);opacity:.85}
+.catalogue-card.locked .codex-recipe-icons{border:1px dashed #71879d55}
+.catalogue-card.locked strong{color:#e7d5af!important}
+.catalogue-card.locked p{color:#c9cfda!important}
+.catalogue-dialog .sound,.inventory-dialog .sound{background:#344b62!important;color:#fff2d4!important;border:1px solid #957955}
+#inventory-tabs button{color:#f5e1bd;border-color:#8a7762}
+#inventory-tabs button.active{background:#ab8750;color:#1a2535}
+.inventory-list .inventory-item{background:#263a50;color:#e8e1d4;border-color:#657789}
+.inventory-list .inventory-item small,.inventory-list .inventory-item p{color:#d9d7d2!important}
+.arena .skill-slot{position:relative;background:#172636!important;border:2px solid #a88b5a!important;box-shadow:0 2px 8px #000b,inset 0 0 0 1px #f8e6bf66!important;overflow:hidden}
+.arena .skill-slot .skill-icon{width:30px;height:30px;image-rendering:pixelated;filter:drop-shadow(0 2px 3px #000a)}
+.arena .skill-slot .skill-key,.arena .skill-slot b{color:#fff7df!important;text-shadow:0 1px 3px #000,1px 1px 2px #000!important;background:#0d1820b8;padding:0 3px;border-radius:2px}
+.arena .hud-actions button{min-height:24px!important;height:auto!important;font-size:11px!important;line-height:1.2!important;padding:5px 7px!important;white-space:nowrap}
+.game-diagnostic{position:absolute;z-index:600;left:50%;top:38%;transform:translateX(-50%);width:min(600px,90vw);padding:22px;background:#351d23ef;color:#fff0e6;border:3px solid #e7b26f;box-shadow:0 20px 70px #000c;font:700 15px/1.5 system-ui;pointer-events:auto}
+@media(max-width:900px){.lobby-dock{grid-template-columns:repeat(5,minmax(0,1fr))}.lobby-dock button{display:grid;justify-items:center;gap:2px;font-size:11px}.menu .hero{height:270px}}
+@media(max-width:560px){.lobby-dock{gap:3px;padding:4px}.lobby-dock button{font-size:9px;min-height:52px;padding:3px}.dock-icon{font-size:18px}.menu .hero{height:275px;background-position:60% center}.menu .hero h1{font-size:40px}.menu .hero:before{background:linear-gradient(90deg,#141f2df5,#1b2b3ce1 73%,transparent)}.menu .lobby-columns{grid-template-columns:1fr}.codex-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.catalogue-card{min-height:168px}.codex-recipe-icons{gap:2px;height:68px}.codex-recipe-icons img,.codex-recipe-icons img.item-sprite{width:48px;height:48px}}

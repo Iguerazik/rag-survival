@@ -1,0 +1,21 @@
+{
+  "versao": "8.0-safe",
+  "base": "V7_HUD_SPRITES_AUDIO_COMPLETO",
+  "created_separately": true,
+  "new_files": [
+    "progression.js",
+    "encounters.js",
+    "v8-progression.css",
+    "LEIA-ME_V8.md"
+  ],
+  "changes": [
+    "progression_tier_10",
+    "elites_miniboss",
+    "maze_secret_boss",
+    "inventory_sales",
+    "modal_backdrop_close",
+    "hotkeys",
+    "rarer_chests",
+    "chest_expiry"
+  ]
+}

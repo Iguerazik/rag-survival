@@ -1,0 +1,13 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Paridade do motor (navegador)</title>
+<script type="module">
+  import * as core from '../../engine/core.mjs';
+  import { CARD_MONSTERS, MOB_ELEMENTS } from '../../engine/cards-data.mjs';
+  import { run } from './parity-scenario.mjs';
+  window.parity = (async () => {
+    const [maps, catalog] = await Promise.all(['server-maps.json', 'online-skills.json'].map(f => fetch('../../' + f).then(r => r.json())));
+    core.configure({ maps, catalog, cards: CARD_MONSTERS, elements: MOB_ELEMENTS });
+    return { ...run(core), userAgent: navigator.userAgent };
+  })();
+</script>

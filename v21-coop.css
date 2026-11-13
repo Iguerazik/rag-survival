@@ -1,0 +1,14 @@
+/* V21 - drag handles, understated mob feedback and cooperative revive. */
+.arena .ro-drag-handle{cursor:grab!important;touch-action:none!important;user-select:none!important;}
+.arena .ro-drag-handle:active{cursor:grabbing!important}
+.arena .ro-drag-handle .ro-panel-heading::before,.arena .map-titlebar h2::before,
+.arena .ro-quest-title #quest-title::before,.arena .ro-toolbar-grip>span::before{content:'⠿ ';font-size:13px;color:#956a30}
+.arena .hud-customize{align-items:center;gap:5px}
+.arena .hud-drag-tip{font:700 10px/1.4 Tahoma,Arial,sans-serif;padding:4px 7px;color:var(--r15-ink,#172e49);background:var(--r15-card,#eff3fa);border:1px solid #9aadc3;border-radius:3px;white-space:nowrap}
+.arena .ro-being-dragged{z-index:110!important;opacity:.97}
+.arena .online-revive-hint{box-shadow:0 8px 22px #0009}
+.arena .online-revive-hint span{max-width:240px;font-size:12px;line-height:1.4}
+.arena .online-death-overlay{z-index:120}
+@media(max-width:650px){.arena .hud-drag-tip{display:none}}
+
+.arena .ro-window-active{z-index:90!important}
