@@ -97,6 +97,14 @@ test('V23.6: SOLO no navegador — MVP no mapa, aviso no chão e item do tesouro
   const before=await browser.evaluate('items().length');
   assert.ok(await browser.evaluate(`${P}.rewardChoices.every(o=>o.stat==='gear')`),'tesouro com equipamento');
   await browser.evaluate("document.querySelector('#coop-server-rewards button').click()");
+  // V24.1: depois do tesouro começa o modo infinito; Esc → "Encerrar run e receber recompensas".
+  for(let i=0;i<60&&(await browser.evaluate('run.endless'))==null;i++)await sleep(100);
+  assert.notEqual(await browser.evaluate('run.endless'),null,'modo infinito começou');
+  assert.equal(await browser.evaluate('mode'),'play','a partida continua no infinito');
+  for(let i=0;i<30&&!/∞/.test(await browser.evaluate("document.getElementById('mvp-countdown').textContent"));i++)await sleep(100);
+  assert.match(await browser.evaluate("document.getElementById('mvp-countdown').textContent"),/∞ Infinito/);
+  await browser.evaluate('pause()');
+  assert.ok(await browser.evaluate("(()=>{const b=[...ui.dialog.querySelectorAll('button')].find(b=>/Encerrar run/.test(b.textContent));if(b)b.click();return !!b;})()"),'botão Encerrar run');
   // Espera o fim da partida (até 8 s): com a suíte inteira rodando em paralelo, 1,2 s fixo às vezes não bastava.
   for(let i=0;i<80&&(await browser.evaluate('mode'))!=='ended';i++)await sleep(100);
   assert.equal(await browser.evaluate('mode'),'ended');

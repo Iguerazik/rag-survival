@@ -732,7 +732,7 @@ function packPlayer() {
   const moving=mode==='play'&&run.player.hp>0;
   const {dx,dy}=moving?onlineMoveIntent():{dx:0,dy:0};
   const out={dx,dy,attack:true,auto:run.auto,skill:run.coopSkill||0,skillSeq:run.coopSkillSeq||0,upgrade:run.coopUpgrade||null,reward:run.coopReward||null,
-    eventSeq:run.authorityEventSeq||0,riftEnter:run.coopRiftEnter||0,item:run.coopItem||null,route:run.coopRoute||null};
+    eventSeq:run.authorityEventSeq||0,riftEnter:run.coopRiftEnter||0,item:run.coopItem||null,route:run.coopRoute||null,endRun:run.endRequest===true};
   if(run.serverSpawnSynced && run.player.hp>0){
     const seq=++run.mvSeq,x=Math.round(run.player.x*100)/100,y=Math.round(run.player.y*100)/100;
     out.mv={seq,x,y,warp:run.warpSeq||0};
@@ -1030,7 +1030,7 @@ function receiveAuthoritativeWorld(world){
   if(world.maze&&run.mazeEvent)Object.assign(run.mazeEvent,{active:!!world.maze.active,defeated:!!world.maze.defeated,room:world.maze.room});
   run.onlineCds=self.cds||{};run.onlineCdsAt=performance.now();run.onlineZones=world.zones||[];run.contract=world.contract||null;run.onlineTrial=self.trial||0;
   run.level=self.level;run.xp=self.xp;run.needed=self.needed;run.kills=world.kills;run.zeny=self.zeny;
-  run.wave=world.wave;run.mvpActive=!!world.mvpActive;
+  run.wave=world.wave;run.mvpActive=!!world.mvpActive;run.endless=Number.isFinite(world.endless)?world.endless:null;
   if(Number.isFinite(world.mapStart))run.mapStart=world.mapStart;
   if(run.time<simTime-1||run.time>simTime+1)run.time=simTime;
   run.riftPortal=world.riftPortal||null;run.portal=world.rift?.exit||null;run.mvpArena=!!world.mvpArena;
@@ -1199,6 +1199,7 @@ function receiveAuthoritativeWorld(world){
     if(e.type==='immune'&&e.by===selfId()&&run.numbers.length<14)popup(e.x,e.y-35,'Imune · '+Elemental.names[e.el],'#bcc9e0',11);
     if(e.type==='magicImmune'&&e.player===selfId())popup(p.x,p.y-44,'Imune','#ffe28a',13);
     if(e.type==='mvpWarning'){announce('⚠ PRESENÇA DE MVP DETECTADA! Prepare-se para a batalha.',4);tone(180,95,.6,'sawtooth',.07);if(run.effects.length<16)effect('blast',e.x,e.y,120,'#e7b75e');}
+    if(e.type==='endlessStart'){announce('∞ MODO INFINITO! O MVP caiu e as hordas não param: EXP ×'+String(e.xp||2.5).replace('.',',')+'. Esc → Encerrar run para receber as recompensas.',9);tone(330,660,.45,'triangle',.06);}
     if(e.type==='mvpPhase'){const names={2:'REFORÇOS',3:'PODER ESPECIAL',4:'FÚRIA'};announce('⚠ MVP · FASE '+e.phase+' — '+names[e.phase]+'!',5);tone(e.phase===4?95:210,110,.5,'triangle',.08);if(run.effects.length<16)effect('blast',e.x,e.y,130,e.phase===4?'#ff584a':'#ffbf68');}
     if(e.type==='mvpEnter')announce('⚠ O MVP '+e.name+' APARECEU! Ele chama reforços · desvie dos avisos no chão.',7);
     if(e.type==='mvpDown')announce('MVP DERROTADO! Escolha 1 equipamento permanente do tesouro.',7);
@@ -1386,6 +1387,7 @@ function pause() {
   const lock = $('hud-layout-lock'), locked = lock?.getAttribute('aria-pressed') === 'true';
   showDialog(run.inMvp ? 'ARENA DO MVP' : expeditions[run.map].name.toUpperCase(), 'Jogo pausado', 'A partida continua de onde você parou. As janelas da tela (personagem, mapa, atalhos, música) podem ser arrastadas pelo título.', [
     button('Continuar', 'primary', resume),
+    ...(run.endless!=null ? [button('Encerrar run e receber recompensas', 'primary', () => { run.endRequest = true; resume(); })] : []),
     button('Restaurar posição das janelas', 'secondary', () => { $('hud-layout-reset')?.click(); resume(); }),
     button(locked ? 'Destravar janelas' : 'Travar janelas', 'secondary', () => { lock?.click(); resume(); }),
     button('Voltar ao menu', 'secondary', menu),
@@ -1487,7 +1489,8 @@ function finish(victory) {
     }).catch(()=>{if(run===finishedRun&&mode==='ended')ui.body.textContent=ui.body.textContent.replace(' · Salvando EXP do personagem…',' · EXP salva no servidor (confira no menu).');});
   }
   const loot = (run.picked.length ? ' · Itens: ' + run.picked.join(', ') : '') +
-    (run.zeny ? ' · +' + run.zeny.toLocaleString('pt-BR') + ' z' : '');
+    (run.zeny ? ' · +' + run.zeny.toLocaleString('pt-BR') + ' z' : '') +
+    (run.endless != null ? ' · ∞ Infinito: ' + timeText(run.endless) + ' (nível ' + run.level + ')' : '');
   tone(victory ? 392 : 160, victory ? 784 : 72, .5);
   // V22.1: fim do mapa com opção de seguir para o PRÓXIMO mapa ou voltar ao menu.
   const nextMap = victory ? mapOrder[mapOrder.indexOf(run.map) + 1] : null;
@@ -1592,7 +1595,7 @@ function updateHud() {
   $('hud-level').textContent = run.authoritative ? 'RUN Nv. '+run.level : run.career ? 'Base ' + run.journey.base + ' · Classe ' + run.journey.job : 'Treino de 3ª classe';
   $('hud-gold').textContent='🪙 '+run.zeny.toLocaleString('pt-BR')+' z';
   $('hud-pet').textContent=run.pet ? '🐾 '+Codex.pets[run.pet.id]?.name : '';
-  $('mvp-countdown').textContent = run.rift?.active ? 'Fenda · missão opcional' : run.mvpActive ? bosses[expeditions[run.map].boss].name : 'MVP ' + timeText(Math.ceil(Math.max(0,FINAL_WAVE - (run.time - run.mapStart))));
+  $('mvp-countdown').textContent = run.endless!=null ? '∞ Infinito ' + timeText(run.endless) : run.rift?.active ? 'Fenda · missão opcional' : run.mvpActive ? bosses[expeditions[run.map].boss].name : 'MVP ' + timeText(Math.ceil(Math.max(0,FINAL_WAVE - (run.time - run.mapStart))));
   ExpeditionQuest.hud();
   EliteRifts.hud();
   const portalLabel=nearbyPortal(),portalButton=$('portal-button');
