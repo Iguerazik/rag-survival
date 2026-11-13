@@ -90,8 +90,11 @@ const RunRelics = (() => {
   }
   function drawPickup(chest){
     if(!names[chest.kind])return false;
-    const color=chest.kind==='healing'?'#ff9f9f':chest.kind==='goldMagnet'||chest.kind==='zenyCache'?'#ffdf82':chest.kind==='xpMagnet'?'#9dffdc':'#d8c8ff';
-    ring(chest.x,chest.y,13+Math.sin(run.time*4)*2,color,2);
+    // Cores bem distintas: Orbe de EXP em azul, Ímã de Zeny em laranja-dourado, Bolsa de Zeny em amarelo claro.
+    const color=chest.kind==='healing'?'#ff8f8f':chest.kind==='goldMagnet'?'#ffa424':chest.kind==='zenyCache'?'#fff0a8':chest.kind==='xpMagnet'?'#58b8ff':'#d8c8ff';
+    const fill=chest.kind==='goldMagnet'?'rgba(120,64,0,.55)':chest.kind==='xpMagnet'?'rgba(10,40,110,.55)':null;
+    if(fill){ctx.save();ctx.fillStyle=fill;ctx.beginPath();ctx.arc(chest.x,chest.y,12,0,Math.PI*2);ctx.fill();ctx.restore();}
+    ring(chest.x,chest.y,13+Math.sin(run.time*4)*2,color,fill?3:2);
     ctx.save();ctx.fillStyle=color;ctx.font='bold 12px Tahoma';ctx.textAlign='center';ctx.fillText(chest.kind==='healing'?'+HP':chest.kind==='xpMagnet'?'EXP':chest.kind==='goldMagnet'||chest.kind==='zenyCache'?'Z':'ASA',chest.x,chest.y+4);
     if(distance(chest,run.player)<190)ctx.fillText(names[chest.kind],chest.x,chest.y-24);ctx.restore();return true;
   }

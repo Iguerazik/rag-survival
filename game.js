@@ -778,8 +778,16 @@ function skillIconUrl(id){
 function serverPanel(id,extraClass=''){
  let el=document.getElementById(id);
  if(!el){el=document.createElement('aside');el.id=id;el.className='coop-server-upgrades'+extraClass;el.setAttribute('aria-live','polite');document.body.append(el);}
+ placeServerPanel(el);
  return el;
 }
+/** V25.3: o painel de escolha fica logo acima da barra MENU (canto inferior direito), sem cobri-la. */
+function placeServerPanel(el){
+ const bar=document.querySelector('.hud-actions');const r=bar&&!bar.hidden?bar.getBoundingClientRect():null;
+ const bottom=r&&r.height>0&&r.top<innerHeight?Math.max(85,Math.round(innerHeight-r.top+10)):85;
+ el.style.bottom=bottom+'px';el.style.maxHeight=Math.max(220,innerHeight-bottom-12)+'px';el.style.overflowY='auto';
+}
+addEventListener('resize',()=>{for(const id of ['coop-server-upgrades','coop-server-rewards']){const el=document.getElementById(id);if(el&&!el.hidden)placeServerPanel(el);}});
 function offerButton(head,info,onPick,icon=''){
  const btn=document.createElement('button');btn.type='button';btn.className='coop-offer';
  // V23.6: ícone da habilidade/bênção/equipamento à esquerda, texto legível nos dois temas.
@@ -2204,6 +2212,8 @@ function renderRemote(member){
 }
 function draw() {
   const bounds = view();
+  // Base fixa a cada quadro: se algum efeito deixar o canvas desbalanceado, o próximo quadro se recupera sozinho.
+  if(viewport?.w&&viewport?.h)ctx.setTransform(canvas.width/viewport.w,0,0,canvas.height/viewport.h,0,0);
   ctx.save();
   ctx.scale(bounds.scale, bounds.vertical);
   ctx.translate(-bounds.left, -bounds.top);

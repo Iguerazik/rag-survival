@@ -16,7 +16,8 @@ const SkillFX = (() => {
     return x - Math.floor(x);
   }
   function glow(ctx, x, y, r, color, alpha = 1) {
-    if (r <= 0) return;
+    // Gradientes com coordenadas inválidas lançam erro entre save/restore e corrompem o canvas inteiro.
+    if (!(r > 0) || !Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(r)) return;
     ctx.save();
     ctx.globalAlpha *= alpha;
     const g = ctx.createRadialGradient(x, y, 0, x, y, r);
@@ -1013,6 +1014,10 @@ const SkillFX = (() => {
     }
     const id = renderers[kind] ? kind : alias[kind];
     if (!renderers[id]) return false;
+    if (options?.from && (options.angle == null || options.length == null) && Number.isFinite(options.x) && Number.isFinite(options.y)) {
+      const dx = options.x - options.from.x, dy = options.y - options.from.y;
+      options = { angle: Math.atan2(dy, dx), length: Math.hypot(dx, dy), ...options };
+    }
     const budget=typeof run!=='undefined' && run?.rift?.active ? 28 : 90;
     if (list.length >= budget) list.splice(0,list.length-budget+1);
     list.push({ kind: id, t: 0, dur: options.dur ?? Math.max(.48, (durations[id] ?? .6) * 1.45), seed: Math.random() * 1000, ...options });
@@ -1024,6 +1029,7 @@ const SkillFX = (() => {
   }
   function draw(ctx, time) {
     for (const fx of list) {
+      if ((fx.x != null && !Number.isFinite(fx.x)) || (fx.y != null && !Number.isFinite(fx.y))) continue;
       ctx.save();
       try {
         const progress = Math.min(1, fx.t / Math.max(.01, fx.dur));

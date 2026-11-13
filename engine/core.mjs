@@ -782,7 +782,9 @@ function learn(world,p,id,automatic){
 function offerUpgrade(world,p){
  if(p.choices.length||p.pendingUps<=0)return;
  const full=p.slots.length>=MAX_SLOTS;
- const options=p.pool.filter(id=>(p.skills[id]||0)<SK[id].max&&(!isActive(id)||p.slots.includes(id)||!full));
+ // Pré-requisito (ex.: Garras de Aço e Ataque Aéreo só depois de Adestrar Falcão; Ataque Fatal depois do Golpe Fulminante).
+ const ready=id=>{const r=SK[id].req;return !r||(p.skills[r]||0)>0||!p.pool.includes(r);};
+ const options=p.pool.filter(id=>(p.skills[id]||0)<SK[id].max&&ready(id)&&(!isActive(id)||p.slots.includes(id)||!full));
  if(!options.length&&!(p.level>=3&&runeOptions(p).length)){p.pendingUps=0;return;}
  for(let i=options.length-1;i>0;i--){const j=Math.floor(rand(world)*(i+1));[options[i],options[j]]=[options[j],options[i]];}
  p.choices=options.slice(0,3);
