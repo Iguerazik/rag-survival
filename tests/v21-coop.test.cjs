@@ -12,7 +12,7 @@ test('V21: aproximação ressuscita automaticamente (sem tecla ou flag do client
  const a=w.players.get('a'),b=w.players.get('b');a.hp=0;b.x=a.x+25;b.y=a.y;
  command(w,'b',{dx:0,dy:0,attack:false});
  for(let i=0;i<Math.ceil((REVIVE_SECONDS+.1)/.05);i++)tickWorld(w,.05);
- assert.ok(a.hp>0 && a.hp<a.max*.52);
+ assert.equal(a.hp,a.max); // V25.7: HP e SP cheios ao ressuscitar
  assert.ok(w.events.some(e=>e.type==='revived'&&e.player==='a'&&e.by==='b'));
 });
 

@@ -122,3 +122,16 @@ test('V25.7: quem é ressuscitado volta com HP e SP cheios',async()=>{
  assert.ok(a.hp>0,'reanimado');
  assert.equal(a.hp,a.max);assert.equal(a.sp,a.maxSp);
 });
+
+test('V25.7: ataque e habilidades priorizam o chefe ao alcance',async()=>{
+ const core=await engine();
+ const w=core.makeWorld('sewer','normal',[member('a','archer','hunter')],{seed:6});quiet(w);
+ const p=w.players.get('a');p.skills={arrows:3};p.slots=['arrows'];
+ const near=core.testing.spawn(w,'cramp',{at:{x:p.x+60,y:p.y}});
+ const boss=core.testing.spawn(w,'cramp',{at:{x:p.x+200,y:p.y},elite:'miniBoss'});
+ near.hp=near.max=1e6;boss.hp=boss.max=1e6;
+ const hb=boss.hp;
+ for(let i=0;i<180;i++){p.hp=p.max;p.sp=p.maxSp;p.input={...(p.input||{}),attack:true,auto:true};core.tickWorld(w,1/60);}
+ assert.ok(boss.hp<hb,'o chefe levou dano');
+ assert.equal(near.hp,near.max,'o monstro comum mais perto não foi o alvo');
+});

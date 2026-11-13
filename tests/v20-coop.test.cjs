@@ -16,7 +16,7 @@ test('V21: jogador abatido pode ser ressuscitado por proximidade sem usar R', as
  command(world,'b',{dx:0,dy:0,attack:false});
  for(let i=0;i<75;i++)tickWorld(world,.05);
  assert.ok(a.hp>0,'ally should regain HP');
- assert.ok(a.hp<=a.max*.55,'should not revive with full life');
+ assert.equal(a.hp,a.max,'V25.7: volta com a vida cheia');assert.equal(a.sp,a.maxSp,'e com SP cheio');
  assert.ok(world.events.some(e=>e.type==='revived'&&e.by==='b'));
  assert.equal(snapshotWorld(world,'a').self.downed,false);
 });

@@ -611,11 +611,21 @@ const skillRange=(p,def)=>(def.r||0)+(def.r>200?(p.st.range||0)+(p.modifiers.ran
 // V25.7: gasto de SP 20% menor (as classes avançadas zeravam o SP).
 const spCost=(p,def,level,auto=false)=>Math.max(1,Math.ceil(Math.round(6+def.cd*2.2)*.8*(1-Math.min(.5,p.st.spcost||0))*(p.base.gear?.spCost||1)*(auto?.6:1)));
 const SUPPORT=new Set(['heal','healzone','buff','revive']);
+/** V25.7: o chefe mais perto dentro do alcance (MVP, mini chefe, guardião da fenda, guardião do labirinto, Prova da Guilda).
+ * O guardião da fenda com a proteção dos selos ativa não conta (não toma dano até os selos caírem). */
+const isBoss=m=>m.elite==='mvp'||m.elite==='miniBoss'||m.riftGuardian||!!m.special||!!m.trial;
+function bossInRange(world,p,visible,range){
+ let pick=null,best=Infinity;
+ for(const m of visible){if(!isBoss(m)||m.hp<=0||(m.riftGuardian&&world.rift?.ward))continue;const d=distance(p,m);if(d<=range&&d<best){best=d;pick=m;}}
+ return pick;
+}
 function skillCast(world,p,id,closest,visible,auto=false){
  const def=SK[id],level=p.skills[id]||0;if(!def||!level||def.k==='passive')return false;
  if(world.time<(p.cooldowns[id]||0))return false;
  const cost=spCost(p,def,level,auto);if(p.sp<cost)return false;
  const map=nav(world),range=skillRange(p,def),allies=[...world.players.values()];
+ // V25.7: habilidades de ataque também miram primeiro o chefe que estiver ao alcance.
+ if(['melee','bolt','ball','area','zone','trap'].includes(def.k)){const boss=bossInRange(world,p,visible,def.k==='trap'?300:range);if(boss)closest=boss;}
  let target=null,point={x:p.x,y:p.y};
  switch(def.k){
   case 'melee':case 'bolt':case 'ball':case 'area':case 'zone':
@@ -1034,6 +1044,9 @@ function advancePlayer(world,p,dt){
  let closest=null,best=Infinity;for(const m of visible){const d=distance(m,p);if(d<best){best=d;closest=m;}}
  if(!hidden&&closest&&world.time>=p.attackAt&&input.attack){
   const range=p.range+(p.modifiers.range||0)+st.range+(p.level>6?20:0);
+  // V25.7: chefe (MVP, mini chefe, guardião, Prova) ao alcance tem prioridade sobre o monstro mais perto.
+  const boss=bossInRange(world,p,visible,range);
+  if(boss){closest=boss;best=distance(p,boss);}
   if(best<=range){
    const power=p.damage*(1+Math.min(1.8,(p.level-1)*.06))*dmgBonus(p);
    p.attackAt=world.time+lag(world,p.rate*(1-Math.min(.6,(p.modifiers.attackRate||0)+st.aspd)));
