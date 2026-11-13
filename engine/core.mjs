@@ -452,9 +452,9 @@ function defeated(world,m,source){
  // Drops do solo: Zeny em 55% dos abates (2 a 5+6×mapa), poção vermelha em 4,5%.
  if(rand(world)<.55||rare)groundDrop(world,'zeny',m.x+8,m.y,(2+Math.floor(rand(world)*(4+mapTier(world)*6)))*(rare?5:1));
  if(rand(world)<.045&&world.pickups.filter(o=>o.kind==='potion').length<12)groundDrop(world,'potion',m.x-5,m.y+5,1);
- // V25.4: poção azul (30% do SP) volta, mas limitada: 2,5% por abate (elite 25%), no máximo 3 no chão e uma a cada 18 s.
- if(world.time>=(world.spPotionAt||0)&&rand(world)<(rare?.25:.025)&&world.pickups.filter(o=>o.kind==='sppotion'&&!o.taken).length<3){
-  world.spPotionAt=world.time+lag(world,18);groundDrop(world,'sppotion',m.x+5,m.y+5,30);}
+ // V25.4/V25.7: poção azul (30% do SP), limitada: 4% por abate (elite 35%), no máximo 4 no chão e uma a cada 11 s.
+ if(world.time>=(world.spPotionAt||0)&&rand(world)<(rare?.35:.04)&&world.pickups.filter(o=>o.kind==='sppotion'&&!o.taken).length<4){
+  world.spPotionAt=world.time+lag(world,11);groundDrop(world,'sppotion',m.x+5,m.y+5,30);}
  // Mesmas chances de carta do modo solo (cards.js / game.js): comum 0,035% · elite 0,045% · miniboss 0,08% · MVP 0,75%.
  // Só monstros que TÊM carta (antes o online sorteava carta até de quem não tem, como Gatuna/Gatuno).
  if(CARDS.has(m.id)&&rand(world)<(m.cardRate??(m.elite==='mvp'?.0075:m.elite==='miniBoss'?.0008:m.elite?.00045:.00035))){
@@ -608,7 +608,8 @@ function strikeArea(world,p,center,radius,power,skill,st,level,needSight=true){
 }
 const skillRange=(p,def)=>(def.r||0)+(def.r>200?(p.st.range||0)+(p.modifiers.range||0)*.5:0);
 // Custo de SP do solo: 6 + 2,2 × recarga (no automático, 60%); Desconto/cartas reduzem.
-const spCost=(p,def,level,auto=false)=>Math.max(1,Math.ceil(Math.round(6+def.cd*2.2)*(1-Math.min(.5,p.st.spcost||0))*(p.base.gear?.spCost||1)*(auto?.6:1)));
+// V25.7: gasto de SP 20% menor (as classes avançadas zeravam o SP).
+const spCost=(p,def,level,auto=false)=>Math.max(1,Math.ceil(Math.round(6+def.cd*2.2)*.8*(1-Math.min(.5,p.st.spcost||0))*(p.base.gear?.spCost||1)*(auto?.6:1)));
 const SUPPORT=new Set(['heal','healzone','buff','revive']);
 function skillCast(world,p,id,closest,visible,auto=false){
  const def=SK[id],level=p.skills[id]||0;if(!def||!level||def.k==='passive')return false;

@@ -38,7 +38,7 @@ test('V23.6: drops e subida de nível do solo (poção azul limitada desde a V25
  const src=read('engine/core.mjs');
  assert.match(src,/if\(rand\(world\)<\.045&&world\.pickups\.filter\(o=>o\.kind==='potion'\)\.length<12\)groundDrop\(world,'potion'/);
  // V25.4: a poção azul voltou, mas limitada (no máximo 3 no chão e uma a cada 18 s).
- assert.match(src,/filter\(o=>o\.kind==='sppotion'&&!o\.taken\)\.length<3\)/);
+ assert.match(src,/filter\(o=>o\.kind==='sppotion'&&!o\.taken\)\.length<4\)/);
  assert.match(src,/const xpNeeded=level=>Math\.ceil\(26\*D\.pow\(level,1\.42\)\);/);
  const core=await engine();
  const w=core.makeWorld('sewer','normal',[member('a','sword')],{seed:4}),p=w.players.get('a');w.spawnAt=1e9;core.tickWorld(w,.05);

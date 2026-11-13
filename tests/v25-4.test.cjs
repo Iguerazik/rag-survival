@@ -79,7 +79,7 @@ test('V25.4: poção azul volta limitada; EXP do solo e do Aprendiz T.; pontos d
  const p=w.players.get('a');
  for(let i=0;i<400;i++){w.time+=.5;const m=core.testing.spawn(w,'cramp',{at:{x:p.x+900,y:p.y}});core.testing.defeated(w,m,p);w.pickups=w.pickups.filter(o=>o.kind!=='xp'&&o.kind!=='zeny');}
  const blue=w.pickups.filter(o=>o.kind==='sppotion'&&!o.taken);
- assert.ok(blue.length>=1&&blue.length<=3,'entre 1 e 3 poções azuis no chão ('+blue.length+')');
+ assert.ok(blue.length>=1&&blue.length<=4,'entre 1 e 4 poções azuis no chão ('+blue.length+')');
  // EXP: o jogador sozinho recebe +20% de EXP da run
  const solo=core.makeWorld('sewer','normal',[member('a','sword')],{seed:1}),duo=core.makeWorld('sewer','normal',[member('a','sword'),member('b','mage')],{seed:1});
  for(const x of [solo,duo]){quiet(x);x.pickups=[];}
