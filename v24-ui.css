@@ -1,0 +1,34 @@
+/* V24.1 · título do jogo, ajustes de HUD e música. Carregado por último (sobrepõe as camadas antigas). */
+@font-face { font-family: 'Cinzel'; font-style: normal; font-weight: 700; font-display: swap; src: url('assets/fonts/cinzel-latin-700-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Cinzel'; font-style: normal; font-weight: 900; font-display: swap; src: url('assets/fonts/cinzel-latin-900-normal.woff2') format('woff2'); }
+
+/* Título: centralizado, sem caixa/borda ao redor, fonte Cinzel (OFL) dourada. */
+html body .menu .hero { justify-content: center !important; align-items: center !important; width: 100% !important; max-width: none !important;
+  background: none !important; border: 0 !important; box-shadow: none !important; outline: 0 !important; height: auto !important; min-height: 0 !important; margin-inline: auto !important; }
+html body .menu .hero::before, html body .menu .hero::after { display: none !important; content: none !important; }
+html body .menu .hero .hero-content { width: 100% !important; max-width: none !important; padding: 10px 0 14px !important; text-align: center !important;
+  background: none !important; border: 0 !important; box-shadow: none !important; }
+html body .menu .hero #title { margin: 0 auto !important; text-align: center !important; border: 0 !important; background: none !important; box-shadow: none !important;
+  font-family: 'Cinzel', 'Trajan Pro', Georgia, serif !important; font-weight: 900 !important; font-size: clamp(34px, 5.4vw, 64px) !important;
+  letter-spacing: .08em !important; line-height: 1.05 !important; color: #ffe7a8 !important;
+  text-shadow: 0 2px 0 #6b4416, 0 4px 10px rgba(0, 0, 0, .75), 0 0 28px rgba(255, 196, 90, .35) !important; }
+html body .menu .hero #title em { font-style: normal !important; font-weight: 700 !important; font-size: 1em !important; color: #f3c56a !important; white-space: nowrap; }
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  html body .menu .hero #title, html body .menu .hero #title em {
+    background: linear-gradient(180deg, #fff6d6 0%, #ffd77e 45%, #c98a2e 100%) !important; -webkit-background-clip: text !important; background-clip: text !important;
+    color: transparent !important; text-shadow: none !important; filter: drop-shadow(0 2px 0 #5a3812) drop-shadow(0 4px 8px rgba(0, 0, 0, .7)); }
+}
+@media (max-width: 600px) { html body .menu .hero #title { font-size: clamp(28px, 9vw, 40px) !important; letter-spacing: .05em !important; } }
+
+/* Botões "↺ HUD" / cadeado saíram da tela de jogo: agora ficam no menu de pausa (Esc). */
+html body .arena #hud-customize, html body #hud-customize { display: none !important; }
+
+/* Ajustes de música abertos durante a partida (pelo ♫ do painel). */
+html body > .ro-music-popover.in-game { position: fixed !important; z-index: 2400 !important; max-height: calc(100vh - 24px); overflow: auto; box-sizing: border-box; }
+html body .arena #game-music-panel .ro-music-game-caption { cursor: pointer; }
+
+/* Nome pequeno do cabeçalho: mesma fonte do título, sem relevo/sombra estranha no tema claro. */
+html body .menu .site-head .brand span, html body .menu .site-head .brand b { font-family: 'Cinzel', Georgia, serif !important; font-weight: 900 !important;
+  font-size: 15px !important; letter-spacing: .08em !important; text-shadow: none !important; -webkit-text-stroke: 0 !important; }
+html body .menu .site-head .brand b { color: #a8741a !important; }
+html[data-theme=dark] body .menu .site-head .brand b { color: #f0c96a !important; }

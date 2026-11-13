@@ -2,7 +2,8 @@
 /* V23 - Modo solo = "sala local de 1 jogador" rodando o MESMO motor do servidor (engine/core.mjs).
  * O navegador continua só desenhando: a cada passo fixo de 0,05 s (20 ticks/s, igual ao servidor)
  * a sala recebe a entrada do jogador, avança o motor e entrega um snapshot para o mesmo código que
- * desenha o online (receiveAuthoritativeWorld). Pausar o jogo pausa a sala (nada avança).
+ * desenha o online (receiveAuthoritativeWorld). Pausar o jogo (Esc) pausa a sala (nada avança).
+ * V24.1: escolher habilidade, baú ou tesouro NÃO pausa mais: a partida segue e o herói anda, como no online.
  */
 const LocalRoom = (() => {
   const STEP = .05;          // mesmo ritmo do servidor
@@ -32,9 +33,6 @@ const LocalRoom = (() => {
       room.acc -= STEP;
       const started = performance.now();
       room.core.command(room.world, ID, input());
-      // V23.6: como no solo antigo, o jogo fica pausado enquanto há uma escolha aberta (habilidade, baú, forja, tesouro).
-      const me = room.world.players.get(ID);
-      if (me && (me.choices.length || me.rewardChoices.length)) { room.acc = 0; room.paused = true; stepped = true; break; }
       room.paused = false;
       room.core.tickWorld(room.world, STEP);
       room.tickMs = room.tickMs * .95 + (performance.now() - started) * .05;

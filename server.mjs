@@ -58,7 +58,7 @@ function canEnter(member,map,difficulty){
 }
 
 const rooms=new Map();
-const MIME={'.html':'text/html','.js':'text/javascript','.mjs':'text/javascript','.css':'text/css','.gif':'image/gif','.png':'image/png','.webp':'image/webp','.svg':'image/svg+xml','.json':'application/json','.ico':'image/x-icon','.ogg':'audio/ogg','.mp3':'audio/mpeg','.wav':'audio/wav','.md':'text/markdown'};
+const MIME={'.html':'text/html','.js':'text/javascript','.mjs':'text/javascript','.css':'text/css','.gif':'image/gif','.png':'image/png','.webp':'image/webp','.svg':'image/svg+xml','.json':'application/json','.ico':'image/x-icon','.ogg':'audio/ogg','.mp3':'audio/mpeg','.wav':'audio/wav','.md':'text/markdown','.woff2':'font/woff2'};
 const makeId=()=>randomBytes(18).toString('hex');
 const allowedNumber=(v,limit=100_000)=>Number.isFinite(Number(v))?Math.min(limit,Math.max(-limit,Number(v))):0;
 const cleanName=s=>String(s||'Aventureiro').replace(/[<>\r\n\x00-\x1f]/g,'').trim().slice(0,24)||'Aventureiro';
