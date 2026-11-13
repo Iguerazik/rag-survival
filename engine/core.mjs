@@ -378,7 +378,10 @@ function warp(p,x,y,world){
 function spawn(world,id,{elite='',boss=false,at=null,near=null}={}){
  const map=nav(world),stats=mobStat[id]||[45,75,14,2];const count=world.players.size;
  const factor=diff[world.difficulty]||diff.normal;
- const hp=(boss?bossHp[id]||1900:stats[0])*(boss?2.15:elite?4.3:1)*factor[0]*teamHealthScale(count)*(boss?1.14:1)*hordeGrowth(world)*(1+mapTier(world)*.2);
+ // V24.1: no MVP o crescimento da horda pesa menos (^0,75): aos 12 min o MVP tinha ~5,6× o HP base e a luta só demorava.
+ // ...e o dano do MVP subiu 35% (23 → 31) para a luta ter perigo de verdade.
+ const growth=boss?D.pow(hordeGrowth(world),.75):hordeGrowth(world);
+ const hp=(boss?bossHp[id]||1900:stats[0])*(boss?2.15:elite?4.3:1)*factor[0]*teamHealthScale(count)*(boss?1.14:1)*growth*(1+mapTier(world)*.2);
  const living=[...world.players.values()].filter(p=>p.hp>0),target=near||living[Math.floor(rand(world)*living.length)]||{x:map.spawn[0],y:map.spawn[1]};
  let x=at?at.x:target.x,y=at?at.y:target.y;
  for(let k=0;k<(at?0:70);k++){
@@ -387,7 +390,7 @@ function spawn(world,id,{elite='',boss=false,at=null,near=null}={}){
   if(passable(map,nx,ny)&&passable(map,nx+12,ny)&&passable(map,nx,ny+12)&&living.every(p=>D.hypot(nx-p.x,ny-p.y)>95)&&(!map.rooms||roomAt(map,nx,ny)===roomAt(map,target.x,target.y))){x=nx;y=ny;break;}
  }
  const safe=nearestOpen(map,x,y);x=safe.x;y=safe.y;
- const m={uid:++world.mobSeq,id,x,y,hp,max:hp,damage:(boss?23:stats[2])*(elite?1.22:1)*factor[1]*teamDamageScale(count)*(1+mapTier(world)*.1)*(.78+clock(world)/60*.09),
+ const m={uid:++world.mobSeq,id,x,y,hp,max:hp,damage:(boss?23*1.35:stats[2])*(elite?1.22:1)*factor[1]*teamDamageScale(count)*(1+mapTier(world)*.1)*(.78+clock(world)/60*.09),
   speed:(boss?77:stats[1])*(elite?1.07:1),xp:stats[3],dir:0,elite:boss?'mvp':elite,r:boss?32:elite?21:13,
   contactAt:0,attackAt:0,hitFlash:0,strike:null,warning:null,riftId:0,riftGuardian:false,riftSeal:false,noLoot:false,
   target:target.id||null,stunUntil:0,slowUntil:0,slowBy:1,poisonUntil:0,poisonDps:0,poisonBy:null,vulnUntil:0,vuln:0,lex:false};world.mobs.push(m);
