@@ -24,20 +24,25 @@ const sword = {
  ],
  second: [
   add('spearmastery','Perícia com Lança',10,'passive','Passiva: +3% de dano e um pouco mais de alcance por nível.',{stats:{dmg:.03,range:2},ic:'pierce'}),
-  add('pierce','Perfurar',10,'melee','Três estocadas rápidas. Dano maior contra elites e chefes.',{r:112,cd:1.55,m:1.5,big:1.3,ic:'pierce',fx:'pierce'}),
-  add('brandish','Brandir Lança',10,'area','Varre os monstros à frente e os empurra.',{r:125,rad:85,cd:3.4,m:1.5,st:{knock:25},ic:'pierce',fx:'bowling'}),
-  add('spearstab','Estocada',10,'melee','Estocada que empurra o alvo para longe.',{r:122,cd:2.6,m:1.4,st:{knock:70},ic:'pierce',fx:'pierce'}),
-  add('boomerang','Lança Bumerangue',5,'bolt','Arremessa a lança em um alvo distante.',{r:300,cd:2.4,m:1.5,ic:'pierce',fx:'charge'}),
-  add('twohandquicken','Rapidez com Duas Mãos',10,'buff','Ataca muito mais rápido por alguns segundos.',{cd:18,dur:12,stats:{aspd:[.15,.02]},ic:'concentration',fx:'concentration'}),
+  add('pierce','Perfurar',10,'melee','Três estocadas rápidas. Dano maior contra elites e chefes.',{r:112,cd:1.55,m:1.5,big:1.3,ic:'pierce',fx:'pierce',req:'spearmastery'}),
+  add('brandish','Brandir Lança',10,'area','Varre os monstros à frente e os empurra.',{r:125,rad:85,cd:3.4,m:1.5,st:{knock:25},ic:'pierce',fx:'bowling',req:'spearmastery'}),
+  add('spearstab','Estocada',10,'melee','Estocada que empurra o alvo para longe.',{r:122,cd:2.6,m:1.4,st:{knock:70},ic:'pierce',fx:'pierce',req:'spearmastery'}),
+  add('boomerang','Lança Bumerangue',5,'bolt','Arremessa a lança em um alvo distante.',{r:300,cd:2.4,m:1.5,ic:'pierce',fx:'charge',req:'spearmastery'}),
+  add('twohandquicken','Rapidez com Duas Mãos',10,'buff','Ataca muito mais rápido por alguns segundos.',{cd:18,dur:12,stats:{aspd:[.15,.02]},ic:'concentration',fx:'concentration',req:'twohand'}),
   add('counter','Contra-Ataque',5,'passive','Passiva: chance de revidar com um golpe crítico ao ser atingido.',{stats:{counter:.08},ic:'bash'}),
   add('bowling','Impacto de Tyr',10,'area','Golpe pesado que atinge e empurra o grupo de monstros.',{r:128,rad:104,cd:4.1,m:1.9,st:{knock:40},ic:'bowling',fx:'bowling'}),
   add('chargeatk','Avanço Ofensivo',1,'melee','Investida de longe contra um alvo, com dano alto.',{r:260,cd:5,m:2.6,ic:'bash',fx:'bash'}),
  ],
  trans: [ add('joint','Golpe Traumático',5,'melee','Fere o alvo e causa sangramento contínuo.',{r:135,cd:2.15,m:1.5,st:{poison:[.3,5]},ic:'joint',fx:'joint'}) ],
  third: [
-  add('dragon','Sopro do Dragão',10,'area','Sopro de fogo que queima todos na área do alvo.',{r:300,rad:110,cd:3.2,m:2.4,el:'fire',ic:'dragon',fx:'dragon'}),
+  add('dragontrain','Adestrar Dragão',1,'passive','Passiva: monta no dragão (libera o Sopro do Dragão), +3% de defesa e regeneração de HP.',{stats:{def:.03,regen:.6},ic:'dragon'}),
+  add('dragon','Sopro do Dragão',10,'area','Sopro de fogo que queima todos na área do alvo.',{r:300,rad:110,cd:3.2,m:2.4,el:'fire',ic:'dragon',fx:'dragon',req:'dragontrain'}),
   add('ignition','Impacto Flamejante',5,'self','Explosão flamejante ao redor do Cavaleiro Rúnico.',{rad:136,cd:5,m:2.5,el:'fire',ic:'ignition',fx:'ignition'}),
   add('sonicwave','Onda de Choque',5,'bolt','Onda cortante lançada em um alvo distante.',{r:390,cd:2.15,m:2.0,ic:'sonicwave',fx:'sonicwave'}),
+  add('windcutter','Cortador de Vento',5,'self','Corte de vento em todos ao seu redor.',{rad:118,cd:3.1,m:1.9,el:'wind',ic:'magnum',fx:'magnum'}),
+  add('hundredspear','Cem Lanças',5,'melee','Sequência de estocadas muito forte em um alvo.',{r:140,cd:2.9,m:3.0,ic:'pierce',fx:'pierce'}),
+  add('crushstrike','Golpe Esmagador',5,'melee','Golpe pesado que atordoa o alvo.',{r:130,cd:4.4,m:3.2,st:{stun:[.35,.05,1.5]},ic:'bowling',fx:'bowling'}),
+  add('stormblast','Explosão Tempestuosa',5,'area','Explosão de energia rúnica na área do alvo.',{r:330,rad:115,cd:4.6,m:2.7,ic:'magnum',fx:'storm'}),
  ],
 };
 const mage = {
@@ -59,15 +64,15 @@ const mage = {
  ],
  second: [
   add('firepillar','Coluna de Fogo',10,'trap','Armadilha mágica: uma coluna de fogo explode quando um monstro pisa.',{rad:75,cd:5,m:2.2,el:'fire',fx:'fire'}),
-  add('sightrasher','Supernova',10,'self','Bolas de fogo disparam em todas as direções e empurram os monstros.',{rad:150,cd:5,m:1.7,el:'fire',st:{knock:40},fx:'magnum'}),
+  add('sightrasher','Supernova',10,'self','Bolas de fogo disparam em todas as direções e empurram os monstros.',{rad:150,cd:5,m:1.7,el:'fire',st:{knock:40},fx:'magnum',req:'sight'}),
   add('meteor','Chuva de Meteoros',10,'zone','Meteoros caem na área por alguns segundos e podem atordoar.',{r:340,rad:120,cd:9,m:.9,dur:3,tick:.6,el:'fire',st:{stun:[.1,0,1]},ic:'crimson',fx:'crimsonHit'}),
   add('jupitel','Trovão de Júpiter',10,'bolt','Esfera elétrica que causa dano alto e arremessa o alvo.',{r:400,cd:3,m:2.3,el:'wind',st:{knock:55},ic:'lightning',fx:'lightning'}),
   add('vermilion','Ira de Thor',10,'zone','Tempestade de relâmpagos em uma área grande.',{r:320,rad:130,cd:9,m:.85,dur:2.4,tick:.6,el:'wind',ic:'vermilion',fx:'vermilion'}),
   add('waterball','Esfera d\'Água',5,'bolt','Esferas de água em sequência contra um alvo.',{r:380,cd:2.8,m:2.0,el:'water',ic:'frost',fx:'frost'}),
-  add('frostnova','Congelar',10,'self','Onda de gelo ao seu redor com chance de congelar.',{rad:120,cd:7,m:.8,el:'water',st:{freeze:[.4,.04,2.5]},ic:'frost',fx:'frost'}),
+  add('frostnova','Congelar',10,'self','Onda de gelo ao seu redor com chance de congelar.',{rad:120,cd:7,m:.8,el:'water',st:{freeze:[.4,.04,2.5]},ic:'frost',fx:'frost',req:'frost'}),
   add('stormgust','Nevasca',10,'zone','Nevasca persistente que fere, desacelera e pode congelar.',{r:320,rad:110,cd:9,m:.7,dur:3,tick:.6,el:'water',st:{freeze:[.12,0,2],slow:[.6,1.2]},ic:'stormgust',fx:'stormgust'}),
   add('earthspike','Coluna de Pedra',5,'bolt','Estacas de pedra surgem sob o alvo.',{r:380,cd:2.6,m:1.9,el:'earth'}),
-  add('heavensdrive','Fúria da Terra',5,'area','Estacas de pedra atingem todos na área.',{r:320,rad:105,cd:4.6,m:1.7,el:'earth'}),
+  add('heavensdrive','Fúria da Terra',5,'area','Estacas de pedra atingem todos na área.',{r:320,rad:105,cd:4.6,m:1.7,el:'earth',req:'earthspike'}),
   add('quagmire','Pântano dos Mortos',5,'zone','Pântano que deixa os monstros muito lentos.',{r:300,rad:120,cd:12,m:0,dur:6,tick:1,el:'earth',st:{slow:[.45,1.5]}}),
  ],
  trans: [ add('napalm','Vulcão Napalm',5,'ball','Rajada espiritual no alvo e em quem estiver ao redor.',{r:340,rad:84,cd:2.9,m:1.9,el:'ghost',ic:'napalm',fx:'napalm'}) ],
@@ -75,6 +80,10 @@ const mage = {
   add('crimson','Meteoro Escarlate',5,'area','Um meteoro explode na área do alvo.',{r:395,rad:112,cd:3.35,m:2.6,el:'fire',ic:'crimson',fx:'crimsonHit'}),
   add('comet','Cometa',5,'area','Explosão enorme em uma área ampla.',{r:420,rad:180,cd:7,m:3.4,el:'fire',ic:'comet',fx:'cometHit'}),
   add('lightning','Corrente Elétrica',5,'area','O raio salta entre os inimigos próximos do alvo.',{r:380,rad:120,cd:4.25,m:2.2,el:'wind',ic:'lightning',fx:'lightning'}),
+  add('jackfrost','Geada Infernal',5,'self','Onda de gelo ao seu redor que pode congelar.',{rad:150,cd:5.2,m:2.2,el:'water',st:{freeze:[.3,.05,2]},ic:'frost',fx:'stormgust'}),
+  add('earthstrain','Fenda Terrestre',5,'area','A terra se parte sob os monstros do alvo.',{r:360,rad:120,cd:4.4,m:2.5,el:'earth',ic:'sand',fx:'grimtooth'}),
+  add('soulexpansion','Expansão Espiritual',5,'area','Explosão de almas no alvo e em volta.',{r:380,rad:100,cd:3.1,m:2.3,ic:'spirit',fx:'spirit'}),
+  add('tetravortex','Vórtice Elemental',5,'ball','Quatro elementos explodem no alvo: dano altíssimo.',{r:400,rad:80,cd:6,m:4.2,ic:'napalm',fx:'crimsonHit'}),
  ],
 };
 const archer = {
@@ -100,7 +109,13 @@ const archer = {
  third: [
   add('arrowstorm','Tempestade de Flechas',5,'area','Chuva de flechas devastadora na área do alvo.',{r:420,rad:125,cd:3.5,m:2.5,ic:'arrowstorm',fx:'arrowstorm'}),
   add('aimed','Disparo Certeiro',5,'bolt','Tiro carregado com dano muito alto.',{r:460,cd:3.55,m:3.2,ic:'aimed',fx:'aimed'}),
-  add('wargstrike','Disparo Selvagem',5,'bolt','O Warg avança contra o alvo.',{r:395,cd:4.4,m:2.6,ic:'wargstrike',fx:'wargstrike'}),
+  add('wargtrain','Vínculo com o Lobo',1,'passive','Passiva: um lobo passa a acompanhar você e libera o Disparo Selvagem. +4% de dano.',{stats:{dmg:.04},ic:'wargstrike'}),
+  add('wargstrike','Disparo Selvagem',5,'bolt','O Warg avança contra o alvo.',{r:395,cd:4.4,m:2.6,ic:'wargstrike',fx:'wargstrike',req:'wargtrain'}),
+  add('wargbite','Mordida do Lobo',5,'bolt','O lobo morde o alvo e o prende no lugar.',{r:360,cd:4.8,m:2.2,st:{stun:[.6,.06,1.6]},ic:'wargstrike',fx:'wargstrike',req:'wargtrain'}),
+  add('wargdash','Investida do Lobo',5,'area','O lobo avança e atropela os monstros da área.',{r:330,rad:95,cd:3.8,m:2.3,st:{knock:30},ic:'wargstrike',fx:'wargstrike',req:'wargtrain'}),
+  add('fearbreeze','Brisa do Medo',5,'buff','Dispara várias flechas a cada ataque por alguns segundos.',{cd:20,dur:12,stats:{dbl:[.18,.04],aspd:[.05,.01]},ic:'concentration',fx:'concentration'}),
+  add('clusterbomb','Bomba de Fragmentação',5,'trap','Armadilha que explode em estilhaços numa área grande.',{rad:105,cd:4.6,m:2.4,el:'fire',ic:'landmine',fx:'landmineHit'}),
+  add('electricshocker','Choque Elétrico',5,'trap','Armadilha elétrica que paralisa os monstros.',{rad:80,cd:6,m:.8,el:'wind',st:{stun:[1,0,2.5]},ic:'landmine',fx:'landmineHit'}),
  ],
 };
 const acolyte = {
@@ -118,13 +133,13 @@ const acolyte = {
   add('signum','Signum Crucis',10,'self','Enfraquece todos os inimigos ao redor: eles recebem mais dano.',{rad:210,cd:12,m:0,el:'holy',st:{vuln:[.06,.012,8]},fx:'blessing'}),
  ],
  second: [
-  add('sanctuary','Santuário',10,'healzone','Consagra o chão: cura quem do grupo ficar em cima.',{rad:115,cd:12,dur:5,tick:1,el:'holy',ic:'sanctuary',fx:'sanctuary'}),
+  add('sanctuary','Santuário',10,'healzone','Consagra o chão: cura quem do grupo ficar em cima.',{rad:115,cd:12,dur:5,tick:1,el:'holy',ic:'sanctuary',fx:'sanctuary',req:'heal'}),
   add('magnus','Magnus Exorcismus',10,'zone','Cruz sagrada no chão que causa dano em pulsos.',{r:325,rad:112,cd:9,m:.6,dur:4,tick:.5,el:'holy',ic:'magnus',fx:'magnusPulse'}),
   add('kyrie','Kyrie Eleison',10,'buff','Barreira que bloqueia os próximos golpes em cada aliado.',{cd:16,dur:12,party:1,stats:{shield:[2,.3]},el:'holy',fx:'assumptio'}),
   add('magnificat','Magnificat',5,'buff','O grupo recupera SP muito mais rápido.',{cd:22,dur:15,party:1,stats:{spregen:[3,1]},el:'holy',fx:'blessing'}),
   add('gloria','Gloria',5,'buff','O grupo ganha chance de acerto crítico (dano dobrado).',{cd:20,dur:12,party:1,stats:{crit:[.06,.02]},el:'holy',fx:'blessing'}),
   add('impositio','Impositio Manus',5,'buff','Aumenta o dano de todo o grupo.',{cd:20,dur:14,party:1,stats:{dmg:[.05,.02]},el:'holy',fx:'blessing'}),
-  add('aspersio','Aspersio',5,'buff','Encanta sua arma com água benta: você causa mais dano.',{cd:20,dur:14,stats:{dmg:[.08,.03]},el:'holy',fx:'blessing'}),
+  add('aspersio','Aspersio',5,'buff','Encanta sua arma com água benta: você causa mais dano.',{cd:20,dur:14,stats:{dmg:[.08,.03]},el:'holy',fx:'blessing',req:'agiup'}),
   add('lexaeterna','Lex Aeterna',1,'debuff','O próximo golpe no alvo mais forte causa dano dobrado.',{r:300,cd:5,el:'holy',st:{lex:1},fx:'holy'}),
   add('turnundead','Esconjurar',10,'bolt','Luz que fere o alvo, com pequena chance de destruir monstros comuns na hora.',{r:300,cd:4,m:2.0,el:'holy',kill:.03,ic:'holy',fx:'judex'}),
   add('macemastery','Perícia com Maça',10,'passive','Passiva: +3% de dano por nível.',{stats:{dmg:.03},ic:'mastery'}),
@@ -136,12 +151,16 @@ const acolyte = {
   add('adoramus','Adoramus',10,'area','Luz sagrada no alvo e nos monstros próximos, que ficam lentos.',{r:365,rad:93,cd:2.8,m:2.6,el:'holy',st:{slow:[.6,1]},ic:'adoramus',fx:'adoramus'}),
   add('judex','Judex',5,'area','Explosão sagrada no alvo.',{r:330,rad:76,cd:2.25,m:2.0,el:'holy',ic:'judex',fx:'judex'}),
   add('praefatio','Praefatio',10,'buff','Barreira forte que bloqueia golpes em todo o grupo.',{cd:18,dur:12,party:1,stats:{shield:[4,.4]},el:'holy',ic:'praefatio',fx:'praefatio'}),
+  add('laudaagnus','Lauda Agnus',5,'heal','Cura forte em você e nos aliados próximos.',{cd:8,rad:200,amt:[70,14],el:'holy',ic:'heal',fx:'heal'}),
+  add('epiclesis','Epiclesis',5,'healzone','Árvore sagrada que cura o grupo na área por alguns segundos.',{rad:135,cd:16,dur:6,tick:1,el:'holy',ic:'sanctuary',fx:'sanctuary'}),
+  add('duplelight','Luz Dupla',5,'bolt','Dois feixes sagrados no alvo.',{r:360,cd:2.2,m:2.6,el:'holy',ic:'holy',fx:'holy'}),
+  add('oratio','Oratio',5,'debuff','O alvo mais forte fica vulnerável e recebe mais dano.',{r:320,cd:9,el:'holy',st:{vuln:[.15,.03,6]},ic:'judex',fx:'holy'}),
  ],
 };
 const merchant = {
  first: [
   add('mammon','Mammonita',10,'melee','Golpe com moedas: dano alto em um alvo próximo.',{r:95,cd:2.2,m:1.9,ic:'mammon',fx:'mammon'}),
-  add('cartrev','Cavalo-de-Pau',1,'self','Gira o carrinho, acerta todos ao redor e empurra.',{rad:105,cd:4.4,m:2.0,st:{knock:40},ic:'cartrev',fx:'cartrev'}),
+  add('cartrev','Cavalo-de-Pau',1,'self','Gira o carrinho, acerta todos ao redor e empurra.',{rad:105,cd:4.4,m:2.0,st:{knock:40},ic:'cartrev',fx:'cartrev',req:'pushcart'}),
   add('uproar','Grito de Guerra',1,'buff','Grito que aumenta seu dano por um bom tempo.',{cd:24,dur:20,stats:{dmg:[.12,0]},ic:'overthrust',fx:'overthrust'}),
   add('discount','Desconto',10,'passive','Passiva: suas habilidades gastam menos SP.',{stats:{spcost:.03},ic:'discount'}),
   add('overcharge','Superfaturar',10,'passive','Passiva: ganha mais Zeny.',{stats:{zeny:.06},ic:'discount'}),
@@ -155,11 +174,16 @@ const merchant = {
   add('hammerfall','Martelo de Thor',5,'self','Martelada no chão que atordoa os monstros ao redor.',{rad:112,cd:5,m:.9,st:{stun:[.3,.1,2]},ic:'hammerfall',fx:'hammerfall'}),
   add('weaponry','Perícia em Armamento',10,'passive','Passiva: +2,5% de dano por nível.',{stats:{dmg:.025},ic:'mastery'}),
  ],
- trans: [ add('cartterm','Choque de Carrinho',10,'melee','Pancada com o carrinho: dano alto e chance de atordoar.',{r:140,cd:2.65,m:2.6,st:{stun:[.2,0,1.2]},ic:'cartterm',fx:'cartterm'}) ],
+ trans: [ add('cartterm','Choque de Carrinho',10,'melee','Pancada com o carrinho: dano alto e chance de atordoar.',{r:140,cd:2.65,m:2.6,st:{stun:[.2,0,1.2]},ic:'cartterm',fx:'cartterm',req:'pushcart'}) ],
  third: [
   add('axetornado','Fúria do Furacão',5,'self','Gira o machado e acerta todos ao redor.',{rad:140,cd:3.4,m:2.6,ic:'axetornado',fx:'axetornado'}),
   add('axeboom','Arremesso de Machado',5,'bolt','Lança o machado em um alvo distante.',{r:400,cd:2.9,m:2.5,ic:'axeboom',fx:'charge'}),
-  add('armcannon','Canhão de Prótons',5,'area','Disparo que explode na área do alvo.',{r:450,rad:100,cd:4.6,m:3.2,ic:'armcannon',fx:'armcannon'}),
+  add('madogear','Licença do Robô',1,'passive','Passiva: pilota o Robô Mágico (libera o Canhão de Prótons) e ganha +5% de defesa.',{stats:{def:.05},ic:'armcannon'}),
+  add('armcannon','Canhão de Prótons',5,'area','Disparo que explode na área do alvo.',{r:450,rad:100,cd:4.6,m:3.2,ic:'armcannon',fx:'armcannon',req:'madogear'}),
+  add('knuckleboost','Soco Turbinado',5,'melee','O robô dá um soco potente no alvo.',{r:135,cd:2.6,m:2.6,ic:'overthrust',fx:'hammerfall',req:'madogear'}),
+  add('flamelauncher','Lança-Chamas',5,'area','O robô cospe fogo na área do alvo.',{r:300,rad:105,cd:3.6,m:2.4,el:'fire',ic:'armcannon',fx:'fire',req:'madogear'}),
+  add('vulcanarm','Braço Vulcânico',5,'bolt','Rajada rápida de tiros do robô em um alvo.',{r:420,cd:1.9,m:1.9,ic:'armcannon',fx:'armcannon',req:'madogear'}),
+  add('coldslower','Gelo Lento',5,'area','Névoa gelada que deixa os monstros lentos.',{r:330,rad:115,cd:5.5,m:1.2,el:'water',st:{slow:[.5,3]},ic:'frost',fx:'frost',req:'madogear'}),
  ],
 };
 const thief = {
@@ -176,19 +200,23 @@ const thief = {
   add('katar','Perícia com Katar',10,'passive','Passiva: +3% de dano e +1% de crítico por nível.',{stats:{dmg:.03,crit:.01},ic:'mastery'}),
   add('righthand','Perícia com Mão Direita',5,'passive','Passiva: +4% de dano por nível.',{stats:{dmg:.04},ic:'mastery'}),
   add('lefthand','Perícia com Mão Esquerda',5,'passive','Passiva: +4% de golpe duplo por nível. Com adaga ou espada na mão esquerda, a 2ª arma soma ao dano (35% + 6% por nível). Sem 2ª arma nem katar, o golpe duplo vale metade.',{stats:{dbl:.04},ic:'doubleattack'}),
-  add('sonicblow','Lâminas Destruidoras',10,'melee','Oito golpes seguidos em um alvo, com chance de atordoar.',{r:127,cd:3.2,m:2.6,st:{stun:[.1,.02,1.2]},ic:'sonicblow',fx:'sonicblow'}),
-  add('grimtooth','Tocaia',5,'area','Espinhos surgem sob um grupo de inimigos distante.',{r:260,rad:87,cd:3.3,m:1.5,ic:'grimtooth',fx:'grimtooth'}),
-  add('cloaking','Furtividade',10,'buff','Fica invisível e mais rápido por alguns segundos.',{cd:16,dur:2.5,durLv:.25,stats:{hidden:[1,0],speed:[.15,0]},ic:'playdead',fx:'playdead'}),
-  add('enchantpoison','Envenenar Arma',10,'buff','Seus ataques normais passam a envenenar os monstros.',{cd:18,dur:14,stats:{venom:[.2,.03]},el:'poison',ic:'envenom',fx:'envenom'}),
+  add('sonicblow','Lâminas Destruidoras',10,'melee','Oito golpes seguidos em um alvo, com chance de atordoar.',{r:127,cd:3.2,m:2.6,st:{stun:[.1,.02,1.2]},ic:'sonicblow',fx:'sonicblow',req:'katar'}),
+  add('grimtooth','Tocaia',5,'area','Espinhos surgem sob um grupo de inimigos distante.',{r:260,rad:87,cd:3.3,m:1.5,ic:'grimtooth',fx:'grimtooth',req:'sonicblow'}),
+  add('cloaking','Furtividade',10,'buff','Fica invisível e mais rápido por alguns segundos.',{cd:16,dur:2.5,durLv:.25,stats:{hidden:[1,0],speed:[.15,0]},ic:'playdead',fx:'playdead',req:'hide'}),
+  add('enchantpoison','Envenenar Arma',10,'buff','Seus ataques normais passam a envenenar os monstros.',{cd:18,dur:14,stats:{venom:[.2,.03]},el:'poison',ic:'envenom',fx:'envenom',req:'envenom'}),
   add('poisonreact','Refletir Veneno',10,'passive','Passiva: chance de revidar ao ser atingido.',{stats:{counter:.05},el:'poison',ic:'envenom'}),
-  add('venomdust','Névoa Tóxica',10,'zone','Névoa venenosa no chão que fere quem ficar dentro.',{r:250,rad:90,cd:8,m:.35,dur:5,tick:1,el:'poison',ic:'envenom',fx:'envenom'}),
-  add('venomsplasher','Explosão Tóxica',10,'area','Explosão de veneno no alvo e nos monstros ao redor.',{r:118,rad:100,cd:6,m:2.4,el:'poison',ic:'envenom',fx:'envenom'}),
+  add('venomdust','Névoa Tóxica',10,'zone','Névoa venenosa no chão que fere quem ficar dentro.',{r:250,rad:90,cd:8,m:.35,dur:5,tick:1,el:'poison',ic:'envenom',fx:'envenom',req:'enchantpoison'}),
+  add('venomsplasher','Explosão Tóxica',10,'area','Explosão de veneno no alvo e nos monstros ao redor.',{r:118,rad:100,cd:6,m:2.4,el:'poison',ic:'envenom',fx:'envenom',req:'poisonreact'}),
  ],
  trans: [ add('souldestroyer','Destruidor de Almas',10,'bolt','Energia cortante em um alvo distante.',{r:365,cd:2.6,m:2.4,ic:'souldestroyer',fx:'souldestroyer'}) ],
  third: [
   add('rolling','Lâminas de Loki',5,'self','Gira as lâminas e corta todos ao redor.',{rad:126,cd:2.45,m:2.2,ic:'rolling',fx:'rolling'}),
   add('counterslash','Lâminas Retalhadoras',5,'self','Corte amplo em todos os monstros em volta.',{rad:119,cd:4.2,m:2.7,ic:'counterslash',fx:'counterslash'}),
   add('ripper','Castigo de Loki',5,'bolt','Corte lançado à distância.',{r:400,cd:3.1,m:2.3,ic:'ripper',fx:'ripper'}),
+  add('crossimpact','Impacto Cruzado',5,'melee','Sete cortes em X num único alvo.',{r:130,cd:3.4,m:3.4,ic:'sonicblow',fx:'sonicblow'}),
+  add('darkillusion','Ilusão Sombria',5,'bolt','Surge atrás do alvo e golpeia de surpresa.',{r:380,cd:3,m:2.4,ic:'souldestroyer',fx:'ripper'}),
+  add('meteorassault','Assalto Meteoro',5,'self','Golpe em área ao seu redor que pode atordoar.',{rad:130,cd:4,m:2.5,st:{stun:[.2,.03,1.2]},ic:'counterslash',fx:'counterslash'}),
+  add('venompressure','Pressão Venenosa',5,'melee','Golpe envenenado no alvo.',{r:125,cd:2.7,m:2.1,st:{poison:[.18,5]},ic:'envenom',fx:'envenom'}),
  ],
 };
 // Aprendiz T. (Aprendiz renascido): no Ragnarok só tem as habilidades de Aprendiz, as mesmas do solo.
@@ -212,7 +240,10 @@ for (const line of [sword, mage, archer, acolyte, merchant, thief]) line.boon = 
 const lines = { sword, mage, archer, acolyte, merchant, thief };
 const starters = { sword: 'bash', mage: 'fire', archer: 'arrows', acolyte: 'heal', merchant: 'mammon', thief: 'envenom' };
 // estágio da jornada -> conjuntos liberados
-const stages = [['first'], ['first', 'second'], ['novice', 'boon'], ['first', 'boon'], ['first', 'second', 'trans'], ['first', 'second', 'trans', 'third']];
+// V25.9: cada classe só recebe as PRÓPRIAS habilidades (pedido do jogador). 1ª classe e 1ª transclasse: as da 1ª classe;
+// 2ª classe: as da 2ª; transclasse: as da 2ª + as dela; 3ª classe: só as da 3ª (com as Melhorias de treino, que
+// completam o pool curto). Para usar as skills das classes anteriores, o jogador escolhe "Jogar como" na Progressão.
+const stages = [['first'], ['second'], ['novice','boon'], ['first','boon'], ['second','trans'], ['third','boon']];
 const classes = {
  sword: ['sword','knight','highnovice','highsword','lordknight','runeknight'], mage: ['mage','wizard','highnovice','highmage','highwizard','warlock'],
  archer: ['archer','hunter','highnovice','higharcher','sniper','ranger'], acolyte: ['acolyte','priest','highnovice','highacolyte','highpriest','archbishop'],

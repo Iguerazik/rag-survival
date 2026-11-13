@@ -135,7 +135,7 @@ function grantFinalRewards(room){
   const p=room.world.players.get(member.id);
   if(member.userId&&p){try{accounts.grantCoop(member.userId,room.world.id,{
    zeny:p.zeny,kills:p.kills,level:p.level,map:room.config.map,difficulty:room.config.difficulty,seconds:clock(room.world),
-   line:p.job,win:room.world.won,cards:p.cards,rifts:room.world.riftsDone||0,trial:p.trialDone,
+   line:p.job,playStage:p.stage,win:room.world.won,cards:p.cards,rifts:room.world.riftsDone||0,trial:p.trialDone,
    discoveries:{...p.discoveries,active:p.evolutions},item:room.world.won?p.mvpItem||null:null,
    wings:{gained:p.wingsGained,used:p.wingsUsed},potionsUsed:p.potionsUsed});}catch(err){failed=true;console.error('Falha ao registrar recompensa co-op:',err);}}
  }

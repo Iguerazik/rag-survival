@@ -277,7 +277,9 @@ export function addPlayer(world,member){
  const sp=Math.round((SP_BASE[job]||60)*base.spMul+base.spFlat),max=Math.round(hp*base.hpMul);
  // A habilidade inicial é sempre da etapa atual da classe (o Aprendiz T. começa com Primeiros Socorros, não com a da classe anterior).
  const pool=skillPool(job,stage),preferred=catalog.starters[job]||catalog.starters.sword;
- const starter=pool.includes(preferred)?preferred:(pool.find(isActive)||preferred);
+ // V25.9: a 1ª habilidade de dano da classe; se ela depende de outra (falcão, dragão, katar…), a base vem junto no nível 1.
+ const starter=pool.includes(preferred)?preferred:(pool.find(id=>isActive(id)&&['melee','bolt','ball','area','zone','self','trap'].includes(SK[id].k))||pool.find(isActive)||preferred);
+ const starterReq=SK[starter]?.req&&pool.includes(SK[starter].req)?SK[starter].req:null;
  const i=world.players.size, angle=i*Math.PI/3;
  const p={id:member.id,userId:member.userId||null,job,sp,maxSp:sp,x:map.spawn[0]+D.cos(angle)*24,y:map.spawn[1]+D.sin(angle)*24,
   hp:max,max,dir:0,walk:0,weapon:weapon[job],animKind:'',animType:'sword',animProgress:0,animSkill:'',arena:false,
@@ -285,7 +287,7 @@ export function addPlayer(world,member){
   base,stage,pool:skillPool(job,stage),st:ZERO_STATS(),relics:{},relicHp:{},buffs:new Map(),shield:0,shieldUntil:0,hiddenUntil:0,
   input:{dx:0,dy:0,attack:true,skill:0,skillSeq:0,revive:false},lastInput:0,hitAt:-99,invulnerableUntil:1.5,strikes:[],
   downedAt:0,reviveProgress:0,reviveBy:null,animStart:0,animDuration:0,animSeq:0,
-  claimed:new Set(),cards:[],earned:[],upgrades:0,animUntil:0,skills:{[starter]:1},slots:[starter],choices:[],pendingUps:0,offerAt:0,choiceSeq:0,upgradeSeq:0,
+  claimed:new Set(),cards:[],earned:[],upgrades:0,animUntil:0,skills:starterReq?{[starterReq]:1,[starter]:1}:{[starter]:1},slots:[starter],choices:[],pendingUps:0,offerAt:0,choiceSeq:0,upgradeSeq:0,
   cooldowns:Object.create(null),cdSpan:Object.create(null),rewardSeq:0,rewardOffer:0,rewardChoices:[],modifiers:{damage:0,hpRegen:0,range:0,attackRate:0,heal:0,speed:0,maxSp:0},lastSkillAt:0,chestQueue:[],
   mvSeq:0,warpSeq:0,moveBudget:24,usesClientMove:false,riftEnterSeq:0,
   character:member.character&&typeof member.character==='object'?member.character:null,

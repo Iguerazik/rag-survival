@@ -10,13 +10,13 @@ const RuneCombos = (() => {
     ['thief','Execução de Morroc','sand','envenom','boss'], ['thief','Névoa Venenosa','envenom','sand','wave'],
     ['sword','Lança de Valquíria','joint','pierce','boss'], ['mage','Ruptura do Inverno','stormgust','napalm','wave'],
     ['archer','Caçada do Falcão','falcon','precise','boss'], ['acolyte','Exorcismo de Glast Heim','judex','adoramus','wave'],
-    ['merchant','Forja de Thor','overthrust','cartterm','boss'], ['thief','Sentença do Algoz','envenom','sonicblow','boss'],
-    ['sword','Sentença Rúnica','joint','bash','boss'], ['sword','Chamas de Muspelheim','dragon','ignition','wave'],
+    ['merchant','Forja de Thor','overthrust','cartterm','boss'], ['thief','Sentença do Algoz','grimtooth','sonicblow','boss'],
+    ['sword','Sentença Rúnica','joint','bowling','boss'], ['sword','Chamas de Muspelheim','dragon','ignition','wave'],
     ['mage','Convergência Arcana','lightning','crimson','boss'], ['mage','Chuva de Meteoros','crimson','comet','wave'],
-    ['archer','Marca do Sentinela','precise','aimed','boss'], ['archer','Vendaval de Payon','arrows','arrowstorm','wave'],
-    ['acolyte','Sentença de Odin','holy','adoramus','boss'], ['acolyte','Aurora de Prontera','holy','judex','wave'],
-    ['merchant','Artilharia de Einbroch','axeboom','armcannon','boss'], ['merchant','Furacão da Forja','mammon','axetornado','wave'],
-    ['thief','Ceifa de Morroc','envenom','souldestroyer','boss'], ['thief','Espiral de Loki','rolling','ripper','wave'],
+    ['archer','Marca do Sentinela','wargstrike','aimed','boss'], ['archer','Vendaval de Payon','aimed','arrowstorm','wave'],
+    ['acolyte','Sentença de Odin','praefatio','adoramus','boss'], ['acolyte','Aurora de Prontera','adoramus','judex','wave'],
+    ['merchant','Artilharia de Einbroch','axeboom','armcannon','boss'], ['merchant','Furacão da Forja','axeboom','axetornado','wave'],
+    ['thief','Ceifa de Morroc','sonicblow','souldestroyer','boss'], ['thief','Espiral de Loki','rolling','ripper','wave'],
   ].map(([family,name,first,second,role],i)=>({id:'rune-'+i,family,name,first,second,role}));
   function trigger(state, skill, target, run) {
     state.ready ??= {}; state.cooldowns ??= {};

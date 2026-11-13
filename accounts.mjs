@@ -186,7 +186,8 @@ export function accountStore(dataDir){
          const next=awardJourney(before,kills,seconds,!!award.win);
          // Metas de mudança de classe também contam no online: melhor nível de run, fendas e Prova da Guilda.
          const old=before.runRecords?.[stage]||{};
-         next.runRecords={...(before.runRecords||{}),[stage]:{bestLevel:Math.max(num(old.bestLevel),Math.min(200,Math.floor(num(award.level,1)))),rifts:num(old.rifts)+Math.max(0,Math.min(6,Math.floor(num(award.rifts))))}};
+         // V25.9: jogando como uma classe anterior ("Jogar como"), as metas da classe atual não contam.
+         if(award.playStage==null||Number(award.playStage)===stage)next.runRecords={...(before.runRecords||{}),[stage]:{bestLevel:Math.max(num(old.bestLevel),Math.min(200,Math.floor(num(award.level,1)))),rifts:num(old.rifts)+Math.max(0,Math.min(6,Math.floor(num(award.rifts))))}};
          if(Number.isInteger(award.trial)&&award.trial===stage)next.guildTrials={...(before.guildTrials||{}),[stage]:true};
          data.journeys={...data.journeys,[lineId]:next};
        }

@@ -13,7 +13,7 @@ const member=(id,job,classId)=>({id,profile:{job,classId},character:{base:60,sta
 
 test('V25.3: melhorias do falcão só aparecem depois de Adestrar Falcão; Ataque Fatal só depois do Golpe Fulminante',async()=>{
  const core=await engine();
- const cases=[['archer','hunter',['steelcrow','falcon'],'falconry','owl'],['sword','knight',['fatal'],'bash','recovery']];
+ const cases=[['archer','hunter',['steelcrow','falcon'],'falconry','owl'],['sword','sword',['fatal'],'bash','recovery']];
  for(const [job,classId,locked,req,dummy] of cases){
   for(let seed=1;seed<=40;seed++){
    const w=core.makeWorld('sewer','normal',[member('a',job,classId)],{seed});
@@ -55,12 +55,12 @@ test('V25.6: depois de Adestrar Falcão, o Ataque Aéreo (ativa) aparece na esco
  for(let seed=1;seed<=20;seed++){
   const w=core.makeWorld('sewer','normal',[member('a','archer','hunter')],{seed});
   w.spawnAt=1e9;w.nextRiftAt=1e9;w.eliteAt=1e9;w.nextMagnetAt=1e9;w.contract.done=true;w.trials=[];w.mobs=[];
-  const p=w.players.get('a');
+  const p=w.players.get('a');p.skills={};p.slots=[]; // V25.9: o Caçador já começa com falcão + Ataque Aéreo; aqui testa a ordem
   p.choices=['falconry'];p.pendingUps=2;core.command(w,'a',{upgrade:{seq:(p.upgradeSeq||0)+1,id:'falconry'}});
   assert.ok(p.choices.includes('falcon'),'seed '+seed+': '+p.choices.join(','));
  }
  const w=core.makeWorld('sewer','normal',[member('a','archer','hunter')],{seed:1});w.spawnAt=1e9;w.mobs=[];
- const p=w.players.get('a');p.skills.falconry=1;core.tickWorld(w,.05);const before=p.st.autoblitz;
+ const p=w.players.get('a');p.skills={falconry:1};core.tickWorld(w,.05);const before=p.st.autoblitz;
  p.skills.falcon=5;core.tickWorld(w,.05);
  assert.ok(Math.abs(p.st.autoblitz-before-.1)<1e-9,'Ataque Aéreo nv. 5: +10% de ataque automático');
  assert.equal(core.skillCatalog.skills.falcon.k,'ball','Ataque Aéreo é ativa');

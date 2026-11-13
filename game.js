@@ -189,12 +189,18 @@ function addToAlbum(id, amount = 1) {
 function saveJourney(line, profile) {
   persist({ journeys: { ...saved.journeys, [line]: profile } });
 }
+/** V25.9: "Jogar como" uma classe anterior já liberada (para usar as skills dela e completar o Códex).
+ * O personagem (nível, atributos, equipamento) é o mesmo; só a classe da run, e portanto as skills, mudam. */
+function playStageOf(profile) {
+  const stage = profile?.stage ?? 0, as = profile?.playAs;
+  return Number.isInteger(as) && as >= 0 && as < stage ? as : stage;
+}
 function selectedJob() {
-  return jobs[jobLines[selected][journeyMode === 'training' ? 5 : journeyOf().stage]];
+  return jobs[jobLines[selected][journeyMode === 'training' ? 5 : playStageOf(journeyOf())]];
 }
 function renderMenu() {
   const list = Object.entries(jobLines).map(([id, route]) => {
-    const hero = jobs[route[journeyMode === 'training' ? 5 : journeyOf(id).stage]];
+    const hero = jobs[route[journeyMode === 'training' ? 5 : playStageOf(journeyOf(id))]];
     const el = button('', 'class', () => selectClass(id));
     el.dataset.hero = id;
     el.style.setProperty('--accent', hero.color);
@@ -1373,9 +1379,10 @@ function start(online = false, partySlot = 0, map = selectedMap) {
   renderSkills();
   if(run.authoritative){
     // Mesma regra do motor: a habilidade inicial vem da etapa atual (Aprendiz T. → Primeiros Socorros).
-    const cat=onlineCatalog,tiers=cat?.stages?.[run.journey?.stage|0]||cat?.stages?.[0]||[],pool=tiers.flatMap(t=>cat?.lines?.[run.line]?.[t]||[]);
-    const preferred=cat?.starters?.[run.line],first=pool.includes(preferred)?preferred:pool.find(id=>cat?.skills?.[id]&&cat.skills[id].k!=='passive');
-    syncOnlineSkills({skills:first?{[first]:1}:{},slots:first?[first]:[]});
+    const cat=onlineCatalog,tiers=cat?.stages?.[journeyMode==='training'?5:playStageOf(run.journey)]||cat?.stages?.[0]||[],pool=tiers.flatMap(t=>cat?.lines?.[run.line]?.[t]||[]);
+    const preferred=cat?.starters?.[run.line],first=pool.includes(preferred)?preferred:(pool.find(id=>['melee','bolt','ball','area','zone','self','trap'].includes(cat?.skills?.[id]?.k))||pool.find(id=>cat?.skills?.[id]&&cat.skills[id].k!=='passive'));
+    const req=first&&cat?.skills?.[first]?.req&&pool.includes(cat.skills[first].req)?cat.skills[first].req:null;
+    syncOnlineSkills({skills:first?(req?{[req]:1,[first]:1}:{[first]:1}):{},slots:first?[first]:[]});
   }
   if(run.local){
     // Personagem no mesmo formato que o servidor lê da conta (nível de Base, atributos, estágio, provas e equipamento).
