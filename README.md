@@ -24,7 +24,7 @@ classe, renascimento, árvores de habilidades, equipamentos, cartas, Zeny, MVPs 
 | `tests/` | Testes automatizados (`node --test`) |
 | `tools/` | Scripts de geração de dados e `bench-tps.mjs` (benchmark de ticks) |
 | `docs/historico/` | Notas de versões anteriores (V4 → V23.7), guardadas só como histórico |
-| `Dockerfile`, `docker-entrypoint.sh`, `railway.json` | Publicação no Railway (ou qualquer Docker) |
+| `Dockerfile`, `docker-entrypoint.sh` | Publicação no Railway (ou qualquer Docker) |
 
 ## Tecnologias
 
@@ -75,7 +75,7 @@ Variáveis úteis no PC: `PORT=3001`, `DATA_DIR=./data`. O banco é criado sozin
 
 | Variável | Padrão | Railway | Descrição |
 |---|---|---|---|
-| `PORT` | 3000 | automática | Porta HTTP (o Railway define) |
+| `PORT` | 3000 | 8080 (automática) | Porta HTTP (o Railway define) |
 | `HOST` | 0.0.0.0 | 0.0.0.0 | Interface de rede |
 | `TICK_RATE` | 60 | 60 | Ticks de simulação por segundo |
 | `SNAPSHOT_RATE` | 20 | 20 | Snapshots de rede por segundo |
@@ -105,36 +105,43 @@ node tools/bench-tps.mjs . 60 780 7 6 god   # partida completa com 6 bots: dura�
 - Nomes técnicos antigos (`midgard_sid`, `midgard-*`, `midgard.sqlite`, `MIDGARD_*`) foram **mantidos de propósito**:
   trocá-los apagaria sessões e saves existentes.
 - No Railway o disco do container é **temporário**: o banco precisa ficar num **Volume** montado em `/data`.
-- Backup a qualquer momento (sem parar o jogo):
+- O `ADMIN_TOKEN` fica em Railway → serviço → *Variables*. Backup a qualquer momento (sem parar o jogo):
   ```bash
-  curl -H "Authorization: Bearer $ADMIN_TOKEN" -o backup.sqlite https://SEU-ENDERECO.up.railway.app/api/admin/backup
+  curl -H "Authorization: Bearer $ADMIN_TOKEN" -o backup.sqlite https://rag-survival-production.up.railway.app/api/admin/backup
   ```
 - Restaurar/migrar um banco (só sem partida em andamento; o atual vai para `/data/backups/`):
   ```bash
-  curl -X POST -H "Authorization: Bearer $ADMIN_TOKEN" --data-binary @midgard.sqlite https://SEU-ENDERECO.up.railway.app/api/admin/restore
+  curl -X POST -H "Authorization: Bearer $ADMIN_TOKEN" --data-binary @midgard.sqlite https://rag-survival-production.up.railway.app/api/admin/restore
   ```
   O servidor valida o arquivo, apaga as sessões antigas (todos entram de novo com usuário e senha) e reinicia.
 
 ## Publicação no Railway
 
-1. **New Project → Deploy from GitHub repo →** `rag-survival` (branch `main`). O `railway.json` faz o build pelo
-   `Dockerfile` (Node 22) com healthcheck em `/api/health` e reinício automático em caso de falha.
-2. **Volume:** no serviço, *Add Volume* com *mount path* `/data`.
-3. **Variables:** `TRUST_PROXY=1`, `REQUIRE_HTTPS=1`, `ADMIN_TOKEN=<32+ caracteres aleatórios>`
-   (`TICK_RATE`, `SNAPSHOT_RATE`, `DATA_DIR` e `HOST` já vêm do Dockerfile).
-4. **Region:** a mais próxima do Brasil entre as oferecidas (US East · Virginia).
-5. **Networking → Generate Domain** (porta 3000 se pedir). HTTPS e WSS são automáticos; o cliente usa o
-   mesmo endereço (`wss://<domínio>/api/coop/ws`), sem `localhost`.
-6. Compartilhe o link `https://<domínio>` com os amigos.
+**Endereço público:** https://rag-survival-production.up.railway.app
+(projeto `rag-survival`, ambiente `production`, região **US East · Virginia**, 1 réplica).
 
-O serviço é **um só** (frontend + backend + banco SQLite), com **1 réplica** (volume não permite réplicas).
+Configuração aplicada no painel do Railway (o Railway não lê mais `railway.json` em serviços novos):
+
+| Item | Valor |
+|---|---|
+| Origem | GitHub `Iguerazik/rag-survival`, branch `main`, deploy automático com **Wait for CI** |
+| Build | `Dockerfile` (Node 22 Alpine), detectado automaticamente |
+| Start | `node server.mjs` (CMD do Dockerfile) |
+| Porta | o Railway injeta `PORT=8080`; o domínio aponta para a porta **8080** |
+| Healthcheck | `/api/health` (120 s), reinício **On Failure** (até 10 tentativas) |
+| Volume | `rag-survival-volume--v_B`, montado em `/data` (Virginia) |
+| Variáveis | `TRUST_PROXY=1`, `REQUIRE_HTTPS=1`, `DATA_DIR=/data`, `TICK_RATE=60`, `SNAPSHOT_RATE=20`, `ADMIN_TOKEN` (segredo) |
+
+O serviço é **um só** (frontend + backend + SQLite). HTTPS e WSS são automáticos; o cliente usa o mesmo endereço
+(`wss://<domínio>/api/coop/ws`), sem `localhost`. Para criar de novo do zero: *New Project → Deploy from GitHub repo*,
+adicionar o Volume em `/data`, as variáveis acima e *Generate Domain* na porta 8080.
 
 ## Atualizar o jogo
 
 1. Trabalhe numa branch (`git switch -c minha-mudanca`), rode `npm test`.
 2. Abra um Pull Request para `main`; o GitHub Actions roda os testes (`.github/workflows/test.yml`).
-3. Com tudo verde, faça o merge: o Railway publica a `main` sozinho. Com **"Wait for CI"** ligado no serviço,
-   o Railway só publica se os testes passarem.
+3. Com tudo verde, faça o merge: o Railway publica a `main` sozinho. O **"Wait for CI"** está ligado no serviço:
+   o Railway só publica se os testes do GitHub Actions passarem.
 4. **Rollback:** Railway → *Deployments* → deploy anterior → *Redeploy*.
 
 Cada deploy reinicia o processo: partidas em andamento terminam (lobbies voltam sozinhos por até 3 minutos).
