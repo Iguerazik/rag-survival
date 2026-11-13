@@ -11,7 +11,7 @@ import { randomBytes } from 'node:crypto';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const sandbox = vm.createContext({ console: { log() {}, warn() {}, error() {} } });
 for (const file of ['cards.js', 'items.js']) vm.runInContext(fs.readFileSync(path.join(here, file), 'utf8'), sandbox, { filename: file });
-vm.runInContext('this.__api = { Gear, itemDb, cardDb, mobElements };', sandbox);
+vm.runInContext('this.__api = { Gear, itemDb, cardDb, mobElements, RefineRules };', sandbox);
 const api = sandbox.__api;
 
 /** Bônus de equipamento (formato do motor) do personagem `line` salvo em `data` (progresso da conta). */
@@ -35,3 +35,12 @@ export function grantMvpItem(data, chosen, map) {
   const result = api.Gear.grantItem(Array.isArray(data.items) ? data.items : [], chosen, Math.max(0, MAP_ORDER.indexOf(String(map))), uid);
   return JSON.parse(JSON.stringify(result));
 }
+
+/* ===== V24: forja (refino) — as MESMAS regras do navegador (RefineRules em items.js), decididas aqui no servidor. ===== */
+export const refineConfig = JSON.parse(JSON.stringify({ MAX: api.RefineRules.MAX, DUPLICATE_CAP: api.RefineRules.DUPLICATE_CAP, TABLE: api.RefineRules.TABLE }));
+export const refineErrors = JSON.parse(JSON.stringify(api.RefineRules.errors));
+/** Uma tentativa de refino (sem efeitos colaterais): devolve o resultado e o item novo, ou o erro. */
+export function refineAttempt(item, zeny, rng, expectFrom) {
+  return JSON.parse(JSON.stringify(api.RefineRules.attempt(item, zeny, rng, expectFrom)));
+}
+export function refinePreview(item) { return JSON.parse(JSON.stringify(api.RefineRules.preview(item))); }

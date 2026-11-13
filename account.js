@@ -153,7 +153,10 @@ window.MidgardAccount = (() => {
       const bd={...(t.clearsByDifficulty||{})};for(const [d,m] of Object.entries(c.clearsByDifficulty||{}))bd[d]={...m,...(bd[d]||{})};
       t.clearsByDifficulty=bd;for(const [k,v] of Object.entries(c))if(!(k in t))t[k]=v;
     }
-    return {...server,...local,journeys,album,campaign,zeny:Math.max(Number(server.zeny)||0,Number(local.zeny)||0),
+    // V24: o refino é decidido no servidor — um save local antigo nunca baixa o refino de um item.
+    const serverRefine=new Map((server.items||[]).filter(Boolean).map(x=>[x.uid,x.refine||0]));
+    const items=Array.isArray(local.items)?local.items.map(x=>x&&serverRefine.has(x.uid)&&serverRefine.get(x.uid)>(x.refine||0)?{...x,refine:serverRefine.get(x.uid)}:x):server.items;
+    return {...server,...local,items,journeys,album,campaign,zeny:Math.max(Number(server.zeny)||0,Number(local.zeny)||0),
       best:Math.max(Number(server.best)||0,Number(local.best)||0)};
   }
   /** V22.2: relê o progresso verificado do servidor (após uma partida online) e alinha a revisão. */
@@ -186,5 +189,20 @@ window.MidgardAccount = (() => {
     }
   }
   bind();
-  return {user:()=>user,signedIn,initialSave,saveKey,queueSave,flush,open,refresh};
+  /** V24: envia o que está pendente e diz se a nuvem está em dia (a forja só roda com o progresso sincronizado). */
+  async function settle(){
+    if(!user)return true;
+    if(pending)await flush();
+    if(pending&&!uploading)await flush();
+    return !pending&&!conflicted;
+  }
+  /** V24: o servidor decidiu uma mudança (forja): adota o progresso dele como verdade e alinha a revisão. */
+  function adopt(snap){
+    if(!user||!snap||!Number.isSafeInteger(snap.revision))return;
+    revision=snap.revision;conflicted=false;
+    if(pending){pending=null;try{localStorage.removeItem(dirtyKey)}catch{}}
+    syncMessage('✓ Progresso salvo online.');
+  }
+  function currentRevision(){return revision}
+  return {user:()=>user,signedIn,initialSave,saveKey,queueSave,flush,open,refresh,settle,adopt,request,currentRevision};
 })();

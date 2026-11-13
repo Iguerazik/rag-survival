@@ -50,7 +50,7 @@ const ROClientWindows = (()=>{
         b.style.left=coords[slot][0];b.style.top=coords[slot][1];
         b.title=meta.name+(item?' — '+Gear.label(item):' — vazio')+' · clique para gerenciar';
         const slotName=make('span','ro-v15-slot-label',meta.name);b.append(slotName);
-        if(item){const sprite=Gear.sprite(item.id);sprite.setAttribute('aria-hidden','true');b.append(sprite);}else b.append(make('span','','+'));
+        if(item){const sprite=Gear.sprite(item.id,item.refine||0);b.dataset.refineBand=String(RefineRules.tier(item.refine||0));sprite.setAttribute('aria-hidden','true');b.append(sprite);}else b.append(make('span','','+'));
         b.setAttribute('aria-label',b.title);paper.append(b);
       }
       const side=make('section','ro-gear-details');side.append(make('h3','','Conjunto equipado'));

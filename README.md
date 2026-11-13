@@ -51,6 +51,12 @@ classe, renascimento, árvores de habilidades, equipamentos, cartas, Zeny, MVPs 
 - `GET /api/health` mostra o TPS medido e a duração dos ticks (média, p95, p99, máximo, ticks acima de 16,67 ms).
   No Railway o servidor também registra essas medidas no log a cada minuto de partida.
 
+## Forja (refino até +10)
+
+Configuração central em `items.js` → `RefineRules` (chances, chance de quebra, custos e bônus por nível).
+Com conta, o **servidor** sorteia e grava (`POST /api/account/refine`, transação SQLite com `requestId` contra repetição);
+sem conta, o navegador usa as mesmas regras. Detalhes e tabela: `docs/FORJA.md`.
+
 ## Requisitos
 
 - Node.js **22.13 ou superior** (`node -v`)
