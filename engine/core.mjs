@@ -659,8 +659,9 @@ function skillCast(world,p,id,closest,visible,auto=false){
  if(def.k==='bolt'||def.k==='ball')event(world,'projectile',{player:p.id,skill:id,fromX:Math.round(p.x),fromY:Math.round(p.y),toX:Math.round(point.x),toY:Math.round(point.y),duration:arrive});
  return true;
 }
+// V25.7: quem é ressuscitado (por um aliado ou pela habilidade) volta com HP e SP cheios.
 function reviveNow(world,down,by,share){
- down.hp=Math.ceil(down.max*share);down.invulnerableUntil=world.time+lag(world,3.5);
+ down.hp=down.max;down.sp=down.maxSp;down.invulnerableUntil=world.time+lag(world,3.5);
  down.reviveProgress=0;down.reviveBy=null;down.downedAt=0;
  event(world,'revived',{player:down.id,by:by.id,hp:down.hp});
 }
@@ -1724,7 +1725,7 @@ function leaveRift(world,success,wiped=false){
   groundDrop(world,'chest',portal.x+26,portal.y+8,2);
   event(world,'riftComplete',{x:portal.x,y:portal.y});
  }else{
-  if(wiped)for(const p of players){p.hp=Math.max(p.hp,Math.ceil(p.max*.25));p.downedAt=0;p.reviveProgress=0;p.reviveBy=null;p.invulnerableUntil=world.time+lag(world,3);}
+  if(wiped)for(const p of players){p.hp=p.max;p.sp=p.maxSp;p.downedAt=0;p.reviveProgress=0;p.reviveBy=null;p.invulnerableUntil=world.time+lag(world,3);}
   event(world,'riftFailed',{x:portal.x,y:portal.y,wiped});
  }
 }

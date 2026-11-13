@@ -112,3 +112,13 @@ test('V25.4: Tesouro do MVP sorteia a peça do Códex que falta (Varinha do Arqu
   if(core.rollMvpGear(w,p).some(o=>o.id==='wand'))wand++;}
  assert.ok(wand>25,'Varinha aparece no tesouro ('+wand+'/200)');
 });
+
+test('V25.7: quem é ressuscitado volta com HP e SP cheios',async()=>{
+ const core=await engine();
+ const w=core.makeWorld('sewer','normal',[member('a','sword'),member('b','acolyte')],{seed:3});quiet(w);
+ const a=w.players.get('a'),b=w.players.get('b');
+ a.hp=0;a.sp=1;a.downedAt=w.time;b.x=a.x+10;b.y=a.y;
+ for(let i=0;i<120&&a.hp<=0;i++){b.hp=b.max;core.command(w,'b',{revive:true});core.tickWorld(w,.05);}
+ assert.ok(a.hp>0,'reanimado');
+ assert.equal(a.hp,a.max);assert.equal(a.sp,a.maxSp);
+});
