@@ -1,0 +1,39 @@
+/* Emotes (emotes.js) — só aparência. */
+.emote-wheel { position: fixed; inset: 0; z-index: 2600; display: grid; place-items: center; pointer-events: none; }
+.emote-wheel[hidden] { display: none; }
+.emote-ring { position: relative; width: 300px; height: 300px; pointer-events: auto; border-radius: 50%;
+  background: radial-gradient(circle, rgba(32, 21, 10, .62) 0 46%, rgba(32, 21, 10, .32) 62%, transparent 72%); }
+.emote-ring::before { content: ''; position: absolute; inset: 38px; border-radius: 50%; border: 2px solid rgba(226, 193, 111, .75);
+  box-shadow: 0 0 0 1px rgba(60, 38, 14, .6), 0 0 14px rgba(255, 210, 110, .25); pointer-events: none; }
+.emote-option { position: absolute; left: 50%; top: 50%; width: 58px; height: 58px; margin: -29px 0 0 -29px; transform: translate(var(--x), var(--y));
+  display: grid; place-items: center; padding: 0; cursor: pointer; border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #fffaf0, #efe2c6); border: 2px solid #8a6a3a;
+  box-shadow: 0 3px 0 #3b2614, 0 4px 10px rgba(0, 0, 0, .35); transition: transform .12s, box-shadow .12s; }
+.emote-option img { width: 36px; height: auto; max-height: 40px; image-rendering: pixelated; }
+.emote-option span { position: absolute; top: 100%; margin-top: 3px; left: 50%; transform: translateX(-50%); white-space: nowrap; font: 600 11px/1.2 system-ui, sans-serif;
+  color: #fff3d6; text-shadow: 0 1px 2px #000, 0 0 4px #000; opacity: 0; transition: opacity .12s; pointer-events: none; }
+.emote-option:hover, .emote-option:focus-visible { transform: translate(var(--x), var(--y)) scale(1.12); box-shadow: 0 3px 0 #3b2614, 0 0 0 2px #ffe28f, 0 0 16px rgba(255, 214, 110, .75); outline: none; }
+.emote-option:hover span, .emote-option:focus-visible span { opacity: 1; }
+.emote-option.missing::after { content: attr(title); font: 700 10px/1.1 system-ui, sans-serif; color: #5b3d1e; text-align: center; padding: 0 4px; }
+.emote-hint { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); margin: 0; font: 700 14px/1 'Cinzel', Georgia, serif; color: #ffe8b5; text-shadow: 0 1px 2px #000; }
+.emote-hint kbd { display: inline-block; margin-left: 6px; padding: 2px 6px; border-radius: 4px; background: #3a2616; border: 1px solid #a07c45; font: 700 12px/1 system-ui, sans-serif; color: #ffe8b5; }
+.emote-close { position: absolute; left: 50%; top: calc(50% + 26px); transform: translateX(-50%); padding: 3px 9px; border-radius: 99px; cursor: pointer;
+  background: rgba(30, 20, 11, .85); border: 1px solid #8f6d3b; color: #ffe8b5; font: 600 11px/1.2 system-ui, sans-serif; }
+
+/* balão acima da cabeça (posição calculada no JS) */
+.emote-bubble { position: absolute; left: 0; top: 0; z-index: 2500; pointer-events: none; opacity: 0; transition: opacity .2s; }
+.emote-bubble.visible { opacity: 1; }
+.emote-bubble img { display: block; width: 44px; height: auto; image-rendering: pixelated; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .45)); }
+
+/* botão discreto no menu (dentro da etiqueta da classe) */
+html body .menu .menu-home .mh-emote-open { display: inline-flex; align-items: center; gap: 4px; margin-left: 2px; padding: 2px 8px 2px 4px; height: 26px; cursor: pointer;
+  border-radius: 99px; border: 1px solid #a07c45; background: #4a3420; color: #ffe0a0; font: 600 11px/1 system-ui, sans-serif; letter-spacing: 0; transition: background .15s, box-shadow .15s; }
+html body .menu .menu-home .mh-emote-open img { width: 18px; height: 18px; object-fit: contain; image-rendering: pixelated; }
+html body .menu .menu-home .mh-emote-open:hover { background: #6a4a28; box-shadow: 0 0 10px rgba(255, 210, 110, .5); }
+@media (prefers-reduced-motion: reduce) { .emote-option, .emote-bubble { transition: none; } }
+
+/* no menu: arco acima da cabeça, sem o disco escuro, para o personagem continuar visível */
+.emote-wheel.arc .emote-ring { background: none; }
+.emote-wheel.arc .emote-ring::before { inset: 22px 10px auto; height: 236px; border-radius: 50% 50% 0 0 / 60% 60% 0 0; border-bottom: 0; box-shadow: none; }
+.emote-wheel.arc .emote-hint { top: 24%; padding: 3px 8px; border-radius: 99px; background: rgba(30, 20, 11, .78); border: 1px solid #8f6d3b; font-size: 12px; }
+.emote-wheel.arc .emote-close { top: 34%; }

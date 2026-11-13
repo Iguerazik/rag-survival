@@ -337,6 +337,7 @@ function sameOrigin(req){
 }
 /* ---------- V22.1: WebSocket — o servidor EMPURRA o mundo SNAPSHOT_RATE vezes por segundo (20) e aplica comandos na hora ---------- */
 const wsJson=(conn,obj)=>conn.send(JSON.stringify(obj));
+const EMOTE_IDS=new Set(['amor','exclamacao','interrogacao','ideia','gota','grr','lala','heh','reticencias','positivo','negativo']);
 function wsMessage(conn,text){
  const now=Date.now();
  if(now-conn.windowAt>1000){conn.windowAt=now;conn.count=0}
@@ -360,6 +361,13 @@ function wsMessage(conn,text){
  if(msg.t==='in'&&room.phase==='playing'&&room.world&&msg.input&&typeof msg.input==='object'){
   command(room.world,me.id,msg.input);me.input=inputView(room.world,me.id);
  }else if(msg.t==='ping')wsJson(conn,{t:'pong',c:Number.isFinite(msg.c)?msg.c:0});
+ else if(msg.t==='emote'&&room.phase==='playing'&&EMOTE_IDS.has(msg.id)){
+  // Emotes: só repassa para a sala (lista fechada, no máximo 1 a cada 0,8 s por jogador). Não toca no mundo/simulação.
+  if(now-(me.emoteAt||0)<800)return;
+  me.emoteAt=now;
+  const out=JSON.stringify({t:'emote',from:me.id,id:msg.id});
+  for(const m of room.members.values())if(m.ws?.open)try{m.ws.send(out)}catch{}
+ }
 }
 function pushTo(room,member,force=false){
  const conn=member.ws;if(!conn?.open)return;

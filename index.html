@@ -71,7 +71,7 @@
 <script defer src="mapgen.js?v=13"></script>
 <script defer src="warps.js?v=12"></script>
 <script defer src="account.js?v=22.5"></script>
-<script defer src="coop.js?v=22.5"></script>
+<script defer src="coop.js?v=25.1"></script>
 <script defer src="bgm.js?v=13"></script>
 <script defer src="trials.js?v=12"></script>
 <script defer src="controls.js?v=12"></script>
@@ -92,8 +92,12 @@
 <script defer src="ro-windows.js?v=15"></script>
 <script defer src="ro-hud-layout.js?v=22"></script>
 <script defer src="v12-ui.js?v=12"></script>
+<script defer src="menu-home.js?v=1"></script>
+<script defer src="emotes.js?v=1"></script>
 <link rel="stylesheet" href="v22-fixes.css?v=22.5">
 <link rel="stylesheet" href="v24-ui.css?v=24.1">
+<link rel="stylesheet" href="menu-home.css?v=1">
+<link rel="stylesheet" href="emotes.css?v=1">
 </head>
 <body>
 <main id="menu" class="menu">
@@ -108,6 +112,44 @@
     <div class="ro-music-options"><button type="button" id="menu-bgm-source" class="sound" aria-pressed="true">Usar arquivos do RO</button><label class="ro-music-file">Carregar áudio <input id="menu-music-file" type="file" accept="audio/mpeg,audio/mp3,audio/ogg,.mp3,.ogg"></label></div>
     <p class="ro-audio-help">A faixa oficial de Prontera (08.mp3) não acompanha o pacote. Adicione seu arquivo autorizado em assets/bgm/ro/08.mp3. Sem ele, toca a composição alternativa.</p>
   </section>
+  <!-- Menu principal na praça de Prontera (menu-home.js / menu-home.css). Fundo sem interface pintada;
+       personagem = sprite real da classe; todos os botões chamam as ações que o menu já tinha. -->
+  <section id="menu-home" class="menu-home" aria-label="Praça de Prontera">
+    <canvas id="menu-home-canvas" class="menu-home-canvas" aria-hidden="true"></canvas>
+    <aside class="mh-card mh-character" aria-label="Seu personagem">
+      <div class="mh-character-head"><strong id="mh-name">Visitante</strong><span id="mh-zeny" class="mh-zeny" title="Zeny guardado">0 z</span></div>
+      <p class="mh-class"><span id="mh-class">—</span> <small id="mh-stage"></small></p>
+      <div class="mh-bars">
+        <span id="mh-base">Nv. base 1</span><span class="mh-bar"><i id="mh-base-exp"></i></span>
+        <span id="mh-job">Nv. classe 1</span><span class="mh-bar job"><i id="mh-job-exp"></i></span>
+      </div>
+      <p id="mh-gear" class="mh-gear">—</p>
+      <p id="mh-online" class="mh-online" data-state="guest"><span class="mh-dot" aria-hidden="true"></span><span id="mh-online-text">verificando…</span></p>
+    </aside>
+    <div id="mh-hero-tag" class="mh-hero-tag"><button type="button" id="mh-prev" class="mh-arrow" aria-label="Classe anterior" title="Classe anterior">‹</button><span id="mh-hero-name" aria-live="polite">Aventureiro</span><button type="button" id="mh-next" class="mh-arrow" aria-label="Próxima classe" title="Próxima classe">›</button></div>
+    <nav class="mh-panel" aria-label="Menu principal">
+      <div class="mh-logo"><h1 id="title">RAG <em>SURVIVAL</em></h1></div>
+      <button type="button" id="mh-play" class="mh-btn mh-play"><span class="mh-ico" aria-hidden="true">▶</span>Jogar</button>
+      <button type="button" id="mh-solo" class="mh-btn" title="Começa no mapa e na dificuldade escolhidos"><svg class="mh-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7z"/></svg>Solo</button>
+      <button type="button" id="mh-online-btn" class="mh-btn" title="Criar ou entrar numa sala"><svg class="mh-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="8.5" r="3.4"/><circle cx="16.5" cy="8" r="3"/><path d="M1.5 20.5c0-3.8 3-6.2 6.5-6.2s6.5 2.4 6.5 6.2z"/><path d="M14.6 14.2c3.6-.4 7.9 1.6 7.9 6.3h-6.3c0-2.4-.5-4.6-1.6-6.3z"/></svg>Multiplayer</button>
+      <button type="button" id="mh-character" class="mh-btn"><img class="mh-ico" src="assets/ui-v12/status.svg" alt="">Personagem</button>
+      <button type="button" id="mh-equipment" class="mh-btn"><img class="mh-ico" src="assets/ui-v12/equip.svg" alt="">Equipamentos</button>
+      <div class="mh-more" role="group" aria-label="Mais opções">
+        <button type="button" id="mh-inventory" title="Inventário"><img src="assets/ui-v12/items.svg" alt=""><span>Inventário</span></button>
+        <button type="button" id="mh-cards" title="Cartas"><span class="mh-glyph" aria-hidden="true">♠</span><span>Cartas</span></button>
+        <button type="button" id="mh-forge" title="Forja &amp; Zeny"><span class="mh-glyph" aria-hidden="true">⚒</span><span>Forja</span></button>
+        <button type="button" id="mh-bestiary" title="Bestiário"><img src="assets/monsters/poring.gif" alt=""><span>Bestiário</span></button>
+        <button type="button" id="mh-progress" title="Progressão de classes"><img src="assets/ui-v12/progression.svg" alt=""><span>Classes</span></button>
+        <button type="button" id="mh-codex" title="Códex, pets e loja"><span class="mh-glyph" aria-hidden="true">✧</span><span>Códex</span></button>
+      </div>
+      <div class="mh-icons" role="group" aria-label="Sistema">
+        <button type="button" id="mh-settings" title="Configurações" aria-label="Configurações"><img src="assets/ui-v12/option.svg" alt=""></button>
+        <button type="button" id="mh-help" title="Como jogar online" aria-label="Como jogar online"><span aria-hidden="true">?</span></button>
+        <button type="button" id="mh-updates" title="Atualizações" aria-label="Atualizações"><span aria-hidden="true">✉</span></button>
+        <button type="button" id="mh-credits" title="Créditos" aria-label="Créditos"><span aria-hidden="true">i</span></button>
+      </div>
+    </nav>
+  </section>
   <div class="wrap">
     <nav class="lobby-dock" aria-label="Menu do aventureiro">
       <button type="button" id="nav-status"><img class="dock-ro-icon" src="assets/skin-v11/btn_status_off.png" alt=""><span>Status</span></button>
@@ -121,14 +163,6 @@
       <button type="button" id="nav-scores"><span class="ro-dock-glyph">♛</span><span>Recordes</span></button>
       <button type="button" id="nav-settings" class="ro-settings-link"><img class="dock-ro-icon" src="assets/skin-v11/btn_option_off.png" alt=""><span>Opções</span></button>
     </nav>
-    <section class="hero" aria-labelledby="title">
-      <div class="hero-content">
-        <p class="eyebrow"><span></span> RAGNAROK ONLINE · RENEWAL</p>
-        <h1 id="title">RAG <em>SURVIVAL</em></h1>
-        <p class="intro">Escolha sua linhagem, evolua até a terceira classe e enfrente os MVPs de Rune-Midgard.</p>
-        <div class="hero-meta"><span>◆</span> Solo ou co-op para até 6 jogadores</div>
-      </div>
-    </section>
     <section class="online-hub" id="online-hub" aria-label="Partida com amigos">
       <div class="online-hub-banner"><div><small>◈ COMPANHIA DE RUNE-MIDGARD</small><h2>Jogue com seus amigos</h2><p>Contas individuais · Salas privadas · Combate cooperativo para até 6 aventureiros</p></div><button type="button" id="online-hub-help" class="sound">❔ Como entrar</button></div>
       <section id="coop-panel" class="coop-panel" aria-labelledby="coop-title">
@@ -149,7 +183,7 @@
         <p id="coop-status" role="status"></p>
       </section>
     </section>
-    <section class="roster" aria-labelledby="roster-title">
+    <section class="roster" id="match-prep" aria-labelledby="roster-title">
       <div class="lobby-columns">
         <div class="character-window client-window">
       <div class="section-head client-title"><h2 id="roster-title">Escolha sua linhagem</h2><span id="record">RECORDE · 00:00</span></div>
@@ -225,6 +259,17 @@
   <p class="account-feedback" id="account-feedback" role="status" aria-live="polite"></p>
 </dialog>
 <dialog id="account-profile-dialog" class="account-dialog" aria-labelledby="account-profile-title"><header class="account-head"><h2 id="account-profile-title">Meu aventureiro</h2><button type="button" id="account-profile-close">✕</button></header><p id="account-profile-info"></p><p id="account-cloud-status"></p><button id="account-import-local" class="sound" type="button">Importar progresso de visitante (uma vez)</button><p class="account-import-note">A importação substitui o progresso online desta conta. Use apenas se você jogava antes de criar a conta.</p></dialog>
+<dialog id="updates-dialog" class="account-dialog mh-dialog" aria-labelledby="updates-title"><header class="account-head"><h2 id="updates-title">Atualizações</h2><button type="button" data-close aria-label="Fechar">✕</button></header>
+<ul class="mh-notes">
+<li><strong>Menu novo</strong> — praça de Prontera, seu personagem em destaque e acesso rápido a Jogar, Solo e Multiplayer.</li>
+<li><strong>Modo infinito</strong> — depois do MVP as hordas não param (EXP ×2,5). Esc → Encerrar run para receber as recompensas.</li>
+<li><strong>Metas de classe</strong> — o nível de run pedido para evoluir ficou no máximo 30.</li>
+</ul></dialog>
+<dialog id="credits-dialog" class="account-dialog mh-dialog" aria-labelledby="credits-title"><header class="account-head"><h2 id="credits-title">Créditos</h2><button type="button" data-close aria-label="Fechar">✕</button></header>
+<p>RAG SURVIVAL é um jogo de fã, sem fins lucrativos, inspirado em Vampire Survivors e em Ragnarok Online.</p>
+<p>Ragnarok Online, seus personagens, monstros e recursos gráficos pertencem à Gravity Co., Ltd. e à Lee Myoungjin.</p>
+<p>Ilustração da praça de Prontera: fornecida pelo autor do projeto. Fonte dos títulos: Cinzel (SIL Open Font License).</p>
+</dialog>
 <dialog id="bestiary-dialog" class="rebirth-dialog catalogue-dialog" aria-labelledby="bestiary-heading"><header class="inventory-head"><h2 id="bestiary-heading">Bestiário de Rune-Midgard</h2><button id="bestiary-close" type="button">Fechar ✕</button></header><div id="bestiary-list" class="bestiary-grid"></div></dialog>
   <dialog id="codex-dialog" class="rebirth-dialog catalogue-dialog" aria-labelledby="codex-heading">
   <header class="inventory-head"><h2 id="codex-heading">Códex de Combinações</h2><button id="codex-close" class="sound" type="button">Fechar ✕</button></header>

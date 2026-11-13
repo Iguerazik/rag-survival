@@ -1,0 +1,14 @@
+Coloque aqui os GIFs animados dos emotes (nomes exatos):
+amor.gif          <- Amor_new.gif
+exclamacao.gif    <- Exclamação_new.gif
+interrogacao.gif  <- Interrogação_new.gif
+ideia.gif         <- Ideia_new.gif
+gota.gif          <- Gota_new.gif
+grr.gif           <- Grr_new.gif
+lala.gif          <- Lala_new.gif
+heh.gif           <- Heh_new.gif
+reticencias.gif   <- Reticencias_new.gif
+positivo.gif      <- Positivo_new.gif
+negativo.gif      <- Negativo_new.gif
+Fonte: https://browiki.org/wiki/Categoria:Emotes (emotes do Ragnarok Online, © Gravity).
+Se algum arquivo faltar, o botão daquele emote mostra só o nome.

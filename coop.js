@@ -151,6 +151,7 @@ const Coop = (() => {
         if ([401, 404].includes(msg.status)) { const active = !!run?.coop; leave(false); if (active) menu(); status('Conexão com a sala encerrada.'); }
         return;
       }
+      if (msg.t === 'emote') { if (msg.from !== current.id && typeof Emotes !== 'undefined') Emotes.showRemote(msg.from, msg.id); return; } // emotes: só visual
       if (msg.t !== 's') return;
       socketLive = performance.now(); socketRetry = 0;
       try { handle(current, msg, wsRtt || run?.netRtt || 0); } catch (error) { console.error('[Midgard] snapshot', error); }
@@ -167,6 +168,7 @@ const Coop = (() => {
       if (run?.coop && mode !== 'ended') socket.send(JSON.stringify({ t: 'in', input: packPlayer() }));
     } catch {}
   }
+  function sendEmote(id) { if (!session || !socketOk() || !run?.coop) return false; try { socket.send(JSON.stringify({ t: 'emote', id: String(id).slice(0, 16) })); return true; } catch { return false; } }
   function sendPing() { if (socket && socket.readyState === 1) try { socket.send(JSON.stringify({ t: 'ping', c: performance.now() })); } catch {} }
   function closeSocket() {
     clearTimeout(socketTimer); clearInterval(inputTimer); clearInterval(pingTimer); inputTimer = pingTimer = 0;
@@ -327,5 +329,5 @@ const Coop = (() => {
     if (!session || !isHost()) return;
     await api('/' + session.code + '/next', { token: session.token, mode: modeName });
   }
-  return { init, leave, lobby, next, refresh: sessionUi, id: () => session?.id, host: isHost, config:()=>roomConfig, transport: () => socketOk() ? 'websocket' : 'http' };
+  return { init, leave, lobby, next, refresh: sessionUi, id: () => session?.id, host: isHost, config:()=>roomConfig, transport: () => socketOk() ? 'websocket' : 'http', sendEmote };
 })();
