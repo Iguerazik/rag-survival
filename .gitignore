@@ -41,3 +41,8 @@ Thumbs.db
 desktop.ini
 .vscode/
 .idea/
+
+# Ambiente de teste local (INICIAR_RAG_SURVIVAL_TESTE.bat)
+dados-teste/
+logs-teste/
+cloudflared.exe

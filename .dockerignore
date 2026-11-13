@@ -18,3 +18,6 @@ Thumbs.db
 **/*.sqlite
 **/*.sqlite-wal
 **/*.sqlite-shm
+dados-teste
+logs-teste
+cloudflared.exe
