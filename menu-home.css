@@ -1,7 +1,8 @@
 /* Menu principal na praça de Prontera (menu-home.js). Carregado por último; só aparência. */
 html body .menu .menu-home {
-  position: relative; display: block; width: min(1080px, calc(100% - 72px)); margin: 10px auto 18px;
-  height: clamp(520px, 74vh, 700px); border-radius: 12px; overflow: hidden; isolation: isolate;
+  position: relative; display: block; width: min(1440px, calc(100% - 40px)); margin: 10px auto 18px;
+  /* V25.1: palco mais largo e um pouco mais baixo para a praça caber inteira (menos zoom) */
+  height: clamp(520px, 72vh, 700px); border-radius: 12px; overflow: hidden; isolation: isolate;
   border: 2px solid #6b5231; background: #2b2016;
   box-shadow: 0 0 0 1px #2a1d0f, 0 14px 40px rgba(0, 0, 0, .45), inset 0 0 0 1px rgba(255, 228, 160, .25);
 }

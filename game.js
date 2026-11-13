@@ -36,6 +36,8 @@ let muted = saved.muted === true;
 let combatMode = saved.combatMode === 'manual' ? 'manual' : 'auto';
 let selectedDifficulty = Campaign.validDifficulty(saved,selected,saved.difficulty || 'easy');
 let audio;
+// V25.1 (visual): a arma desenhada por cima do sprite ficava feia; o sprite da classe já mostra o personagem.
+const SHOW_WEAPON_OVERLAY=false;
 let run;
 let lastFrame = 0;
 let mode = 'menu';
@@ -2269,9 +2271,9 @@ function draw() {
       const remoteAction=remote?.action ?? ((actor.walk ? 8 : 0) + actor.dir);
       // Parado = quadro 0 (os 3 quadros "idle" do RO são direções da cabeça, não uma animação).
       const remoteFrame=remote?.frame ?? (actor.walk ? run.time*12 : 0);
-      WeaponVisual.draw(ctx,actor,actor.weapon,run.time,.90,remote,'back');
+      SHOW_WEAPON_OVERLAY&&WeaponVisual.draw(ctx,actor,actor.weapon,run.time,.90,remote,'back');
       actorSprite(actor,remoteAction,remoteFrame,.90);
-      WeaponVisual.draw(ctx,actor,actor.weapon,run.time,.90,remote,'front');
+      SHOW_WEAPON_OVERLAY&&WeaponVisual.draw(ctx,actor,actor.weapon,run.time,.90,remote,'front');
       CombatV17.draw(ctx,actor,remote,run.time,.90);
       ctx.globalAlpha = 1;
       if(actor.hp<=0){ctx.save();ctx.textAlign='center';ctx.font='bold 23px Georgia';ctx.lineWidth=3;ctx.strokeStyle='#260f18';ctx.fillStyle='#ffd6d6';ctx.strokeText('✝',actor.x,actor.y-57);ctx.fillText('✝',actor.x,actor.y-57);ctx.restore();}
@@ -2288,9 +2290,9 @@ function draw() {
       ctx.globalAlpha = actor.immunity && Math.floor(run.time * 19) % 2 ? .48 : 1;
       const action = (actor.walk ? 8 : 0) + actor.dir;
       const motion=CombatAnimations.pose(actor,run.authoritative ? performance.now()/1000 : run.time,run.id,action,actor.walk||0);
-      WeaponVisual.draw(ctx,actor,run.gear?.weapon?.id || run.serverWeapon,run.time,.92,motion,'back');
+      SHOW_WEAPON_OVERLAY&&WeaponVisual.draw(ctx,actor,run.gear?.weapon?.id || run.serverWeapon,run.time,.92,motion,'back');
       actorSprite(actor,motion.action,motion.frame,.92);
-      WeaponVisual.draw(ctx,actor,run.gear?.weapon?.id || run.serverWeapon,run.time,.92,motion,'front');
+      SHOW_WEAPON_OVERLAY&&WeaponVisual.draw(ctx,actor,run.gear?.weapon?.id || run.serverWeapon,run.time,.92,motion,'front');
       CombatV17.draw(ctx,actor,motion,run.time,.92);
       CombatV17.reaction(ctx,actor,run.time,.92);
       ctx.globalAlpha = 1;

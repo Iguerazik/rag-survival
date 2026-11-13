@@ -40,7 +40,10 @@ const MenuHome = (() => {
     const panel = document.querySelector('#menu-home .mh-panel');
     const sceneW = Math.max(320, width - (panel ? panel.getBoundingClientRect().width + 20 : 0));
     const s = Math.max(sceneW / IMG_W, height / IMG_H);
-    return { s, ox: sceneW - IMG_W * s, oy: (height - IMG_H * s) * .5, sceneW };
+    // se ainda sobrar imagem dos lados, corta mais da direita do que da esquerda (a loja da NPC fica à vista)
+    // corta mais do céu que do chão: os pés do personagem ficam sempre à vista, com espaço para o nome da classe
+    const oy = Math.min((height - IMG_H * s) * .5, height - 74 - FEET.y * s);
+    return { s, ox: (sceneW - IMG_W * s) * .3, oy: Math.min(0, oy), sceneW };
   }
   function heroInfo() {
     try { const job = selectedJob(); return { id: job.id, job, journey: journeyOf(selected) }; } catch { return null; }
