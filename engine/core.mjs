@@ -427,15 +427,16 @@ function defeated(world,m,source){
    const item=groundDrop(world,{flywing:'flywing',butterflywing:'butterflywing',xpMagnet:'xpmagnet',goldMagnet:'zenymagnet'}[kind],m.x+(kind==='flywing'?22:-22),m.y+26,1);item.utility=true;item.expires=world.time+lag(world,100);
   }
  }
- // Baú verde da forja: 0,11% por abate comum (no máximo 5); Comandantes, Guardião dos Portais e Prova da Guilda sempre.
- if(!rare&&!m.trial&&rand(world)<.0011&&world.pickups.filter(o=>o.kind==='forge').length<5)groundDrop(world,'forge',m.x+7,m.y+5,1).expires=world.time+lag(world,70);
+ // Baú verde da forja: 0,05% por abate comum (era 0,11% até a V24; no máximo 5); Comandantes, Guardião dos Portais e Prova da Guilda sempre.
+ if(!rare&&!m.trial&&rand(world)<.0005&&world.pickups.filter(o=>o.kind==='forge').length<5)groundDrop(world,'forge',m.x+7,m.y+5,1).expires=world.time+lag(world,70);
  if(m.elite==='miniBoss'&&!m.riftGuardian||m.special||m.trial)groundDrop(world,'forge',m.x+43,m.y+8,1);
- // Baú azul comum (0,35% por abate, no máximo 4 no chão), como no solo: 1 bênção entre 3.
- if(!rare&&!m.trial&&rand(world)<.0035&&world.pickups.filter(o=>o.kind==='chest'&&o.amount===1).length<4)
+ // Baú azul comum: 0,15% por abate (era 0,35% até a V24 — "recompensa demais na run"), no máximo 4 no chão: 1 bênção entre 3.
+ if(!rare&&!m.trial&&rand(world)<.0015&&world.pickups.filter(o=>o.kind==='chest'&&o.amount===1).length<4)
   groundDrop(world,'chest',m.x-6,m.y+4,1).expires=world.time+lag(world,65);
  // MVP não solta baú de bênção: o prêmio dele é o tesouro de equipamento (como no solo).
  if(m.special)mazeGuardianDown(world,m,source);
- else if(rare&&!m.riftGuardian&&m.elite!=='mvp'){
+ // V24.1: os 2 guardas de cada fenda não soltam mais baú (eram 3 baús por fenda); o baú da fenda concluída continua.
+ else if(rare&&!m.riftGuardian&&m.elite!=='mvp'&&m.elite!=='riftGuard'){
    const box=groundDrop(world,'chest',m.x,m.y,m.elite==='mvp'?3:2);
    event(world,'chestDrop',{x:box.x,y:box.y,mvp:m.elite==='mvp'});
  }
@@ -1087,7 +1088,7 @@ function shareChest(world,grade,by){
  }
  event(world,'chestShared',{by:by.id,grade});
 }
-// V23.6: subir de nível ficou ~40% mais lento (menos escolhas em sequência).
+// V23.6: subir de nível ficou ~40% mais lento (menos escolhas em sequência). Mantido: as missões pedem nível 30 na run.
 const xpNeeded=level=>Math.ceil(26*D.pow(level,1.42));
 function giveExperience(world,amount){
  // XP is shared across the party, including anyone awaiting resurrection.
@@ -1203,7 +1204,9 @@ export function tickWorld(world,dt){
   if(now>=world.eliteAt&&!world.bossSpawned&&living.length){
    const index=world.fieldEvent++,roster=rosters[world.map]||rosters.sewer,id=roster[index%roster.length],commander=index===3;
    const target=living[index%living.length],e=spawn(world,id,{elite:commander?'miniBoss':'elite',near:target});
-   e.name=(commander?'Comandante ':'Veterano ')+(MONSTER_NAMES[id]||id);e.speed=Math.max(60,e.speed*.9);e.damage*=1.25;
+   // V24.1: elites de campo mais fortes (pedido: "elites muito fáceis"): +60% de HP (Comandante +90%), dano ×1,55 e sem a lentidão de antes.
+   e.hp=e.max=e.max*(commander?1.9:1.6);
+   e.name=(commander?'Comandante ':'Veterano ')+(MONSTER_NAMES[id]||id);e.speed=Math.max(60,e.speed*1.05);e.damage*=1.55;
    e.patterns=index%2?['line','circle']:['circle','summons'];e.attacks=index%2?['Investida do Comandante','Ruptura Circular']:['Ruptura Circular','Chamar Reforços'];e.patternAt=world.time+lag(world,3);
    event(world,'fieldElite',{name:e.name,uid:e.uid});
    world.eliteAt=world.fieldEvent<7?(world.fieldEvent+1)*90:Infinity;

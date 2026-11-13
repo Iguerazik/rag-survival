@@ -39,7 +39,7 @@ test('V23: SOLO no navegador roda o motor único (sala local), a 20 passos/s, e 
   assert.equal(await browser.evaluate('window.MidgardEngine.ok'),true,'motor carregou no navegador');
   const before=await browser.evaluate('JSON.stringify({j:journeyOf(selected),z:saved.zeny||0})').then(JSON.parse);
   await browser.evaluate("document.getElementById('start').click()");
-  // V23.6: o solo pausa enquanto a escolha de habilidade está aberta; o jogador do teste escolhe a 1ª opção.
+  // O jogador do teste escolhe a 1ª opção de habilidade sempre que aparece.
   await browser.evaluate("window.__pick=setInterval(()=>{const b=document.querySelector('#coop-server-upgrades:not([hidden]) button');if(b)b.click();},50)");
   await sleep(6000);
   const s=await browser.evaluate('({mode,local:run.local,auth:run.authoritative,coop:run.coop,kills:run.kills,steps:run.localRoom.steps,time:run.time,slots:[...run.localRoom.world.players.get("solo").slots],tree:document.getElementById("tree-button").hidden})');
@@ -47,11 +47,19 @@ test('V23: SOLO no navegador roda o motor único (sala local), a 20 passos/s, e 
   assert.equal(s.tree,true,'árvore fixa escondida dentro da run');
   assert.ok(s.kills>0,'matou monstros no solo ('+s.kills+')');
   assert.ok(s.steps>=80&&s.steps<=140,'cerca de 20 passos do motor por segundo ('+s.steps+' em ~6 s)');
-  // e a pausa funciona: com uma escolha aberta o motor não avança
-  await browser.evaluate("clearInterval(window.__pick);(()=>{const w=run.localRoom.world,p=w.players.get('solo');w.pickups.push({uid:'xp-pausa',kind:'xp',x:p.x,y:p.y,amount:p.needed+1});})()");
-  await sleep(800);const t0=await browser.evaluate('run.localRoom.world.time');await sleep(1000);
-  assert.equal(await browser.evaluate('run.localRoom.world.time'),t0,'solo pausado durante a escolha');
+  // V24.1: com uma escolha aberta a partida CONTINUA e o herói anda (pedido do jogador), como no online.
+  await browser.evaluate("clearInterval(window.__pick);(()=>{const w=run.localRoom.world,p=w.players.get('solo');w.pickups.push({uid:'xp-escolha',kind:'xp',x:p.x,y:p.y,amount:p.needed+1});})()");
+  await sleep(800);
   assert.equal(await browser.evaluate("document.getElementById('coop-server-upgrades').hidden"),false,'painel de escolha aberto');
+  const t0=await browser.evaluate('run.localRoom.world.time'),x0=await browser.evaluate("run.localRoom.world.players.get('solo').x");
+  await browser.send('Input.dispatchKeyEvent',{type:'keyDown',key:'d',code:'KeyD',windowsVirtualKeyCode:68});await sleep(1000);
+  await browser.send('Input.dispatchKeyEvent',{type:'keyUp',key:'d',code:'KeyD',windowsVirtualKeyCode:68});
+  assert.ok(await browser.evaluate('run.localRoom.world.time')>t0+.5,'o motor segue durante a escolha');
+  assert.ok(Math.abs(await browser.evaluate("run.localRoom.world.players.get('solo').x")-x0)>20,'o herói se move durante a escolha');
+  assert.equal(await browser.evaluate("document.getElementById('coop-server-upgrades').hidden"),false,'a escolha continua aberta até o jogador decidir');
+  // V24.1: trocar de aba/janela não pausa mais
+  await browser.evaluate("window.dispatchEvent(new Event('blur'))");await sleep(200);
+  assert.equal(await browser.evaluate('mode'),'play','perder o foco não pausa');
   await browser.evaluate("window.__pick=setInterval(()=>{const b=document.querySelector('#coop-server-upgrades:not([hidden]) button');if(b)b.click();},50)");
   assert.ok(s.slots.length>=1,'começa com a habilidade inicial do catálogo do RO');
   // Fim da partida: o motor decide (HP do jogador zera dentro do motor) e o navegador grava o progresso do solo.

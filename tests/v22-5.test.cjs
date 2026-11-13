@@ -54,7 +54,7 @@ test('V22.5: SP é gasto e recuperado; poção azul e subir de nível devolvem S
  a.sp=0;a.hp=b.hp=c.hp=20;a.cooldowns.heal=0;tickWorld(w,.05);assert.equal(casts(),before,'sem SP não cura');assert.ok(sp>0);
  b.sp=0;w.pickups.push({uid:'sp-1',kind:'sppotion',x:b.x,y:b.y,amount:35});tickWorld(w,.05);
  assert.ok(b.sp>=b.maxSp*.3,'poção azul recupera SP');
- b.sp=0;w.pickups.push({uid:'xp-1',kind:'xp',x:a.x,y:a.y,amount:30});tickWorld(w,.05);
+ b.sp=0;w.pickups.push({uid:'xp-1',kind:'xp',x:a.x,y:a.y,amount:a.needed+1});tickWorld(w,.05); // V24.1: EXP para subir 1 nível na curva nova
  assert.ok(b.sp>=b.maxSp*.25,'subir de nível devolve SP');
 });
 test('V22.5: horda por jogador — quem se afasta do grupo também recebe monstros, e cada um é alvo',async()=>{

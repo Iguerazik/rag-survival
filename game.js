@@ -796,7 +796,7 @@ function serverUpgradeChoices(offers,seq=0,pending=0){
  if(!el.hidden && el.dataset.offers===key)return;
  el.dataset.offers=key;el.hidden=false;el.replaceChildren();
  const title=document.createElement('strong');title.textContent='✦ Subiu de nível! Escolha uma habilidade'+(pending>1?' ('+pending+' escolhas)':'');el.append(title);
- const desc=document.createElement('small');desc.textContent=(run.local?'O jogo fica pausado até você escolher. ':'A partida continua. ')+'No máximo '+(onlineCatalog?.slots||5)+' habilidades ativas por run; passivas são livres.';el.append(desc);
+ const desc=document.createElement('small');desc.textContent='A partida continua: você pode se mover enquanto escolhe. '+'No máximo '+(onlineCatalog?.slots||5)+' habilidades ativas por run; passivas são livres.';el.append(desc);
  for(const offer of offers){
   const info=skillInfo(offer.id),name=info?.n||offer.name,passive=info?.k==='passive';
   // Etapa 3: runa de habilidade (Cadeia Rúnica, Propagação, Área Amplificada).
@@ -1382,8 +1382,13 @@ function pause() {
   if (mode === 'pause') return resume();
   if (mode !== 'play') return;
   mode = 'pause';
-  showDialog(run.inMvp ? 'ARENA DO MVP' : expeditions[run.map].name.toUpperCase(), 'Jogo pausado', 'A partida continua de onde você parou.', [
-    button('Continuar', 'primary', resume), button('Voltar ao menu', 'secondary', menu),
+  // V24.1: os ajustes das janelas da HUD saíram da tela de jogo e ficam aqui, na pausa.
+  const lock = $('hud-layout-lock'), locked = lock?.getAttribute('aria-pressed') === 'true';
+  showDialog(run.inMvp ? 'ARENA DO MVP' : expeditions[run.map].name.toUpperCase(), 'Jogo pausado', 'A partida continua de onde você parou. As janelas da tela (personagem, mapa, atalhos, música) podem ser arrastadas pelo título.', [
+    button('Continuar', 'primary', resume),
+    button('Restaurar posição das janelas', 'secondary', () => { $('hud-layout-reset')?.click(); resume(); }),
+    button(locked ? 'Destravar janelas' : 'Travar janelas', 'secondary', () => { lock?.click(); resume(); }),
+    button('Voltar ao menu', 'secondary', menu),
   ]);
 }
 // After an MVP falls the next expedition unlocks, and solo runs can travel straight on to it.
@@ -2527,13 +2532,29 @@ window.addEventListener('keyup', event=>{
   const move=Controls.moveKey(event);
   if(move)keys.delete(move);
 });
-window.addEventListener('blur', () => {
-  keys.clear();
-  if (mode === 'play' && !run.coop) pause();
-});
-document.addEventListener('visibilitychange', () => {
-  if (document.hidden && mode === 'play' && !run.coop) pause();
-});
+// V24.1: trocar de aba ou de janela NÃO pausa mais (só o Esc pausa). As teclas são soltas para o herói não andar sozinho.
+window.addEventListener('blur', () => { keys.clear(); clearPointer?.(); });
+document.addEventListener('visibilitychange', () => { keys.clear(); lastFrame = 0; backgroundTicker(document.hidden); });
+/* Com a aba escondida o navegador para o requestAnimationFrame; no solo, um relógio num Worker (que o navegador não
+   congela como os timers da página) continua avançando a partida a ~20 passos/s. O online roda no servidor. */
+let bgWorker = null, bgLast = 0;
+function backgroundTicker(on) {
+  if (!on) { bgWorker?.postMessage('stop'); return; }
+  try {
+    if (!bgWorker) {
+      const src = 'let t=0;onmessage=e=>{clearInterval(t);if(e.data==="start")t=setInterval(()=>postMessage(0),50);};';
+      bgWorker = new Worker(URL.createObjectURL(new Blob([src], { type: 'text/javascript' })));
+      bgWorker.onmessage = () => {
+        if (!document.hidden || mode !== 'play' || !run?.local) { bgLast = 0; return; }
+        const now = performance.now();
+        let dt = bgLast ? Math.min(.25, Math.max(0, (now - bgLast) / 1000)) : .05; bgLast = now;
+        try { while (dt > .0001 && mode === 'play') { const step = Math.min(.024, dt); tick(step); dt -= step; } }
+        catch (error) { console.error('[Midgard] Falha no passo em segundo plano:', error); }
+      };
+    }
+    bgLast = 0; bgWorker.postMessage('start');
+  } catch (error) { console.warn('[Midgard] Sem relógio em segundo plano:', error); }
+}
 window.addEventListener('resize', resize);
 $('minimap-toggle').addEventListener('click', () => {
   const toggle = $('minimap-toggle');
@@ -2877,6 +2898,29 @@ $('game-music-play').addEventListener('click',()=>BGM.toggleMusic());
 $('menu-track').addEventListener('change',event=>BGM.setMenuTrack(event.target.value));
 $('menu-music-launch').addEventListener('click',()=>{const box=$('menu-music-popover');box.hidden=!box.hidden;$('menu-music-launch').setAttribute('aria-expanded',String(!box.hidden));});
 $('music-popover-close').addEventListener('click',()=>{$('menu-music-popover').hidden=true;$('menu-music-launch').setAttribute('aria-expanded','false');});
+/* V24.1: o ♫ do painel de música da partida abre os mesmos ajustes do menu (faixa, volume, arquivos).
+   Arrastar o ♫ continua movendo o painel; só um clique (sem arrastar) abre/fecha os ajustes. */
+(()=>{
+ const caption=document.querySelector('#game-music-panel .ro-music-game-caption'),box=$('menu-music-popover');
+ if(!caption||!box)return;
+ const home=box.parentElement,homeNext=box.nextSibling;let down=null;
+ caption.setAttribute('role','button');caption.setAttribute('tabindex','0');caption.setAttribute('aria-controls','menu-music-popover');
+ caption.title='Clique para abrir os ajustes de música · arraste para mover o painel';
+ const dock=()=>{box.classList.remove('in-game');box.style.left=box.style.top=box.style.right='';if(box.parentElement!==home)home.insertBefore(box,homeNext);};
+ const toggle=()=>{
+  if(!box.hidden&&box.classList.contains('in-game')){box.hidden=true;dock();return;}
+  document.body.append(box);box.classList.add('in-game');box.hidden=false;
+  const r=$('game-music-panel').getBoundingClientRect(),w=box.offsetWidth,h=box.offsetHeight;
+  box.style.left=Math.max(8,Math.min(innerWidth-w-8,r.left))+'px';
+  box.style.top=Math.max(8,r.bottom+8+h>innerHeight?r.top-h-8:r.bottom+8)+'px';box.style.right='auto';
+ };
+ caption.addEventListener('pointerdown',e=>{down={x:e.clientX,y:e.clientY};});
+ caption.addEventListener('click',e=>{if(down&&Math.hypot(e.clientX-down.x,e.clientY-down.y)>5){down=null;return;}down=null;toggle();});
+ caption.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle();}});
+ $('music-popover-close').addEventListener('click',dock);
+ const observer=new MutationObserver(()=>{if(mode==='menu'&&box.classList.contains('in-game')){box.hidden=true;dock();}});
+ observer.observe(document.getElementById('menu'),{attributes:true,attributeFilter:['hidden','class','style']});
+})();
 $('menu-music-file').addEventListener('change',event=>{
   const file=event.currentTarget.files?.[0];
   if(!file)return;
