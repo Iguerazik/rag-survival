@@ -184,6 +184,14 @@ const Gear = (() => {
   const newItem = id => ({ uid: 'i' + (seq++).toString(36) + Math.floor(Math.random() * 1296).toString(36), id, cards: [], refine: 0, upgrades: {}, affixes:ItemQuality.roll(id) });
   const label = item => itemDb[item.id].name + (item.refine ? ' +' + item.refine : '') + (itemDb[item.id].slots ? ' [' + itemDb[item.id].slots + ']' : '');
 
+  /* V25.5: arma na mão esquerda (no espaço do escudo). Só Mercenário, Algoz e Sicário, como no Ragnarok,
+   * com adaga ou espada de uma mão; katar e armas de duas mãos ocupam as duas mãos. */
+  const OFFHAND_KINDS = new Set(['Adaga', 'Espada']);
+  function canOffhand(itemId, line, stage) {
+    const item = itemDb[itemId];
+    return !!item && item.type === 'weapon' && line === 'thief' && [1, 4, 5].includes(Number(stage)) &&
+      OFFHAND_KINDS.has(item.kind) && !item.twoHanded && !item.katar && canEquip(itemId, line, stage);
+  }
   function canEquip(itemId, line, stage) {
     const item = itemDb[itemId];
     if (!item) return false;
@@ -212,16 +220,19 @@ const Gear = (() => {
 
   // Sums weapon ATK, DEF, stat bonuses and every card compounded on the equipped items.
   function bonuses(gear) {
-    const totals = { str: 0, agi: 0, vit: 0, int: 0, dex: 0, luk: 0, flee: 0, weaponAtk: 0, weaponMatk: 0, itemDef: 0, itemMdef: 0, sp: 0, twoHanded: false, atkPct:0, spellPct:0, hpRegen:0, hpPct:0, speed:0, aspdPct:0 };
+    const totals = { str: 0, agi: 0, vit: 0, int: 0, dex: 0, luk: 0, flee: 0, weaponAtk: 0, weaponMatk: 0, offhandAtk: 0, itemDef: 0, itemMdef: 0, sp: 0, twoHanded: false, atkPct:0, spellPct:0, hpRegen:0, hpPct:0, speed:0, aspdPct:0 };
     const cardIds = [];
     for (const [slot, item] of Object.entries(gear)) {
       if (!item) continue;
       const data = itemDb[item.id];
       if (slot === 'shield' && gear.weapon && itemDb[gear.weapon.id]?.twoHanded) continue;
-      if (data.type === 'weapon') { totals.weaponAtk += data.atk; totals.weaponMatk += data.matk ?? 0; totals.twoHanded = !!data.twoHanded; }
+      // V25.5: arma da mão esquerda soma em offhandAtk; o motor aplica a perícia (35% + 6% por nível de Mão Esquerda).
+      if (slot === 'shield' && data.type === 'weapon') totals.offhandAtk += data.atk + (item.refine||0) * (3 + data.tier*2);
+      else if (data.type === 'weapon') { totals.weaponAtk += data.atk; totals.weaponMatk += data.matk ?? 0; totals.twoHanded = !!data.twoHanded; }
       totals.itemDef += (data.def ?? 0) + (data.type === 'weapon' ? 0 : (item.refine||0)*1.25);
-      totals.weaponAtk += data.type === 'weapon' ? (item.refine||0) * (3 + data.tier*2) : 0;
-      totals.weaponMatk += data.type === 'weapon' ? (item.refine||0) * (2 + data.tier) : 0;
+      const mainWeapon = data.type === 'weapon' && slot !== 'shield';
+      totals.weaponAtk += mainWeapon ? (item.refine||0) * (3 + data.tier*2) : 0;
+      totals.weaponMatk += mainWeapon ? (item.refine||0) * (2 + data.tier) : 0;
       totals.itemMdef += data.mdef ?? 0;
       totals.sp += data.sp ?? 0;
       totals.hpRegen += data.hpRegen||0;
@@ -248,7 +259,7 @@ const Gear = (() => {
     if(worn.has('tidalshoes')&&worn.has('woolscarf')){ totals.hpPct+=.10;setNames.push('Sapatos da Maré + Cachecol de Lã'); }
     const cards = Cards.bonuses(cardIds);
     for (const key of ['str', 'agi', 'vit', 'int', 'dex', 'luk']) cards[key] += totals[key];
-    return { ...cards, weaponAtk: totals.weaponAtk, weaponMatk: totals.weaponMatk, def: (cards.def ?? 0) + totals.itemDef,
+    return { ...cards, weaponAtk: totals.weaponAtk, weaponMatk: totals.weaponMatk, offhandAtk: totals.offhandAtk, def: (cards.def ?? 0) + totals.itemDef,
       mdef: totals.itemMdef, spFlat: totals.sp, twoHanded: totals.twoHanded, setNames, flee:(cards.flee||0)+setFlee+totals.flee,
       atkPct:totals.atkPct, spellPct:totals.spellPct, hpRegen:totals.hpRegen+(cards.hpRegen||0),
       hpPct:totals.hpPct+(cards.hpPct||0), speed:totals.speed+(cards.speed||0), aspdPct:totals.aspdPct+(cards.aspdPct||0) };
@@ -271,13 +282,16 @@ const Gear = (() => {
         .map(([slot, uid]) => [slot, Array.isArray(list) ? list.find(item => item && item.uid === uid) : null]);
     for (const [slot, raw] of pairs) {
       const info = gearSlots[slot], data = raw && itemDb[raw.id];
-      if (!info || !data || data.type !== info.type || !canEquip(raw.id, line, stage)) continue;
+      const offhand = slot === 'shield' && data && data.type === 'weapon';
+      if (!info || !data || (offhand ? !canOffhand(raw.id, line, stage) : data.type !== info.type || !canEquip(raw.id, line, stage))) continue;
       const cards = (Array.isArray(raw.cards) ? raw.cards : [])
         .filter(id => typeof cardDb !== 'undefined' && cardDb[id] && cardDb[id].slot === data.type).slice(0, data.slots);
       out[slot] = { uid: String(raw.uid || slot), id: raw.id, refine: whole(raw.refine, 0, MAX_REFINE), cards,
         upgrades: cleanLevels(raw.upgrades), affixes: cleanLevels(raw.affixes) };
     }
     if (out.shield && out.weapon && itemDb[out.weapon.id].twoHanded) delete out.shield;
+    // O mesmo item não pode estar nas duas mãos.
+    if (out.shield && out.weapon && out.shield.uid === out.weapon.uid) delete out.shield;
     // Sem arma equipada, vale a arma inicial da classe (personagem nunca fica com ATK 0).
     const starter = starterGear[line]?.[0];
     if (!out.weapon && starter && canEquip(starter, line, stage)) out.weapon = { uid: 'starter', id: starter, refine: 0, cards: [], upgrades: {}, affixes: {} };
@@ -309,7 +323,7 @@ const Gear = (() => {
     const num = v => Number.isFinite(Number(v)) ? Number(v) : 0;
     const out = { drains: (b.drains || []).map(([c, s]) => [num(c), num(s)]) };
     for (const key of ['str', 'agi', 'vit', 'int', 'dex', 'luk', 'crit', 'hit', 'flee', 'perfectDodge', 'def', 'mdef', 'weaponAtk', 'weaponMatk',
-      'spFlat', 'spPct', 'spRegen', 'hpPct', 'hpRegen', 'atkPct', 'spellPct', 'speed', 'aspdPct', 'autoBash', 'doubleAttack', 'vsWater',
+      'offhandAtk', 'spFlat', 'spPct', 'spRegen', 'hpPct', 'hpRegen', 'atkPct', 'spellPct', 'speed', 'aspdPct', 'autoBash', 'doubleAttack', 'vsWater',
       'earthResist', 'zeny', 'spCost']) out[key] = num(b[key]);
     for (const key of ['splash', 'magicImmune', 'stunImmune', 'endure']) out[key] = !!b[key];
     out.cards = (b.ids || []).slice(0, 16);
@@ -405,5 +419,5 @@ const Gear = (() => {
     ctx.restore();
   }
 
-  return { newItem, label, canEquip, slotFor, describe, bonuses, equipped, engineBonuses, grantItem, MAX_REFINE, roll, rollChoices, sprite, trainingGear, drawChest };
+  return { newItem, label, canEquip, canOffhand, slotFor, describe, bonuses, equipped, engineBonuses, grantItem, MAX_REFINE, roll, rollChoices, sprite, trainingGear, drawChest };
 })();

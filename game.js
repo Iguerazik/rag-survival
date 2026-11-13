@@ -420,7 +420,8 @@ function equipmentWindow(profile) {
     cell.dataset.filled = String(!!item && !blocked);
     if (blocked) cell.disabled = true;
     const sockets = item ? Array.from({ length: itemDb[item.id].slots }, (_, i) => item.cards[i] ? '◆' : '◇').join('') : '';
-    cell.innerHTML = '<span><small>' + info.name + '</small><strong>' + (blocked ? 'Arma de duas mãos' : item ? Gear.label(item) : 'Vazio') +
+    const slotName = slot === 'shield' && item && itemDb[item.id].type === 'weapon' ? 'Mão esquerda' : slot === 'shield' && selected === 'thief' && [1, 4, 5].includes(profile.stage) ? 'Escudo / Mão esq.' : info.name;
+    cell.innerHTML = '<span><small>' + slotName + '</small><strong>' + (blocked ? 'Arma de duas mãos' : item ? Gear.label(item) : 'Vazio') +
       '</strong>' + (item && !blocked ? '<em>' + sockets + (item.cards.length ? ' ' + item.cards.map(id => cardDb[id].name.replace('Carta ', '')).join(', ') : '') + '</em>' : '') + '</span>';
     grid.append(cell);
   }
@@ -461,8 +462,10 @@ function openGearDialog(slot, picking = false) {
   const profile = journeyOf();
   const gear = gearOf(profile);
   const current = gear[slot];
-  const type = gearSlots[slot].type;
-  $('card-dialog-title').textContent = 'Equipamento · ' + gearSlots[slot].name;
+  // V25.5: no espaço do escudo, Mercenário/Algoz/Sicário também podem usar adaga ou espada (mão esquerda).
+  const dual = slot === 'shield' && [1, 4, 5].includes(profile.stage) && selected === 'thief';
+  const type = current ? itemDb[current.id].type : gearSlots[slot].type;
+  $('card-dialog-title').textContent = 'Equipamento · ' + (dual ? 'Escudo ou arma da mão esquerda' : gearSlots[slot].name);
   $('card-dialog-note').textContent = current ? Gear.describe(current.id) : 'Nada equipado neste espaço. Os baús que caem dos monstros trazem novos itens.';
   const nodes = [];
   if (current) {
@@ -522,13 +525,14 @@ function openGearDialog(slot, picking = false) {
       }
     }
   }
-  const options = items().filter(item => itemDb[item.id].type === type && item.uid !== current?.uid);
+  const options = items().filter(item => (itemDb[item.id].type === gearSlots[slot].type || dual && Gear.canOffhand(item.id, selected, profile.stage)) && item.uid !== current?.uid && item.uid !== (slot === 'shield' ? profile.gear?.weapon : null));
   const heading = document.createElement('h3');
   heading.className = 'gear-heading';
   heading.textContent = options.length ? 'Inventário' : 'Nenhum outro item deste tipo no inventário.';
   nodes.push(heading);
   for (const item of options) {
-    const allowed = Gear.canEquip(item.id, selected, profile.stage);
+    const offhand = slot === 'shield' && itemDb[item.id].type === 'weapon';
+    const allowed = offhand ? Gear.canOffhand(item.id, selected, profile.stage) && !itemDb[gear.weapon?.id]?.twoHanded : Gear.canEquip(item.id, selected, profile.stage);
     const owner = equippedBy(item.uid);
     const entry = button('', 'card-entry gear-entry', () => {
       if (!allowed) return;

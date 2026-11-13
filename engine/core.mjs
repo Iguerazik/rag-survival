@@ -220,7 +220,7 @@ function aspdOf(job,agi,dex){
 }
 /** Bônus de equipamento + cartas (Gear.engineBonuses, items.js) com cada número saneado e limitado. */
 const GEAR_LIMITS={str:[-20,60],agi:[-20,60],vit:[-20,60],int:[-20,60],dex:[-20,60],luk:[-20,60],crit:[-20,60],hit:[-60,120],flee:[-60,120],
- perfectDodge:[0,40],def:[0,200],mdef:[0,200],weaponAtk:[0,600],weaponMatk:[0,400],spFlat:[0,200],spPct:[-.5,1],spRegen:[0,1],hpPct:[-.5,1],
+ perfectDodge:[0,40],def:[0,200],mdef:[0,200],weaponAtk:[0,600],weaponMatk:[0,400],offhandAtk:[0,400],spFlat:[0,200],spPct:[-.5,1],spRegen:[0,1],hpPct:[-.5,1],
  hpRegen:[0,20],atkPct:[0,2],spellPct:[0,2],speed:[0,.5],aspdPct:[0,1],autoBash:[0,.5],doubleAttack:[0,10],vsWater:[0,1],earthResist:[0,.9],
  zeny:[0,.2],spCost:[.25,4]};
 export function cleanGear(raw){
@@ -253,6 +253,10 @@ export function deriveCharacter(job,character,extra=null){
  const statusMatk=Math.floor(lv/4+s.int+s.int/2+s.dex/5+s.luk/3);
  const weaponAtk=hasGear?g.weaponAtk:25,weaponMatk=hasGear?g.weaponMatk:15;
  const physical=D.pow(Math.max(1,statusAtk*2+weaponAtk+Math.floor(weaponAtk*main*.005))/27,.55)*(1+g.atkPct);
+ // V25.5: arma da mão esquerda (Mercenário/Algoz/Sicário). dualGain = quanto o dano físico subiria com o ATK das duas armas;
+ // na run vale 35% + 6% por nível de Perícia com Mão Esquerda (65% no nível 5), como a mão esquerda do Ragnarok.
+ const off=hasGear&&!magic&&job==='thief'?g.offhandAtk:0;
+ const dualGain=off>0?D.pow(Math.max(1,statusAtk*2+weaponAtk+off+Math.floor((weaponAtk+off)*main*.005))/27,.55)*(1+g.atkPct)/physical-1:0;
  const magical=D.pow(Math.max(1,statusMatk+weaponMatk)/17,.55)*(1+g.spellPct);
  const stage=int(c.stage,0,5,0),softDef=Math.floor(s.vit/2+s.agi/5+lv/2),hardDef=g.def,trans=stage>=2?1.25:1;
  // V23: SOR/AGI/DES seguem a regra do solo (status.js): HIT, FLEE, Esquiva Perfeita e CRIT em pontos (%).
@@ -265,7 +269,7 @@ export function deriveCharacter(job,character,extra=null){
   // DEF do status.js: DEF macia (VIT/AGI/nível) e DEF dura (equipamento) se combinam.
   def:1-(1-softDef/(softDef+120))*(1-hardDef/(hardDef+60)),mdef:(softMdef+g.mdef)/(softMdef+g.mdef+150),
   regen:(Math.max(1,s.vit/5)-1)*.05+g.hpRegen,spRegen:(1+Math.floor(s.int/6)*.1)*(1+g.spRegen),speed:g.speed,
-  cdr:magic?Math.min(.3,(s.dex*2+s.int-3)/530*.5):0,gear:g};
+  cdr:magic?Math.min(.3,(s.dex*2+s.int-3)/530*.5):0,dualGain,gear:g};
 }
 export function addPlayer(world,member){
  const map=maps[world.map],job=validJob(member.profile?.job);const [hp,speed,damage,range,rate]=jobStat[job];
@@ -540,6 +544,11 @@ const dmgBonus=p=>(1+p.modifiers.damage)*(1+p.st.dmg+(p.hp<p.max*.25?p.st.lowhp:
 function refreshStats(world,p){
  const st=ZERO_STATS();
  for(const [id,level] of Object.entries(p.skills)){const def=SK[id];if(def?.k!=='passive')continue;for(const [k,v] of Object.entries(def.stats))st[k]=(st[k]||0)+v*level;}
+ // V25.5: duas armas. Com a segunda arma o dano sobe (perícia da mão esquerda melhora a fração);
+ // sem ela (e sem katar), a Perícia com Mão Esquerda vale só metade do golpe duplo.
+ const left=p.skills.lefthand||0;
+ if(p.base.dualGain>0)st.dmg+=p.base.dualGain*(.35+.06*left);
+ else if(left&&!ITEMS[p.base.gear.slots?.weapon]?.katar)st.dbl-=SK.lefthand.stats.dbl*left/2; // katar ocupa as duas mãos: vale inteira
  for(const [id,buff] of p.buffs){
   if(buff.until<=world.time){p.buffs.delete(id);continue;}
   for(const [k,v] of Object.entries(buff.stats))if(k!=='shield')st[k]=(st[k]||0)+v;

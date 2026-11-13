@@ -175,7 +175,7 @@ const thief = {
  second: [
   add('katar','Perícia com Katar',10,'passive','Passiva: +3% de dano e +1% de crítico por nível.',{stats:{dmg:.03,crit:.01},ic:'mastery'}),
   add('righthand','Perícia com Mão Direita',5,'passive','Passiva: +4% de dano por nível.',{stats:{dmg:.04},ic:'mastery'}),
-  add('lefthand','Perícia com Mão Esquerda',5,'passive','Passiva: +4% de chance por nível de golpear duas vezes.',{stats:{dbl:.04},ic:'doubleattack'}),
+  add('lefthand','Perícia com Mão Esquerda',5,'passive','Passiva: +4% de golpe duplo por nível. Com adaga ou espada na mão esquerda, a 2ª arma soma ao dano (35% + 6% por nível). Sem 2ª arma nem katar, o golpe duplo vale metade.',{stats:{dbl:.04},ic:'doubleattack'}),
   add('sonicblow','Lâminas Destruidoras',10,'melee','Oito golpes seguidos em um alvo, com chance de atordoar.',{r:127,cd:3.2,m:2.6,st:{stun:[.1,.02,1.2]},ic:'sonicblow',fx:'sonicblow'}),
   add('grimtooth','Tocaia',5,'area','Espinhos surgem sob um grupo de inimigos distante.',{r:260,rad:87,cd:3.3,m:1.5,ic:'grimtooth',fx:'grimtooth'}),
   add('cloaking','Furtividade',10,'buff','Fica invisível e mais rápido por alguns segundos.',{cd:16,dur:2.5,durLv:.25,stats:{hidden:[1,0],speed:[.15,0]},ic:'playdead',fx:'playdead'}),
