@@ -73,6 +73,9 @@ const mapTier=world=>Math.max(0,MAP_ORDER.indexOf(world.map));
 // HP dos monstros cresce com o tempo do mapa (suave no começo, forte no fim) para acompanhar o nível da run.
 const hordeGrowth=world=>{const m=clock(world)/60;return 1+m*.14+m*m*.02;};
 const teamDamageScale=count=>1+Math.max(0,count-1)*.09;
+/* V24.1 · MODO INFINITO: depois do MVP a run continua no mesmo mapa até todos caírem (ou alguém encerrar).
+   Hordas MUITO maiores, chegando mais rápido, e EXP de abate multiplicada. A vitória do MVP já fica garantida. */
+const ENDLESS={xp:2.5,quota:2.2,quotaCap:260,cap:420,capPerPlayer:70,batch:18,interval:.45};
 export const REVIVE_SECONDS=2.8;
 export const REVIVE_RADIUS=66;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -185,6 +188,7 @@ export function makeWorld(mapId='sewer',difficulty='easy',members=[],opts={}){
   mapStart:0,mvpActive:false,portal:null,rift:null,arena:false,mazeEvent:null,
   pathFields:new Map(),pendingEffects:[],riftPortal:null,nextRiftAt:180,riftSeq:0,riftKills:0,pausedTime:0,riftsDone:0,pruneAt:2,zones:[],zoneSeq:0,contract:null,nextMagnetAt:55,magnetSeq:0,trials:[]};
  if(opts.timerGrid>0)world.timerGrid=Number(opts.timerGrid);
+ if(opts.endless===false)world.endlessMode=false;
  world.contract={stage:0,charge:0,node:null,eliteKills:0,goal:2,done:false,route:null,auto:0,pauseUntil:0};
  // Etapa 5: cronogramas do solo (elites de campo a cada 90 s, fendas pelo encounters.js, itens a cada 65 s).
  world.eliteAt=90;world.fieldEvent=0;world.riftIndex=0;world.nextRiftAt=RIFT_SCHEDULE[0]?.time??Infinity;world.nextMagnetAt=55;
@@ -298,6 +302,7 @@ export function command(world,id,raw){
  if(skillSeq>p.skillSeq && skill){p.input.skill=skill;p.skillSeq=skillSeq;}
  p.input.dx=dx;p.input.dy=dy;p.input.attack=raw.attack!==false; // Ressurreição é calculada pela proximidade no servidor.
  p.input.auto=raw.auto===true;
+ if(raw.endRun===true&&world.endless)world.endRequested=true; // V24.1: qualquer jogador encerra o modo infinito (todos recebem as recompensas)
  const mv=raw.mv&&typeof raw.mv==='object'?raw.mv:null;
  if(mv)acceptMove(world,p,mv);
  if(Number.isSafeInteger(raw.riftEnter)&&raw.riftEnter>p.riftEnterSeq){p.riftEnterSeq=raw.riftEnter;interact(world,p);}
@@ -412,7 +417,7 @@ function defeated(world,m,source){
  world.kills++;source.kills++;
  const zenyChance=(source.base?.gear?.zeny||0)+(source.runBonus?.zeny||0); // Carta Cãibra + Bolso de Poring/Destino Afortunado
  if(zenyChance&&rand(world)<zenyChance){const gain=1+Math.floor(rand(world)*500);source.zeny+=gain;event(world,'cardZeny',{player:source.id,amount:gain,x:Math.round(m.x),y:Math.round(m.y)});}
- const rare=!!m.elite,amount=m.xp*(1+clock(world)/900)+(rare?12:0);
+ const rare=!!m.elite,amount=(m.xp*(1+clock(world)/900)+(rare?12:0))*(world.endless?ENDLESS.xp:1);
  groundDrop(world,'xp',m.x,m.y,Math.round(amount));
  // Drops do solo: Zeny em 55% dos abates (2 a 5+6×mapa), poção vermelha em 4,5% (sem poção azul).
  if(rand(world)<.55||rare)groundDrop(world,'zeny',m.x+8,m.y,(2+Math.floor(rand(world)*(4+mapTier(world)*6)))*(rare?5:1));
@@ -1167,8 +1172,9 @@ export function tickWorld(world,dt){
    if(living.length)world.mobs=world.mobs.filter(m=>m.elite||m.dead||living.some(p=>Math.abs(m.x-p.x)<1350&&Math.abs(m.y-p.y)<1100));
   }
   if(world.spawnAt<=0&&living.length){
-   const quotaBase=Math.min(115,6+minutes*10.5+minutes*minutes*.32)/scale[2]; // não reduzir a horda durante o MVP
-   const cap=Math.min(280,85+players.length*45); // limite dinâmico para solo e grupos
+   const raw=6+minutes*10.5+minutes*minutes*.32,E=world.endless;
+   const quotaBase=(E?Math.min(ENDLESS.quotaCap,raw*ENDLESS.quota):Math.min(115,raw))/scale[2]; // não reduzir a horda durante o MVP
+   const cap=E?Math.min(ENDLESS.cap+players.length*ENDLESS.capPerPlayer,ENDLESS.cap*2):Math.min(280,85+players.length*45); // limite dinâmico para solo e grupos
    let chosen=null,deficit=0;
    for(const p of living){
     const friends=living.reduce((n,a)=>n+(a!==p&&distance(a,p)<520?1:0),0);
@@ -1178,9 +1184,9 @@ export function tickWorld(world,dt){
    }
    if(chosen&&common.length<cap){
     const roster=rosters[world.map]||rosters.sewer;
-    const batch=Math.min(Math.ceil(deficit),cap-common.length,2+Math.floor(minutes/1.1),10);
+    const batch=Math.min(Math.ceil(deficit),cap-common.length,2+Math.floor(minutes/1.1),E?ENDLESS.batch:10);
     for(let n=0;n<batch;n++)spawn(world,roster[Math.floor(random(world,0,roster.length))],{near:chosen});
-    world.spawnAt=lag(world,Math.max(.11,(.72-minutes*.065))*scale[2]/(1+(living.length-1)*.5));
+    world.spawnAt=lag(world,Math.max(.11,(.72-minutes*.065))*scale[2]/(1+(living.length-1)*.5)*(E?ENDLESS.interval:1));
    }else world.spawnAt=lag(world,.2);
   }
   tickContract(world,dt,living);
@@ -1250,7 +1256,17 @@ export function tickWorld(world,dt){
  if(world.arena&&world.rift)tickRift(world);
  if(world.mvpArena)tickMvpArena(world);
  if(world.finished)return;
- if([...world.players.values()].every(p=>p.hp<=0)){world.phase='loss';world.finished=true;event(world,'defeat');}
+ if(world.endless&&world.endRequested){endEndless(world,'stop');return;}
+ if([...world.players.values()].every(p=>p.hp<=0)){
+  if(world.endless){endEndless(world,'fallen');return;}
+  world.phase='loss';world.finished=true;event(world,'defeat');
+ }
+}
+/** Fim do modo infinito: a run termina como VITÓRIA (o MVP já tinha caído), com o tempo sobrevivido. */
+function endEndless(world,reason){
+ world.finished=true;world.phase='win';world.won=true;
+ event(world,'endlessEnd',{reason,seconds:Math.round(world.time-world.endless.start)});
+ event(world,'victory',{boss:world.endless.boss,endless:true});
 }
 const TRIAL_NAMES={sword:['Cavaleiro da Provação','Guardião das Runas'],mage:['Conjurador de Geffen','Sentinela Elemental'],archer:['Caçador da Guilda','Lobo do Desafio'],
  acolyte:['Discípulo da Luz','Protetor de Yggdrasil'],merchant:['Ferreiro da Prova','Autômato da Forja'],thief:['Sombra da Guilda','Executor da Meia-noite']};
@@ -1479,7 +1495,13 @@ function tickMvpArena(world){
   }
   world.pickups=world.pickups.filter(o=>o.kind!=='card');
   for(const p of world.players.values()){const gear=p.rewardChoices.find(o=>o.stat==='gear');if(gear&&!p.mvpItem)chooseGear(world,p,gear);}
-  world.won=true;world.finished=true;world.phase='win';event(world,'victory',{boss:bosses[world.map]});
+  world.won=true;
+  if(world.endlessMode===false){world.finished=true;world.phase='win';event(world,'victory',{boss:bosses[world.map]});}
+  else{
+   // V24.1: MVP vencido → modo infinito no mesmo mapa (a vitória já conta; a run termina quando todos caírem ou alguém encerrar).
+   world.mvpArena=null;world.mvpActive=false;world.endless={start:world.time,boss:bosses[world.map]}; // phase continua 'play'
+   world.spawnAt=lag(world,1.5);event(world,'endlessStart',{boss:bosses[world.map],xp:ENDLESS.xp});
+  }
  }
 }
 /** Tesouro do MVP: 4 equipamentos da classe (Gear.rollChoices do solo, com o sorteio do mundo). */
@@ -1643,7 +1665,7 @@ export function snapshotWorld(world,id,sinceEvent=0,opts={}){
  const now=clock(world),r=world.rift;
  const snap={authoritative:true,id:world.id,map:world.map,difficulty:world.difficulty,phase:world.phase,time:Math.round(now*100)/100,
    simTime:Math.round(world.time*1000)/1000,mapStart:Math.round((world.time-now)*1000)/1000,
-   wave:world.wave,kills:world.kills,arena:!!world.arena,portal:null,mvpActive:world.mvpActive,
+   wave:world.wave,kills:world.kills,arena:!!world.arena,portal:null,mvpActive:world.mvpActive,endless:world.endless?Math.round(world.time-world.endless.start):null,
    rift:r?{active:true,index:r.index,left:Math.max(0,Math.round(((r.cleared?r.autoLeave:r.ends)-world.time)*10)/10),ward:r.ward,phase:r.phase,uid:r.guardian,mvp:!!r.mvp,exit:r.cleared?r.exit:null}:null,
    riftPortal:world.riftPortal,mvpPortal:world.mvpPortal||null,mvpArena:!!world.mvpArena,mvpDefeated:!!world.mvpDefeated,maze:world.maze?{active:world.maze.active,defeated:world.maze.defeated,room:world.maze.room}:null,contract:world.arena?null:{route:world.contract.route,stage:world.contract.stage,charge:Math.round(world.contract.charge*10)/10,node:world.contract.node,eliteKills:world.contract.eliteKills,goal:world.contract.goal,done:world.contract.done},reviveSeconds:REVIVE_SECONDS,reviveRadius:REVIVE_RADIUS,
    chests:[],ack:{},mazeEvent:null,self:pview,events:world.events.filter(e=>e.seq>sinceEvent).slice(-48),lastEvent:world.lastEvent,

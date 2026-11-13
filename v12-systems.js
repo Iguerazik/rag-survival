@@ -46,7 +46,8 @@ const ZonePressure=(()=>{
  return {tick,guardianHp,fieldElite};
 })();
 const ProgressionGoals=(()=>{
- const levels=[30,45,15,40,60];
+ // V24.1: meta de nível de run no máximo 30 em cada classe (com o modo infinito pós-MVP, 30 é alcançável).
+ const levels=[30,30,15,30,30];
  function canAdvance(p){const r=p.runRecords?.[p.stage]||{};return (r.bestLevel||0)>=(levels[p.stage]||0)&&(p.stage!==4||(r.rifts||0)>=2);}
  function record(level=0,rift=false){if(!run?.career)return;const profile=journeyOf(run.line);if(profile.stage!==run.journey.stage)return;const old=profile.runRecords?.[profile.stage]||{};const next={bestLevel:Math.max(old.bestLevel||0,level),rifts:(old.rifts||0)+(rift?1:0)};if(next.bestLevel===old.bestLevel&&next.rifts===old.rifts)return;const records={...profile.runRecords,[profile.stage]:next};saveJourney(run.line,{...profile,runRecords:records});run.journey={...run.journey,runRecords:records};}
  function text(p){const r=p.runRecords?.[p.stage]||{};return 'Melhor nível de run nesta classe: '+(r.bestLevel||0)+'/'+(levels[p.stage]||'—')+(p.stage===4?' · Fendas vencidas na transclasse: '+(r.rifts||0)+'/2':'');}

@@ -108,7 +108,7 @@ test('V23 Etapa 4: ataques com aviso no chão (círculo, anel, linha, investida,
  assert.equal(bug.id,'goldenbug');assert.ok(summoned>=2,'Convocar Besouros chama ajudantes ('+summoned+')');
 });
 
-test('V23 Etapa 4: tesouro do MVP — 4 equipamentos da classe, escolha de cada um, fim da expedição',async()=>{
+test('V23 Etapa 4: tesouro do MVP — 4 equipamentos da classe, escolha de cada um, modo infinito e fim da expedição',async()=>{
  const core=await engine();
  const w=core.makeWorld('maze','normal',[member('a','sword'),member('b','mage')],{seed:6});toMvp(core,w);
  const a=w.players.get('a'),b=w.players.get('b');
@@ -127,12 +127,18 @@ test('V23 Etapa 4: tesouro do MVP — 4 equipamentos da classe, escolha de cada 
  const pick=a.rewardChoices[1];core.command(w,'a',{reward:{seq:2,id:pick.id}});core.tickWorld(w,.05);
  assert.deepEqual(a.mvpItem,{id:pick.id,affixes:pick.affixes});assert.ok(!w.finished,'espera o outro jogador');
  core.command(w,'b',{reward:{seq:1,id:'skip'}});core.tickWorld(w,.05);
- assert.equal(w.finished,true);assert.equal(w.won,true);assert.equal(w.phase,'win');assert.equal(b.mvpItem,undefined);
+ // V24.1: depois do tesouro começa o MODO INFINITO (a vitória já conta); qualquer jogador pode encerrar a run.
+ assert.equal(w.won,true);assert.ok(w.endless,'modo infinito ativo');assert.equal(w.finished,false);assert.equal(b.mvpItem,undefined);
+ assert.ok(w.events.some(e=>e.type==='endlessStart'));
+ core.command(w,'b',{endRun:true});core.tickWorld(w,.05);
+ assert.equal(w.finished,true);assert.equal(w.won,true);assert.equal(w.phase,'win');assert.ok(w.events.some(e=>e.type==='endlessEnd'&&e.reason==='stop'));
  assert.ok(a.cards.includes('baphomet')||b.cards.includes('baphomet'),'carta do chão vai para alguém antes de encerrar');
  // Sem escolha em 25 s: leva a 1ª opção.
  const w2=core.makeWorld('maze','normal',[member('c','thief')],{seed:7});toMvp(core,w2);const c=w2.players.get('c');
  const boss2=w2.mobs.find(m=>m.elite==='mvp');core.testing.defeated(w2,boss2,c);boss2.hp=0;const first=c.rewardChoices[0].id;
- w2.time+=25.1;core.tickWorld(w2,.05);assert.equal(w2.finished,true);assert.equal(c.mvpItem.id,first);
+ w2.time+=25.1;core.tickWorld(w2,.05);assert.ok(w2.endless&&!w2.finished);assert.equal(c.mvpItem.id,first);
+ // no infinito, se todos caem a run termina como VITÓRIA (o MVP já tinha caído)
+ c.hp=0;c.reviveAt=Infinity;core.tickWorld(w2,.05);assert.equal(w2.finished,true);assert.equal(w2.won,true);assert.equal(w2.phase,'win');
 });
 
 test('V23 Etapa 4: item do tesouro vai para o inventário com a regra do solo (novo, repetido vira refino, +8 vira Zeny)',()=>{
@@ -178,4 +184,18 @@ test('V23 Etapa 4: a tela desenha avisos do motor, usa portais só com E e mostr
  assert.match(game,/Controls\.matches\(event,'portal'\) && nearbyPortal\(\)/);
  assert.match(game,/function nearbyPortal\(\)/);
  assert.match(read('server.mjs'),/item:room\.world\.won\?p\.mvpItem\|\|null:null/);
+});
+
+test('V24.1: modo infinito pós-MVP — EXP ×2,5, hordas maiores e mais densas',async()=>{
+ const core=await engine();
+ const make=endless=>{const w=core.makeWorld('sewer','normal',[member('a','sword')],{seed:11});w.nextRiftAt=1e9;w.eliteAt=1e9;w.trials=[];w.mobs=[];w.time=600;
+  if(endless){w.won=true;w.mvpDefeated=true;w.endless={start:590,boss:'x'};}return w;};
+ const xpOf=w=>{const a=w.players.get('a');core.testing.spawn(w,'poring',{x:a.x+40,y:a.y});const m=w.mobs.at(-1);
+  const before=w.pickups.length;core.testing.defeated(w,m,a);return w.pickups.slice(before).filter(o=>o.kind==='xp').reduce((s,o)=>s+o.amount,0);};
+ const base=xpOf(make(false)),inf=xpOf(make(true));
+ assert.ok(base>0,'mob comum dá EXP');assert.ok(inf/base>=2&&inf/base<=3,'EXP ×2,5 no infinito ('+base+' → '+inf+')');
+ // mais monstros na tela: mesma janela de 20 s, com e sem infinito
+ const count=endless=>{const w=make(endless);const a=w.players.get('a');a.hp=a.max=1e9;w.spawnAt=w.time;for(let i=0;i<400;i++)core.tickWorld(w,.05);return w.mobs.filter(m=>m.hp>0).length;};
+ const normal=count(false),more=count(true);
+ assert.ok(more>=normal*2,'hordas bem maiores no infinito ('+normal+' → '+more+')');
 });

@@ -4,6 +4,7 @@
  * Só funciona com a variável ADMIN_TOKEN definida (24+ caracteres). Sem ela, as rotas respondem 404.
  *   GET  /api/admin/backup   → baixa uma cópia consistente de midgard.sqlite (VACUUM INTO)
  *   GET  /api/admin/status   → contagens (contas, progresso…) e tamanho do volume, sem dados pessoais
+ *   POST /api/admin/delete-accounts {usernames:[…]} → apaga contas (e progresso/recordes delas)
  *   POST /api/admin/restore  → envia um midgard.sqlite; o servidor valida, guarda o banco atual em
  *                              DATA_DIR/backups/ e reinicia para trocar o arquivo (somente sem partida em andamento)
  * Cabeçalho obrigatório: Authorization: Bearer <ADMIN_TOKEN>
@@ -85,6 +86,14 @@ export function adminRoutes({ dataDir, accounts, send, canRestart }) {
         res.end(bytes);
       } finally { fs.rmSync(tmp, { force: true }); }
       return;
+    }
+    if (pathname === '/api/admin/delete-accounts' && req.method === 'POST') {
+      let raw = '';
+      for await (const chunk of req) { raw += chunk; if (raw.length > 8192) return send(res, 413, { error: 'Pedido grande demais' }); }
+      let body = null; try { body = JSON.parse(raw || '{}'); } catch { return send(res, 400, { error: 'JSON inválido' }); }
+      const result = accounts.removeAccounts(body?.usernames);
+      console.log(`Admin: ${result.removed} conta(s) removida(s).`);
+      return send(res, 200, result);
     }
     if (pathname === '/api/admin/restore' && req.method === 'POST') {
       if (!canRestart()) return send(res, 409, { error: 'Há partida em andamento. Tente quando todos estiverem no lobby.' });

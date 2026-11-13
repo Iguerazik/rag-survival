@@ -57,6 +57,15 @@ Configuração central em `items.js` → `RefineRules` (chances, chance de quebr
 Com conta, o **servidor** sorteia e grava (`POST /api/account/refine`, transação SQLite com `requestId` contra repetição);
 sem conta, o navegador usa as mesmas regras. Detalhes e tabela: `docs/FORJA.md`.
 
+## Modo infinito (pós-MVP)
+
+Depois que o MVP do mapa cai e o tesouro é escolhido, a partida **não termina**: começa o modo infinito.
+
+- A vitória já conta (campanha, recordes e item do tesouro ficam garantidos).
+- EXP dos monstros ×2,5, muito mais hordas na tela (até 420 + 70 por jogador) e reforços mais rápidos.
+- A run termina quando o jogador escolhe **Esc → Encerrar run e receber recompensas** (no co-op, qualquer jogador encerra para o grupo) ou quando todos caem — nos dois casos como vitória.
+- As metas de nível de run das mudanças de classe agora são no máximo 30 (`ProgressionGoals.levels` em `v12-systems.js`). Em simulação, um personagem que sobrevive chega ao nível 30 entre 20 e 25 minutos de partida.
+
 ## Requisitos
 
 - Node.js **22.13 ou superior** (`node -v`)
