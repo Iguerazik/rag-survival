@@ -63,7 +63,7 @@ const isActive=id=>!!SK[id]&&SK[id].k!=='passive';
 const classStage=classId=>{for(const list of Object.values(catalog.classes)){const i=list.indexOf(classId);if(i>=0)return i;}return 0;};
 function skillPool(job,stage){const line=catalog.lines[job]||catalog.lines.sword;return (catalog.stages[stage]||catalog.stages[0]).flatMap(tier=>line[tier]||[]);}
 const SP_BASE={mage:85,acolyte:75},SP_REGEN={mage:5.4,acolyte:5};
-const ZERO_STATS=()=>({dmg:0,aspd:0,speed:0,def:0,regen:0,spregen:0,range:0,dodge:0,zeny:0,crit:0,dbl:0,pickup:0,counter:0,lowhp:0,bashstun:0,spcost:0,cdr:0,autoblitz:0,falcon:0,venom:0,hidden:0,boss:0,drain:0,xp:0});
+const ZERO_STATS=()=>({dmg:0,aspd:0,speed:0,def:0,regen:0,spregen:0,range:0,dodge:0,zeny:0,crit:0,dbl:0,pickup:0,counter:0,lowhp:0,bashstun:0,spcost:0,cdr:0,autoblitz:0,falcon:0,venom:0,hidden:0,boss:0,drain:0,xp:0,cleave:0,quake:0});
 const weapon={sword:'sword',mage:'rod',archer:'bow',acolyte:'rod',merchant:'axe',thief:'knife'};
 // Cooperative tuning: groups of two should not receive the density/damage meant for six.
 const diff={easy:[.82,.68,1.1],normal:[1,.93,.94],hard:[1.33,1.12,.82],nightmare:[1.72,1.42,.72]};
@@ -379,8 +379,19 @@ function acceptMove(world,p,mv){
 }
 function warp(p,x,y,world){
  p.x=x;p.y=y;p.warpSeq++;p.moveBudget=0;p.moveT=world.time;p.invulnerableUntil=Math.max(p.invulnerableUntil,world.time+lag(world,1.6));
+ // V25.2: depois de um teleporte a horda não brota em cima do jogador: ~1,5 s de calma e, nos segundos seguintes,
+ // os reforços chegam pelas bordas da tela.
+ p.spawnCalmUntil=world.time+lag(world,1.5);p.edgeSpawnUntil=world.time+lag(world,8);
 }
-function spawn(world,id,{elite='',boss=false,at=null,near=null}={}){
+/** Posição na borda da tela (elipse ~ metade da área visível no PC), para os monstros entrarem andando. */
+function edgeSpot(world,map,target,living){
+ for(let k=0;k<40;k++){
+  const a=random(world,0,Math.PI*2),nx=target.x+D.cos(a)*random(world,600,720),ny=target.y+D.sin(a)*random(world,420,500);
+  if(passable(map,nx,ny)&&passable(map,nx+12,ny)&&passable(map,nx,ny+12)&&living.every(p=>D.hypot(nx-p.x,ny-p.y)>380)&&(!map.rooms||roomAt(map,nx,ny)===roomAt(map,target.x,target.y)))return {x:nx,y:ny};
+ }
+ return null;
+}
+function spawn(world,id,{elite='',boss=false,at=null,near=null,edge=false}={}){
  const map=nav(world),stats=mobStat[id]||[45,75,14,2];const count=world.players.size;
  const factor=diff[world.difficulty]||diff.normal;
  // V24.1: no MVP o crescimento da horda pesa menos (^0,75): aos 12 min o MVP tinha ~5,6× o HP base e a luta só demorava.
@@ -389,7 +400,9 @@ function spawn(world,id,{elite='',boss=false,at=null,near=null}={}){
  const hp=(boss?bossHp[id]||1900:stats[0])*(boss?2.15:elite?4.3:1)*factor[0]*teamHealthScale(count)*(boss?1.14:1)*growth*(1+mapTier(world)*.2);
  const living=[...world.players.values()].filter(p=>p.hp>0),target=near||living[Math.floor(rand(world)*living.length)]||{x:map.spawn[0],y:map.spawn[1]};
  let x=at?at.x:target.x,y=at?at.y:target.y;
- for(let k=0;k<(at?0:70);k++){
+ const fromEdge=!at&&edge?edgeSpot(world,map,target,living):null;
+ if(fromEdge){x=fromEdge.x;y=fromEdge.y;}
+ for(let k=0;k<(at||fromEdge?0:70);k++){
   const a=random(world,0,Math.PI*2),r=random(world,boss?150:195,boss?230:450);
   const nx=target.x+D.cos(a)*r,ny=target.y+D.sin(a)*r;
   if(passable(map,nx,ny)&&passable(map,nx+12,ny)&&passable(map,nx,ny+12)&&living.every(p=>D.hypot(nx-p.x,ny-p.y)>95)&&(!map.rooms||roomAt(map,nx,ny)===roomAt(map,target.x,target.y))){x=nx;y=ny;break;}
@@ -639,6 +652,12 @@ function resolveStrikes(world,p,visible){
   // Golpe básico em um alvo só (regra do solo; o golpe em arco era só do online antigo). Respingo vem de cartas/bênçãos.
   if(!strike.miss&&(st.dbl||p.base.gear.doubleAttack)&&rand(world)<Math.min(.7,st.dbl+p.base.gear.doubleAttack*.05))hurtMob(world,p,closest,power*(strike.crit?CRIT_MULT:1),'doubleattack',false,false,strike.crit);
   if(st.venom)applyStatus(world,p,closest,{poison:[st.venom,4]},1);
+  // V25.2 — Melhorias de treino (Aprendiz T. e 1ª transclasse): Golpe Amplo e Onda de Choque no ataque básico.
+  if(!strike.miss&&st.cleave){let n=0;for(const m of world.mobs){if(n>=5)break;if(m===closest||!targetable(m)||m.riftSeal||distance(m,closest)>80)continue;hurtMob(world,p,m,power*st.cleave,'treino_amplo',true,true,false,true);n++;}}
+  if(!strike.miss&&st.quake&&rand(world)<Math.min(.4,st.quake)){
+   strikeArea(world,p,closest,100,power*1.3,'treino_onda',null,1,false);
+   event(world,'skillEffect',{by:p.id,x:Math.round(closest.x),y:Math.round(closest.y),skill:'magnum',style:'area',rad:100});
+  }
   if(st.autoblitz&&rand(world)<st.autoblitz){
    strikeArea(world,p,closest,70,p.damage*1.7*(1+st.falcon)*dmgBonus(p),'falcon',null,1,false);
    event(world,'skillEffect',{by:p.id,x:Math.round(closest.x),y:Math.round(closest.y),skill:'falcon',style:'area',rad:70});
@@ -848,7 +867,11 @@ const blessingRank=(p,id)=>Math.max(0,Number(p.blessings.perks[id]||0));
 function blessingOptions(world,p,ctx){
  const stage=clamp(Number(ctx.mapTier)||0,0,9),special=ctx.source==='elite'||ctx.source==='maze'||ctx.source==='rift';
  const maxGrade=stage>=5?3:stage>=2?2:special?2:1;
- const list=Object.entries(BLESSINGS).filter(([id,b])=>(!b.classes||b.classes.includes(ctx.family))&&blessingRank(p,id)<b.cap&&(b.grade<=maxGrade||ctx.source==='mvp'));
+ // V25.2: quem não tem habilidade de dano no kit (Aprendiz T.) não recebe bênção que só serve para habilidades
+ // (recarga, SP, dano mágico de habilidade).
+ const skillDamage=[...p.slots,...p.pool].some(id=>DAMAGE_KINDS.has(SK[id]?.k));
+ const skillOnly=b=>Object.keys(b.bonus||{}).every(k=>SKILL_ONLY_BONUS.has(k));
+ const list=Object.entries(BLESSINGS).filter(([id,b])=>(!b.classes||b.classes.includes(ctx.family))&&blessingRank(p,id)<b.cap&&(b.grade<=maxGrade||ctx.source==='mvp')&&(skillDamage||!skillOnly(b)));
  const picked=[];
  while(picked.length<3&&list.length){
   const weights=list.map(([id,b])=>{
@@ -878,6 +901,7 @@ function applyBlessing(world,p,id){
 }
 /* ---- Runas de habilidade (RuneAugments do solo) ---- */
 const DAMAGE_KINDS=new Set(['melee','bolt','ball','area','zone','self','trap']);
+const SKILL_ONLY_BONUS=new Set(['cooldownReduction','spRegen','spellPct','int']);
 const AREA_KINDS=new Set(['ball','area','zone','self','trap']);
 const RUNE_NAMES={split:'Cadeia Rúnica',splash:'Propagação',wide:'Área Amplificada'};
 const RUNE_TEXT={split:'Acertos desta habilidade ganham +1 salto de cadeia (máx. 2 melhorias).',
@@ -1177,6 +1201,7 @@ export function tickWorld(world,dt){
    const cap=E?Math.min(ENDLESS.cap+players.length*ENDLESS.capPerPlayer,ENDLESS.cap*2):Math.min(280,85+players.length*45); // limite dinâmico para solo e grupos
    let chosen=null,deficit=0;
    for(const p of living){
+    if(world.time<(p.spawnCalmUntil||0))continue; // acabou de se teleportar
     const friends=living.reduce((n,a)=>n+(a!==p&&distance(a,p)<520?1:0),0);
     let local=0;for(const m of common)if(Math.abs(m.x-p.x)<760&&Math.abs(m.y-p.y)<620)local++;
     const missing=quotaBase*(1+friends*.6)-local;
@@ -1185,7 +1210,9 @@ export function tickWorld(world,dt){
    if(chosen&&common.length<cap){
     const roster=rosters[world.map]||rosters.sewer;
     const batch=Math.min(Math.ceil(deficit),cap-common.length,2+Math.floor(minutes/1.1),E?ENDLESS.batch:10);
-    for(let n=0;n<batch;n++)spawn(world,roster[Math.floor(random(world,0,roster.length))],{near:chosen});
+    // área vazia (teleporte, corrida para longe…): os reforços entram pelas bordas da tela em vez de surgir ao lado
+    const edge=world.time<(chosen.edgeSpawnUntil||0)||deficit>quotaBase*.6;
+    for(let n=0;n<batch;n++)spawn(world,roster[Math.floor(random(world,0,roster.length))],{near:chosen,edge});
     world.spawnAt=lag(world,Math.max(.11,(.72-minutes*.065))*scale[2]/(1+(living.length-1)*.5)*(E?ENDLESS.interval:1));
    }else world.spawnAt=lag(world,.2);
   }
@@ -1362,7 +1389,7 @@ function channeling(world,p){
  q.pauseUntil=Math.max(q.pauseUntil,world.time+lag(world,.5));q.charge=Math.max(0,q.charge-.18);return .62;
 }
 /** Asa de Mosca: teleporta para longe (na mesma sala do labirinto), 2,5 s de proteção, cura 12% em 4 s, recarga 60 s.
- * Elites e chefes que perseguiam reaparecem perto depois de 3,4 s. Pode ser automática abaixo do HP escolhido. */
+ * Elites e chefes que perseguiam reaparecem na borda da tela depois de 3,4 s (V25.2). Pode ser automática abaixo do HP escolhido. */
 function useFlyWing(world,p,automatic){
  if(p.hp<=0||world.mvpDefeated||world.time<p.flyNext||stock(p,'flywing')<1)return false;
  const map=nav(world);let dest=null;
@@ -1379,7 +1406,7 @@ function useFlyWing(world,p,automatic){
 function flyPursuit(world,p){
  const ids=new Set(p.pursuers);p.pursuers=[];p.pursuitAt=0;const map=nav(world),room=roomAt(map,p.x,p.y);
  const list=world.mobs.filter(m=>targetable(m)&&ids.has(m.uid)).slice(0,6);
- list.forEach((m,i)=>{for(let k=0;k<20;k++){const a=(i+k*.16)*D.PI*2/Math.max(1,list.length),r=215+k%3*24,at=nearestOpen(map,p.x+D.cos(a)*r,p.y+D.sin(a)*r);
+ list.forEach((m,i)=>{for(let k=0;k<20;k++){const a=(i+k*.16)*D.PI*2/Math.max(1,list.length),r=(k<12?560:215)+k%3*24,at=nearestOpen(map,p.x+D.cos(a)*r,p.y+D.sin(a)*r*.75);
   if(room>=0&&roomAt(map,at.x,at.y)!==room||distance(p,at)<150)continue;m.x=at.x;m.y=at.y;m.warning=null;break;}});
  if(list.length)event(world,'pursuit',{player:p.id,count:list.length});
 }
@@ -1516,8 +1543,10 @@ export function rollMvpGear(world,p){
  while(picks.length<4&&types.length){
   const type=types.splice(Math.floor(rand(world)*types.length),1)[0];
   const ofType=usable.filter(id=>ITEMS[id].type===type);
-  let candidates=ofType.filter(id=>ITEMS[id].tier>=low);
-  if(!candidates.length){const best=Math.max(...ofType.map(id=>ITEMS[id].tier));candidates=ofType.filter(id=>ITEMS[id].tier===best);}
+  // V25.2: o piso de raridade é relativo ao melhor item que existe DAQUELE tipo. Chapéus e acessórios não têm
+  // raridade 4, então a partir do 2º mapa só saíam o Elmo e o Rosário; agora entram as duas melhores raridades do tipo.
+  const best=Math.max(...ofType.map(id=>ITEMS[id].tier));
+  const candidates=ofType.filter(id=>ITEMS[id].tier>=Math.min(low,best-1));
   const weights=candidates.map(id=>D.pow(ITEMS[id].tier,3)*2);
   let value=rand(world)*weights.reduce((x,y)=>x+y,0),index=weights.findIndex(w=>(value-=w)<=0);
   if(index<0)index=candidates.length-1;picks.push(candidates[index]);

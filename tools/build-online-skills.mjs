@@ -197,10 +197,22 @@ const novice = [
  add('playdead','Fingir de Morto',5,'buff','Finge de morto: os monstros perdem você de vista por alguns segundos.',{cd:12,dur:2,durLv:.2,stats:{hidden:[1,0]},ic:'playdead',fx:'playdead'}),
 ];
 for (const line of [sword, mage, archer, acolyte, merchant, thief]) line.novice = novice;
+// V25.2: MELHORIAS de treino (não são habilidades: passivas que aparecem na escolha de nível) para as classes evoluídas
+// com kit fraco — Aprendiz T. (só Primeiros Socorros e Fingir de Morto, sem dano) e a 1ª transclasse, que recomeça do
+// nível 1 com o kit da 1ª classe. Dão dano em área ao ataque básico, ritmo, força, EXP e resistência.
+const boon = [
+ add('treino_amplo','Golpe Amplo',5,'passive','Melhoria: o ataque básico atinge também até 5 monstros em volta do alvo (12% do dano por nível).',{stats:{cleave:.12},boon:1,ic:'bash'}),
+ add('treino_onda','Onda de Choque',5,'passive','Melhoria: 5% de chance por nível de o ataque básico soltar uma onda que fere todos em volta do alvo.',{stats:{quake:.05},boon:1,ic:'magnum'}),
+ add('treino_ritmo','Ritmo de Batalha',5,'passive','Melhoria: +5% de velocidade de ataque por nível.',{stats:{aspd:.05},boon:1,ic:'concentration'}),
+ add('treino_forca','Força de Treino',5,'passive','Melhoria: +6% de dano por nível.',{stats:{dmg:.06},boon:1,ic:'mastery'}),
+ add('treino_saber','Sede de Saber',5,'passive','Melhoria: +6% de experiência recolhida por nível.',{stats:{xp:.06},boon:1,ic:'blessing'}),
+ add('treino_pele','Pele Grossa',5,'passive','Melhoria: menos dano recebido e regeneração de HP por nível.',{stats:{def:.025,regen:.4},boon:1,ic:'endure'}),
+];
+for (const line of [sword, mage, archer, acolyte, merchant, thief]) line.boon = boon;
 const lines = { sword, mage, archer, acolyte, merchant, thief };
 const starters = { sword: 'bash', mage: 'fire', archer: 'arrows', acolyte: 'heal', merchant: 'mammon', thief: 'envenom' };
 // estágio da jornada -> conjuntos liberados
-const stages = [['first'], ['first', 'second'], ['novice'], ['first'], ['first', 'second', 'trans'], ['first', 'second', 'trans', 'third']];
+const stages = [['first'], ['first', 'second'], ['novice', 'boon'], ['first', 'boon'], ['first', 'second', 'trans'], ['first', 'second', 'trans', 'third']];
 const classes = {
  sword: ['sword','knight','highnovice','highsword','lordknight','runeknight'], mage: ['mage','wizard','highnovice','highmage','highwizard','warlock'],
  archer: ['archer','hunter','highnovice','higharcher','sniper','ranger'], acolyte: ['acolyte','priest','highnovice','highacolyte','highpriest','archbishop'],

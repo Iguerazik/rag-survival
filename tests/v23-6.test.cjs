@@ -17,14 +17,15 @@ test('V23.6: direção no padrão do Ragnarok (0 sul, 2 oeste, 4 norte, 6 leste)
  core.command(w,'a',{dx:-1,dy:0});for(let i=0;i<4;i++)core.tickWorld(w,.05);assert.equal(p.dir,2,'andando para a esquerda olha para oeste');
 });
 
-test('V23.6: Aprendiz T. só com habilidades de Aprendiz (Primeiros Socorros e Fingir de Morto), como no Ragnarok',async()=>{
+test('V23.6: Aprendiz T. só com habilidades de Aprendiz (Primeiros Socorros e Fingir de Morto) + Melhorias de treino (V25.2)',async()=>{
  const core=await engine(),cat=JSON.parse(read('online-skills.json'));
- assert.deepEqual(cat.stages[2],['novice']);
+ assert.deepEqual(cat.stages[2],['novice','boon']);
  for(const line of Object.keys(cat.lines))assert.deepEqual(cat.lines[line].novice,['firstaid','playdead']);
  for(const line of Object.keys(cat.lines)){
   const w=core.makeWorld('sewer','normal',[member('a',line,cat.classes[line][2],2)],{seed:2}),p=w.players.get('a');
   assert.deepEqual(Object.keys(p.skills),['firstaid'],line+': começa com Primeiros Socorros');
-  assert.ok(p.pool.every(id=>['firstaid','playdead'].includes(id)),line+': nada da classe anterior ('+p.pool+')');
+  // habilidades: só as de Aprendiz; o resto do sorteio são as Melhorias de treino (passivas, não ocupam atalho)
+  assert.ok(p.pool.every(id=>['firstaid','playdead'].includes(id)||cat.skills[id].boon),line+': nada da classe anterior ('+p.pool+')');
  }
  // Primeiros Socorros cura só você
  const w=core.makeWorld('sewer','normal',[member('a','sword','highnovice',2),member('b','sword')],{seed:3}),a=w.players.get('a'),b=w.players.get('b');

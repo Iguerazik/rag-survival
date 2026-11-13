@@ -802,7 +802,9 @@ function serverUpgradeChoices(offers,seq=0,pending=0){
  for(const offer of offers){
   const info=skillInfo(offer.id),name=info?.n||offer.name,passive=info?.k==='passive';
   // Etapa 3: runa de habilidade (Cadeia Rúnica, Propagação, Área Amplificada).
-  const head=offer.rune?'RUNA · '+name+' · '+(offer.level+1)+'/2':offer.level?'Melhorar · '+name+' · nível '+offer.level+' → '+(offer.level+1):'NOVA · '+name+(passive?' (passiva)':'');
+  // V25.2: Melhorias de treino (Aprendiz T. e 1ª transclasse) aparecem como MELHORIA, não como habilidade.
+  const boon=!!info?.boon;
+  const head=offer.rune?'RUNA · '+name+' · '+(offer.level+1)+'/2':boon?(offer.level?'MELHORIA · '+name+' · nível '+offer.level+' → '+(offer.level+1):'MELHORIA · '+name):offer.level?'Melhorar · '+name+' · nível '+offer.level+' → '+(offer.level+1):'NOVA · '+name+(passive?' (passiva)':'');
   el.append(offerButton(head,offer.d||info?.d||'',()=>{run.coopUpgrade={id:offer.id,seq:++run.coopUpgradeSeq,offer:seq};el.hidden=true;},skillIconUrl(offer.id)));
  }
 }
