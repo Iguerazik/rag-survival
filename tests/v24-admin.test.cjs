@@ -53,3 +53,29 @@ test('V24: backup baixa o banco e a restauração migra as contas de outro servi
   assert.equal(login.status,200,'a conta migrada entra com a mesma senha');
  }finally{s.child.kill();await new Promise(r=>s.child.once('exit',r));for(const d of [a,b])fs.rmSync(d,{recursive:true,force:true});if(file)fs.rmSync(file,{force:true});}
 });
+
+test('V24.2: painel do administrador — quem está online (presença do menu/solo, conta x convidado, salas)',async()=>{
+ const data=fs.mkdtempSync(path.join(os.tmpdir(),'rag-online-'));
+ const s=await start(data,{ADMIN_TOKEN:TOKEN});
+ const H={'Content-Type':'application/json','X-Midgard-Request':'1'};
+ try{
+  assert.equal((await fetch(s.base+'/api/admin/online')).status,401,'sem token não mostra nada');
+  // convidado no menu
+  assert.equal((await fetch(s.base+'/api/presence',{method:'POST',headers:H,body:JSON.stringify({id:'guest-abcdef12',mode:'menu'})})).status,200);
+  assert.equal((await fetch(s.base+'/api/presence',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:'guest-abcdef12'})})).status,403,'exige o cabeçalho do jogo');
+  // conta logada jogando solo
+  const reg=await register(s.base,7);assert.equal(reg.status,201);const cookie=reg.headers.get('set-cookie').split(';')[0];
+  await fetch(s.base+'/api/presence',{method:'POST',headers:{...H,Cookie:cookie},body:JSON.stringify({id:'acct-12345678',mode:'solo',map:'sewer',line:'mage',difficulty:'normal',level:12})});
+  // sala criada
+  const room=await (await fetch(s.base+'/api/coop/rooms',{method:'POST',headers:{...H,Cookie:cookie},body:JSON.stringify({profile:{name:'Amigo',job:'sword'},config:{map:'sewer',difficulty:'normal'}})})).json();
+  const v=await (await fetch(s.base+'/api/admin/online',{headers:auth})).json();
+  assert.equal(v.totals.open,2);assert.equal(v.totals.accounts,1);assert.equal(v.totals.guests,1);assert.equal(v.totals.solo,1);
+  const acct=v.people.find(p=>p.account);assert.equal(acct.username,'conta7');assert.equal(acct.mode,'solo');assert.equal(acct.map,'sewer');assert.equal(acct.level,12);
+  assert.ok(v.people.some(p=>!p.account&&p.mode==='menu'&&/^Convidado/.test(p.name)));
+  assert.ok(room.code,'sala criada');{assert.equal(v.rooms.length,1);assert.equal(v.rooms[0].members[0].account,true);assert.equal(v.rooms[0].phase,'lobby');assert.equal(v.rooms[0].members[0].host,true);}
+  assert.ok(v.server.tick&&v.server.memoryMb>0);
+  assert.ok(!JSON.stringify(v).includes('127.0.0.1'),'sem IPs no painel');
+  // página do painel é servida
+  const page=await fetch(s.base+'/admin.html');assert.equal(page.status,200);assert.match(await page.text(),/noindex/);
+ }finally{s.child.kill();await new Promise(r=>s.child.once('exit',r));fs.rmSync(data,{recursive:true,force:true});}
+});

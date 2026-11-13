@@ -51,6 +51,13 @@ classe, renascimento, árvores de habilidades, equipamentos, cartas, Zeny, MVPs 
 - `GET /api/health` mostra o TPS medido e a duração dos ticks (média, p95, p99, máximo, ticks acima de 16,67 ms).
   No Railway o servidor também registra essas medidas no log a cada minuto de partida.
 
+## Painel do administrador (quem está online)
+
+Abra `https://<seu-endereço>/admin.html` e cole a `ADMIN_TOKEN` (Railway → serviço → Variables). A chave fica só naquela aba.
+O painel mostra, atualizando a cada 5 s: quantas pessoas estão com o jogo aberto (com conta ou convidadas), quem está no menu,
+jogando solo ou online, mapa/classe/nível, as salas do multiplayer com seus membros e o TPS/memória do servidor.
+A presença vem de um aviso do navegador a cada 20 s (`POST /api/presence`), guardado só na memória, sem IP. Sem a chave nada aparece.
+
 ## Modo infinito (pós-MVP)
 
 Depois que o MVP do mapa cai e o tesouro é escolhido, a partida **não termina**: começa o modo infinito.

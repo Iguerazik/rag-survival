@@ -3,6 +3,7 @@
  *
  * Só funciona com a variável ADMIN_TOKEN definida (24+ caracteres). Sem ela, as rotas respondem 404.
  *   GET  /api/admin/backup   → baixa uma cópia consistente de midgard.sqlite (VACUUM INTO)
+ *   GET  /api/admin/online   → quem está com o jogo aberto agora (menu/solo/online) e as salas (V24.2)
  *   GET  /api/admin/status   → contagens (contas, progresso…) e tamanho do volume, sem dados pessoais
  *   POST /api/admin/delete-accounts {usernames:[…]} → apaga contas (e progresso/recordes delas)
  *   POST /api/admin/restore  → envia um midgard.sqlite; o servidor valida, guarda o banco atual em
@@ -64,7 +65,7 @@ function validateUpload(file) {
   } finally { db.close(); }
 }
 
-export function adminRoutes({ dataDir, accounts, send, canRestart }) {
+export function adminRoutes({ dataDir, accounts, send, canRestart, online }) {
   return async function route(req, res, pathname) {
     const ok = authorized(req);
     if (ok === null) return send(res, 404, { error: 'Não encontrado' });
@@ -74,6 +75,7 @@ export function adminRoutes({ dataDir, accounts, send, canRestart }) {
       for (const f of fs.readdirSync(dataDir, { withFileTypes: true })) if (f.isFile()) volumeBytes += fs.statSync(path.join(dataDir, f.name)).size;
       return send(res, 200, { ...accounts.counts(), dataDir, volumeBytes });
     }
+    if (pathname === '/api/admin/online' && req.method === 'GET') return send(res, 200, online ? online() : { rooms: [], people: [] });
     if (pathname === '/api/admin/backup' && req.method === 'GET') {
       const tmp = path.join(dataDir, `backup-tmp-${stamp()}-${process.pid}-${Math.random().toString(36).slice(2, 8)}.sqlite`);
       try {

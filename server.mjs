@@ -261,6 +261,12 @@ const server=http.createServer(async(req,res)=>{
      return accounts.route(req,res,url);
    }
    if(pathname.startsWith('/api/admin/'))return adminApi(req,res,pathname);
+   if(pathname==='/api/presence'&&req.method==='POST'){
+     if(req.headers['x-midgard-request']!=='1')return send(res,403,{error:'Requisição não autorizada'});
+     let raw='';for await(const chunk of req){raw+=chunk;if(raw.length>2048)return send(res,413,{error:'Pedido grande demais'});}
+     let data;try{data=JSON.parse(raw||'{}')}catch{return send(res,400,{error:'JSON inválido'})}
+     return presencePing(req,res,data&&typeof data==='object'?data:{});
+   }
    if(pathname==='/api/version'&&req.method==='GET')return send(res,200,{name:APP_NAME,version:APP_VERSION,patch:PATCH,multiplayer:'servidor-autoritativo',transport:'websocket+http',accounts:true,progress:'sqlite',tickRate:TICK_RATE,snapshotRate:SNAPSHOT_RATE});
    if(pathname==='/api/health'&&req.method==='GET')return send(res,200,{ok:true,patch:PATCH,rooms:rooms.size,playing:[...rooms.values()].filter(r=>r.phase==='playing').length,players:[...rooms.values()].reduce((n,r)=>n+r.members.size,0),uptime:Math.round(process.uptime()),memoryMb:Math.round(process.memoryUsage().rss/1048576),tick:tickStats()});
    if(pathname==='/api/coop/rooms'||pathname.startsWith('/api/coop/rooms/'))
@@ -290,7 +296,39 @@ const server=http.createServer(async(req,res)=>{
    }else res.end(await fs.readFile(filename));
  }catch(error){console.error('server',error);if(!res.headersSent)send(res,500,{error:'Falha interna do servidor'});else res.end()}
 });
-const adminApi=adminRoutes({dataDir:DATA_ROOT,accounts,send,canRestart:()=>[...rooms.values()].every(idleRoom)});
+/* ---------- V24.2: presença (quem está com o jogo aberto) — só para o painel do administrador ----------
+ * O navegador avisa a cada 20 s: menu, solo ou online. Fica só na memória (some ao reiniciar), sem IP. */
+const PRESENCE_TTL=60_000,PRESENCE_MAX=3000,presence=new Map();
+const PRESENCE_MODES=new Set(['menu','solo','online','pause','ended']);
+function presencePing(req,res,data){
+ const id=String(data?.id||'').replace(/[^a-z0-9-]/gi,'').slice(0,40);
+ if(id.length<8)return send(res,400,{error:'id inválido'});
+ const now=Date.now();
+ if(!presence.has(id)&&presence.size>=PRESENCE_MAX){for(const [k,v] of presence)if(now-v.at>PRESENCE_TTL)presence.delete(k);if(presence.size>=PRESENCE_MAX)return send(res,429,{error:'Muitas conexões'});}
+ const me=accounts.current(req),old=presence.get(id);
+ const clip=(v,n)=>String(v??'').slice(0,n);
+ presence.set(id,{id,userId:me?.id||null,nickname:me?.nickname||null,username:me?.username||null,
+  mode:PRESENCE_MODES.has(data.mode)?data.mode:'menu',map:clip(data.map,20)||null,line:clip(data.line,20)||null,
+  difficulty:clip(data.difficulty,12)||null,level:Number.isFinite(data.level)?Math.max(0,Math.min(999,Math.floor(data.level))):null,
+  room:clip(data.room,12)||null,since:old?.since||now,at:now});
+ return send(res,200,{ok:true});
+}
+function onlineView(){
+ const now=Date.now();
+ for(const [k,v] of presence)if(now-v.at>PRESENCE_TTL)presence.delete(k);
+ const roomList=[...rooms.values()].map(room=>({code:room.code,phase:room.phase,map:room.config?.map||null,difficulty:room.config?.difficulty||null,
+  created:room.created,time:room.world?Math.round(room.world.time):null,endless:!!room.world?.endless,
+  members:[...room.members.values()].map(m=>{const p=room.world?.players?.get(m.id);
+   return {name:m.profile?.name||'?',account:!!m.userId,host:m.id===room.hostId,job:m.profile?.job||null,connected:!!m.ws?.open,
+    idleSec:Math.round((now-m.updated)/1000),level:p?.level??null,alive:p?p.hp>0:null};})}));
+ const people=[...presence.values()].sort((a,b)=>b.at-a.at).map(v=>({name:v.nickname||('Convidado '+v.id.slice(0,4)),account:!!v.userId,username:v.username,
+  mode:v.mode,map:v.map,line:v.line,difficulty:v.difficulty,level:v.level,room:v.room,sinceSec:Math.round((now-v.since)/1000),lastSec:Math.round((now-v.at)/1000)}));
+ return {at:now,server:{uptime:Math.round(process.uptime()),memoryMb:Math.round(process.memoryUsage().rss/1048576),tick:tickStats()},
+  totals:{open:people.length,accounts:people.filter(p=>p.account).length,guests:people.filter(p=>!p.account).length,
+   solo:people.filter(p=>p.mode==='solo'||p.mode==='pause').length,online:roomList.reduce((n,r)=>n+(r.phase==='playing'?r.members.length:0),0),rooms:roomList.length},
+  rooms:roomList,people};
+}
+const adminApi=adminRoutes({dataDir:DATA_ROOT,accounts,send,canRestart:()=>[...rooms.values()].every(idleRoom),online:onlineView});
 function sameOrigin(req){
  const origin=req.headers.origin;if(!origin)return true;
  const expected=(req.socket.encrypted?'https':'http')+'://'+req.headers.host;

@@ -2955,3 +2955,21 @@ requestAnimationFrame(frame);
   }).catch(() => {});
   if (location.protocol.startsWith('http')) { check(); setInterval(check, 45000); }
 })();
+
+// V24.2: presença — avisa o servidor a cada 20 s que o jogo está aberto (menu, solo ou online).
+// Serve só para o painel do administrador (admin.html). Sem dados pessoais além do apelido da conta logada.
+(() => {
+  if (!/^https?:$/.test(location.protocol)) return;
+  let id = '';
+  try { id = sessionStorage.getItem('rag-presence') || ''; if (!id) { id = (crypto.randomUUID?.() || Math.random().toString(36).slice(2) + Date.now().toString(36)); sessionStorage.setItem('rag-presence', id); } }
+  catch { id = Math.random().toString(36).slice(2) + Date.now().toString(36); }
+  const ping = () => {
+    const playing = mode === 'play' || mode === 'pause' || mode === 'ended';
+    const state = !playing ? 'menu' : mode === 'ended' ? 'ended' : run?.coop ? 'online' : mode === 'pause' ? 'pause' : 'solo';
+    const body = { id, mode: state };
+    if (playing && run) Object.assign(body, { map: run.map, line: run.line, difficulty: run.difficulty, level: run.level });
+    fetch('/api/presence', { method: 'POST', credentials: 'same-origin', cache: 'no-store', keepalive: true,
+      headers: { 'Content-Type': 'application/json', 'X-Midgard-Request': '1' }, body: JSON.stringify(body) }).catch(() => {});
+  };
+  setTimeout(ping, 1500); setInterval(ping, 20000);
+})();
