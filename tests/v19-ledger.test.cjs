@@ -35,7 +35,7 @@ test('V19: recompensas idempotentes; saldo e desbloqueio por linhagem persistem 
   assert.equal(snap.data.journeys.archer.proofs,1);assert.equal(snap.data.journeys.sword.base,1);
   let history=await fetch(t.base+'/api/account/coop-rewards',{headers:{Cookie:cookie}});
   assert.equal((await history.json()).awards.length,1);
-  const forged=await fetch(t.base+'/api/account/progress',{method:'PUT',headers:{'Content-Type':'application/json','X-Midgard-Request':'1',Cookie:cookie},body:JSON.stringify({revision:snap.revision,data:{...snap.data,zeny:990000,campaign:{}}})});
+  const forged=await fetch(t.base+'/api/account/progress',{method:'PUT',headers:{'Content-Type':'application/json','X-Midgard-Request':'1',Cookie:cookie},body:JSON.stringify({revision:snap.revision,data:{...snap.data,zeny:9_900_000,campaign:{}}})});
   assert.equal(forged.status,403);
   assert.equal(a.snapshot(id).data.zeny,90);
   assert.equal(a.grantCoop(id,'run-2',{...reward,seconds:600,kills:120}),true);

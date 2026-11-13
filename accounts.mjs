@@ -89,6 +89,26 @@ export function accountStore(dataDir){
   }catch(e){try{db.exec('ROLLBACK')}catch{};throw e}
  }
  /** Save do navegador (PUT): refino +9/+10 e itens destruídos na forja só mudam pelo servidor. */
+ /** V25.8: em vez de recusar o save inteiro (o que travava a nuvem para sempre), corrige só o refino:
+  * item destruído na forja sai da lista, refino menor que o do servidor volta ao do servidor e subida que só a
+  * forja do servidor pode dar fica no valor do servidor. O resto do progresso (Zeny, EXP, cartas…) é salvo. */
+ function fixRefines(id,data,trusted){
+  if(!Array.isArray(data.items))return 0;
+  const broken=new Set(brokenUids.all(id).map(r=>r.item_uid));
+  const before=new Map((Array.isArray(trusted.items)?trusted.items:[]).filter(x=>x&&typeof x==='object').map(x=>[String(x.uid),Math.floor(Number(x.refine)||0)]));
+  let fixed=0;const kept=[];
+  for(const item of data.items){
+   if(!item||typeof item!=='object'){kept.push(item);continue;}
+   const uid=String(item.uid);if(broken.has(uid)){fixed++;continue;}
+   const old=before.get(uid);let r=Number(item.refine)||0;
+   if(!Number.isInteger(r)||r<0)r=old??0;
+   if(r>refineConfig.MAX)r=refineConfig.MAX;
+   if(old!==undefined&&r<old)r=old;
+   if(old===undefined?r>refineConfig.DUPLICATE_CAP:(r>old&&(r>refineConfig.DUPLICATE_CAP||r-old>2)))r=old??refineConfig.DUPLICATE_CAP;
+   if(r!==item.refine){fixed++;kept.push({...item,refine:r});}else kept.push(item);
+  }
+  data.items=kept;return fixed;
+ }
  function refineProblem(id,data,trusted){
   const broken=new Set(brokenUids.all(id).map(r=>r.item_uid));
   const before=new Map((Array.isArray(trusted.items)?trusted.items:[]).filter(x=>x&&typeof x==='object').map(x=>[String(x.uid),Math.floor(Number(x.refine)||0)]));
@@ -285,12 +305,14 @@ export function accountStore(dataDir){
   const n=v=>Number.isFinite(Number(v))?Number(v):0;
   const sum=o=>o&&typeof o==='object'?Object.values(o).reduce((t,v)=>t+Math.max(0,n(v)),0):0;
   if(n(data.zeny)<0||n(data.zeny)>2_000_000_000)return 'Zeny inválido.';
+  // V25.8: tetos bem mais largos. Quando um save era recusado, os ganhos seguintes se acumulavam e o personagem
+  // nunca mais sincronizava ("Nuvem pendente"). Os tetos agora só barram valores absurdos/fabricados.
   // V25.1: o modo infinito (pós-MVP) rende bem mais Zeny numa run longa (o Zeny dos drops cresce com o tempo de partida).
   // 80 mil travava a sincronização de runs legítimas de ~20 min; o teto continua barrando valores fabricados.
-  if(n(data.zeny)-n(trusted.zeny)>600_000)return 'Ganho de Zeny grande demais para uma partida. O progresso não foi salvo.';
-  if(sum(data.album)-sum(trusted.album)>12)return 'Cartas demais de uma vez. O progresso não foi salvo.';
-  if(n(data.codexCoins)-n(trusted.codexCoins)>1500)return 'Pontos de Códex demais de uma vez. O progresso não foi salvo.';
-  if((Array.isArray(data.items)?data.items.length:0)-(Array.isArray(trusted.items)?trusted.items.length:0)>40)return 'Itens demais de uma vez. O progresso não foi salvo.';
+  if(n(data.zeny)-n(trusted.zeny)>5_000_000)return 'Ganho de Zeny grande demais para uma partida. O progresso não foi salvo.';
+  if(sum(data.album)-sum(trusted.album)>60)return 'Cartas demais de uma vez. O progresso não foi salvo.';
+  if(n(data.codexCoins)-n(trusted.codexCoins)>10000)return 'Pontos de Códex demais de uma vez. O progresso não foi salvo.';
+  if((Array.isArray(data.items)?data.items.length:0)-(Array.isArray(trusted.items)?trusted.items.length:0)>200)return 'Itens demais de uma vez. O progresso não foi salvo.';
   for(const [line,j] of Object.entries(data.journeys||{})){
    if(!j||typeof j!=='object')return 'Personagem inválido.';
    const old=trusted.journeys?.[line]||{stage:0,base:1,job:1};
@@ -303,7 +325,7 @@ export function accountStore(dataDir){
     // Compara a EXP acumulada (não o nível): níveis baixos sobem muitos de uma vez, o que é legítimo.
     const total=(level,xp,jobLine)=>{let t=Math.max(0,n(xp));for(let l=1;l<Math.min(200,Math.floor(level));l++)t+=levelCost(l,jobLine);return t;};
     // V25.4: teto maior — runs longas do modo infinito, o bônus do solo e o do Aprendiz T. passavam de 14 mil.
-    if(total(base,j.baseXp,false)-total(n(old.base)||1,old.baseXp,false)>45000||total(job,j.jobXp,true)-total(n(old.job)||1,old.jobXp,true)>30000)
+    if(total(base,j.baseXp,false)-total(n(old.base)||1,old.baseXp,false)>400000||total(job,j.jobXp,true)-total(n(old.job)||1,old.jobXp,true)>250000)
       return 'Ganho de EXP grande demais para uma partida. O progresso não foi salvo.';
    }
   }
@@ -377,7 +399,7 @@ export function accountStore(dataDir){
    if(endpoint==='/api/account/coop-rewards'&&req.method==='GET')return send(res,200,{awards:awardsByUser.all(me.id)});
    if(endpoint==='/api/account/progress'&&req.method==='PUT'){
      if(!rateLimit(req,'save:'+me.id,500,3_600_000))return send(res,429,{error:'Muitas gravações. Aguarde.'});
-     const input=await body(req);const serialized=JSON.stringify(input.data);
+     const input=await body(req);let serialized=JSON.stringify(input.data);
      if(typeof serialized!=='string')return send(res,400,{error:'Dados de progresso inválidos.'});
      if(!Number.isSafeInteger(input.revision)||input.revision<0||!validSnapshot(input.data)||serialized.length>250_000)
        return send(res,400,{error:'Dados de progresso inválidos ou muito grandes.'});
@@ -389,8 +411,9 @@ export function accountStore(dataDir){
      const mode=process.env.STRICT_ONLINE_PROGRESS??'1';
      if(mode!=='0'){
        const trusted=snapshot(me.id).data;
-       const problem=mode==='2'?lockedKeys(input.data,trusted):implausible(input.data,trusted)||refineProblem(me.id,input.data,trusted);
+       const problem=mode==='2'?lockedKeys(input.data,trusted):implausible(input.data,trusted);
        if(problem)return send(res,403,{error:problem});
+       if(mode!=='2'&&fixRefines(me.id,input.data,trusted))serialized=JSON.stringify(input.data);
      }
      const result=updateProgress.run(serialized,Date.now(),me.id,input.revision);
      if(result.changes!==1)return send(res,409,{error:'Progresso alterado em outra aba. Recarregue para evitar perder dados.',progress:snapshot(me.id)});

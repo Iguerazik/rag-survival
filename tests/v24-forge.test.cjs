@@ -151,10 +151,15 @@ test('V24 forja ONLINE: servidor decide, cobra uma vez, repete pedido sem cobrar
   assert.equal((await api(s.base,'/api/account/refine',{uid:'nao-existe',from:0,requestId:rid(10),revision:prog.revision},cookie)).status,404);
   assert.equal((await api(s.base,'/api/account/refine',{uid:'espada',from:2,requestId:rid(11),revision:prog.revision})).status,401,'sem login não refina');
   // 8) o navegador não consegue fabricar refino +9 nem baixar refino por save
-  const fake=JSON.parse(JSON.stringify(prog.data));fake.items.find(x=>x.uid==='espada').refine=9;
-  assert.equal((await api(s.base,'/api/account/progress',{revision:prog.revision,data:fake},cookie,'PUT')).status,403);
-  fake.items.find(x=>x.uid==='espada').refine=1;
-  assert.equal((await api(s.base,'/api/account/progress',{revision:prog.revision,data:fake},cookie,'PUT')).status,403);
+  // V25.8: o save não é mais recusado (isso travava a nuvem); o servidor só corrige o refino para o valor dele.
+  const fake=JSON.parse(JSON.stringify(prog.data));fake.items.find(x=>x.uid==='espada').refine=9;fake.muted=true;
+  let put=await api(s.base,'/api/account/progress',{revision:prog.revision,data:fake},cookie,'PUT');assert.equal(put.status,200);
+  prog=(await api(s.base,'/api/account/progress',undefined,cookie,'GET')).data;
+  assert.equal(prog.data.items.find(x=>x.uid==='espada').refine,2,'+9 fabricado volta para +2');assert.equal(prog.data.muted,true,'o resto do save foi gravado');
+  const fake2=JSON.parse(JSON.stringify(prog.data));fake2.items.find(x=>x.uid==='espada').refine=1;
+  put=await api(s.base,'/api/account/progress',{revision:prog.revision,data:fake2},cookie,'PUT');assert.equal(put.status,200);
+  prog=(await api(s.base,'/api/account/progress',undefined,cookie,'GET')).data;
+  assert.equal(prog.data.items.find(x=>x.uid==='espada').refine,2,'refino não baixa por save antigo');
   // 9) o equipamento refinado vale na partida online (o servidor lê da conta)
   const gear=await import(require('node:url').pathToFileURL(path.join(root,'server-gear.mjs')).href);
   assert.equal(gear.equippedForAccount(prog.data,'sword').weapon.refine,2);
@@ -185,7 +190,8 @@ test('V24 forja ONLINE: quebra destrói e desequipa; item destruído não volta 
   assert.ok(!prog.data.items.some(x=>x.uid==='capa'),'item destruído');
   assert.equal(prog.data.journeys.sword.gear.garment,undefined,'e desequipado');
   // save antigo do navegador tentando trazer a capa de volta
-  assert.equal((await api(s.base,'/api/account/progress',{revision:prog.revision,data:{...prog.data,items:before.items}},cookie,'PUT')).status,403);
+  {const put=await api(s.base,'/api/account/progress',{revision:prog.revision,data:{...prog.data,items:before.items}},cookie,'PUT');assert.equal(put.status,200);
+   prog=(await api(s.base,'/api/account/progress',undefined,cookie,'GET')).data;assert.ok(!prog.data.items.some(x=>x.uid==='capa'),'a capa destruída não volta');}
   // +9 → +10 (220.000)
   r=await api(s.base,'/api/account/refine',{uid:'dez',from:9,requestId:rid(21),revision:prog.revision},cookie);
   assert.equal(r.data.result,'success');assert.equal(r.data.item.refine,10);assert.equal(r.data.zeny,600_000-8000-220_000);prog=r.data.progress;
