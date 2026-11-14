@@ -464,6 +464,7 @@ function equipItem(slot, uid) {
 function openGearDialog(slot, picking = false) {
   const dialog = $('card-dialog');
   $('card-back-to-inventory').hidden = false;
+  $('card-back-to-inventory').textContent = window.gearReturnTo ? '← Voltar aos equipamentos' : '← Voltar ao inventário';
   const list = $('card-list');
   const profile = journeyOf();
   const gear = gearOf(profile);
@@ -1427,6 +1428,17 @@ function showDialog(label, title, body, actions) {
   ui.dialog.hidden = false;
   ui.actions.querySelector('button')?.focus({ preventScroll: true });
 }
+async function leaveRunSaving(){
+  if(!run?.coop||mode==='ended')return;
+  const finishedRun=run,line=run.line,result={line,kills:run.kills,seconds:Math.max(0,run.time-(run.mapStart||0)),win:false,zeny:run.zeny};
+  showDialog('SAINDO DA RUN','Salvando o seu progresso…','Aguarde: o servidor está gravando EXP, Zeny, cartas e descobertas desta run.',[]);
+  let ok=false;try{ok=!!(await Coop.leaveSaving())?.saved;}catch{}
+  let text=ok?'Progresso salvo no servidor.':'Você saiu da run. Sem conta conectada, nada foi salvo no servidor.';
+  if(ok){try{const change=await syncOnlineRewards(result);if(change)text+=' Base '+(change.before.base||1)+' → '+(change.after.base||1)+' · Classe '+(change.before.job||1)+' → '+(change.after.job||1)+(result.zeny?' · +'+result.zeny.toLocaleString('pt-BR')+' z':'')+'.';}catch{}}
+  if(run!==finishedRun)return;
+  mode='ended';BGM.stop();
+  showDialog('VOCÊ SAIU DA RUN',ok?'Tudo salvo':'Saída da run',text,[button('Voltar ao menu','primary',()=>{run=finishedRun;menu();})]);
+}
 function resume() {
   mode = 'play';
   ui.dialog.hidden = true;
@@ -1441,6 +1453,8 @@ function pause() {
   showDialog(run.inMvp ? 'ARENA DO MVP' : expeditions[run.map].name.toUpperCase(), 'Jogo pausado', 'A partida continua de onde você parou. As janelas da tela (personagem, mapa, atalhos, música) podem ser arrastadas pelo título.', [
     button('Continuar', 'primary', resume),
     ...(run.endless!=null ? [button('Encerrar run e receber recompensas', 'primary', () => { run.endRequest = true; resume(); })] : []),
+    // V25.10: no online, qualquer jogador pode sair da run guardando o que já ganhou (o grupo continua jogando).
+    ...(run.coop && run.endless==null ? [button('Sair da run e salvar (EXP, Zeny e cartas)', 'secondary', () => leaveRunSaving())] : []),
     button('Restaurar posição das janelas', 'secondary', () => { $('hud-layout-reset')?.click(); resume(); }),
     button(locked ? 'Destravar janelas' : 'Travar janelas', 'secondary', () => { lock?.click(); resume(); }),
     button('Voltar ao menu', 'secondary', menu),
@@ -2896,14 +2910,19 @@ $('run-build-button').addEventListener('click',openInventory);
 $('inventory-close').addEventListener('click', closeInventory);
 $('inventory-dialog').addEventListener('cancel', event => { event.preventDefault(); closeInventory(); });
 $('card-back-to-inventory').addEventListener('click',()=>{
+  const back=window.gearReturnTo;window.gearReturnTo=null;
   $('card-dialog').close();
   gearFromInventory=false;
+  if(back){ROClientWindows.open(back);return;}
   if(run && mode==='inventory') mode=run.inventoryPreviousMode||'play';
   openInventory();
 });
 $('card-dialog').addEventListener('close',()=>{
   const nested=gearFromInventory;
   gearFromInventory=false;
+  // V25.10: aberto pela janela de equipamentos → fechar volta para ela.
+  const back=window.gearReturnTo;window.gearReturnTo=null;
+  if(back&&!$('inventory-dialog').open){setTimeout(()=>ROClientWindows.open(back),0);return;}
   if(run && mode==='inventory' && !$('inventory-dialog').open){
     mode=run.inventoryPreviousMode||'play';canvas.focus({preventScroll:true});
   }

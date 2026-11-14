@@ -117,7 +117,7 @@ test('V23 Etapa 5: asas caem de elites (taxas do solo) e vão para o estoque; se
   assert.equal(acc.spendConsumables(id,{wings:{flywing:1,butterflywing:0},potionsUsed:2}),true);
   d=acc.snapshot(id).data;assert.deepEqual(d.wings,{flywing:3,butterflywing:2});
   assert.equal(acc.spendConsumables(id,{wings:{},potionsUsed:0}),false,'nada gasto = nada muda');
-  assert.match(read('server.mjs'),/if\(p&&member\.userId&&!room\.world\.finished\)\{try\{accounts\.spendConsumables\(member\.userId,\{wings:p\.wingsUsed,potionsUsed:p\.potionsUsed\}\)/);
+  assert.match(read('server.mjs'),/if\(p&&member\.userId&&!room\.world\.finished&&!member\.rewarded\)\{try\{accounts\.spendConsumables\(member\.userId,\{wings:p\.wingsUsed,potionsUsed:p\.potionsUsed\}\)/);
  }finally{child.kill();fs.rmSync(dir,{recursive:true,force:true});}
 });
 

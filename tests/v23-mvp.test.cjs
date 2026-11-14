@@ -183,7 +183,7 @@ test('V23 Etapa 4: a tela desenha avisos do motor, usa portais só com E e mostr
  assert.match(game,/Gear\.grantItem\(items\(\),\{id:e\.id,affixes:e\.affixes\}/);
  assert.match(game,/Controls\.matches\(event,'portal'\) && nearbyPortal\(\)/);
  assert.match(game,/function nearbyPortal\(\)/);
- assert.match(read('server.mjs'),/item:room\.world\.won\?p\.mvpItem\|\|null:null/);
+ assert.match(read('server.mjs'),/item:win\?p\.mvpItem\|\|null:null/);
 });
 
 test('V24.1: modo infinito pós-MVP — EXP ×2,5, hordas maiores e mais densas',async()=>{

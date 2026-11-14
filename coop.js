@@ -210,6 +210,15 @@ const Coop = (() => {
     inputTimer = setInterval(sendInput, 33);
     pingTimer = setInterval(sendPing, 2000);
   }
+  /** V25.10: sai da run no meio guardando EXP, Zeny, cartas e descobertas (qualquer jogador, não só o líder). */
+  async function leaveSaving() {
+    const current = session;
+    if (!current) return { ok: false };
+    const result = await api('/' + current.code + '/leave', { token: current.token, save: true });
+    session = undefined; members = []; roomConfig = null; ready = false; hostId = null;
+    clearTimeout(nextPoll); closeSocket(); sessionUi(); status('Você saiu da run e o progresso foi salvo.');
+    return result || { ok: true };
+  }
   function leave(notify = true) {
     const current = session;
     if (!current) return;
@@ -329,5 +338,5 @@ const Coop = (() => {
     if (!session || !isHost()) return;
     await api('/' + session.code + '/next', { token: session.token, mode: modeName });
   }
-  return { init, leave, lobby, next, refresh: sessionUi, id: () => session?.id, host: isHost, config:()=>roomConfig, transport: () => socketOk() ? 'websocket' : 'http', sendEmote };
+  return { init, leave, leaveSaving, lobby, next, refresh: sessionUi, id: () => session?.id, host: isHost, config:()=>roomConfig, transport: () => socketOk() ? 'websocket' : 'http', sendEmote };
 })();

@@ -44,7 +44,8 @@ const ROClientWindows = (()=>{
       for(const [slot,meta] of Object.entries(gearSlots)) {
         const item=displayedGear[slot];const b=button('',()=>{
           const inRun=!!run&&mode!=='menu'&&mode!=='ended';
-          switchTo(()=>inRun?openInventory():openGearDialog(slot));
+          // V25.10: fora da run, o slot abre o equipamento e o "voltar"/fechar retorna para esta janela (não para o menu).
+          switchTo(()=>{if(inRun)openInventory();else{window.gearReturnTo=tab||'equipment';openGearDialog(slot);}});
         },'ro-slot'+(item?' filled':''));
         b.dataset.slot=slot;
         b.style.left=coords[slot][0];b.style.top=coords[slot][1];
@@ -98,7 +99,7 @@ const ROClientWindows = (()=>{
     }
     const actions=make('footer','ro-client-footer');
     actions.append(button('🎒 Abrir inventário',()=>switchTo(openInventory)));
-    actions.append(button('▣ Álbum de cartas',()=>switchTo(openAlbum)));
+    actions.append(button('▣ Álbum de cartas',()=>switchTo(()=>{if(!run||mode==='menu')window.gearReturnTo=tab||'equipment';openAlbum();})));
     actions.append(button('Fechar',close,'ro-close-client'));
     body.replaceChildren(tabs,upper,main,actions);
   }

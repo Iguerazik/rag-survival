@@ -86,7 +86,7 @@ function removeMember(room,id){
  room.members.delete(id);
  // Etapa 5: saiu antes do fim → sem prêmio, mas asas e poções usadas são descontadas da conta (sem duplicar itens).
  const p=room.world?.players.get(id);
- if(p&&member.userId&&!room.world.finished){try{accounts.spendConsumables(member.userId,{wings:p.wingsUsed,potionsUsed:p.potionsUsed});}catch(err){console.error('Falha ao descontar itens usados:',err);}}
+ if(p&&member.userId&&!room.world.finished&&!member.rewarded){try{accounts.spendConsumables(member.userId,{wings:p.wingsUsed,potionsUsed:p.potionsUsed});}catch(err){console.error('Falha ao descontar itens usados:',err);}}
  if(room.world)room.world.players.delete(id);
  try{member.ws?.close(4001)}catch{}
  // Se o líder sair, a liderança passa para o próximo jogador em vez de derrubar a sala inteira.
@@ -128,16 +128,23 @@ function characterOf(member){
   wings:data.wings||{},potions:data.healPotions||0,flyConfig:data.flyConfig||{}}:null;
 }
 const partyOf=room=>[...room.members.values()].map(member=>({...member,character:characterOf(member)}));
+/** Prêmio de UM jogador (fim da run, ou V25.10: saiu no meio com "Sair e salvar" — conta como run não vencida). */
+function grantMember(room,member,win){
+ const p=room.world.players.get(member.id);
+ if(!member.userId||!p)return true;
+ accounts.grantCoop(member.userId,room.world.id,{
+  zeny:p.zeny,kills:p.kills,level:p.level,map:room.config.map,difficulty:room.config.difficulty,seconds:clock(room.world),
+  line:p.job,playStage:p.stage,win,cards:p.cards,rifts:room.world.riftsDone||0,trial:p.trialDone,
+  discoveries:{...p.discoveries,active:p.evolutions},item:win?p.mvpItem||null:null,
+  wings:{gained:p.wingsGained,used:p.wingsUsed},potionsUsed:p.potionsUsed});
+ member.rewarded=true;return true;
+}
 function grantFinalRewards(room){
  if(!room.world?.finished||room.rewarded)return;
  let failed=false;
  for(const member of room.members.values()){
-  const p=room.world.players.get(member.id);
-  if(member.userId&&p){try{accounts.grantCoop(member.userId,room.world.id,{
-   zeny:p.zeny,kills:p.kills,level:p.level,map:room.config.map,difficulty:room.config.difficulty,seconds:clock(room.world),
-   line:p.job,playStage:p.stage,win:room.world.won,cards:p.cards,rifts:room.world.riftsDone||0,trial:p.trialDone,
-   discoveries:{...p.discoveries,active:p.evolutions},item:room.world.won?p.mvpItem||null:null,
-   wings:{gained:p.wingsGained,used:p.wingsUsed},potionsUsed:p.potionsUsed});}catch(err){failed=true;console.error('Falha ao registrar recompensa co-op:',err);}}
+  if(member.rewarded)continue;
+  try{grantMember(room,member,!!room.world.won);}catch(err){failed=true;console.error('Falha ao registrar recompensa co-op:',err);}
  }
  if(!failed){room.rewarded=true;room.phase='ended';}
 }
@@ -177,9 +184,14 @@ async function roomsApi(req,res,parts){
  if(!me || me.userId!==(account?.id||null))return send(res,401,{error:'Sessão da sala inválida'});
  me.updated=Date.now();
  if(action==='leave'){
+   // V25.10: qualquer jogador (não só o líder) pode sair no meio da run guardando EXP, Zeny, cartas e descobertas.
+   let saved=false;
+   if(data.save===true&&room.phase==='playing'&&room.world&&!room.world.finished&&!me.rewarded){
+     try{saved=grantMember(room,me,false);}catch(err){console.error('Falha ao salvar a saída da run:',err);}
+   }
    removeMember(room,me.id);
    if(!room.members.size)closeRoom(room);
-   return send(res,200,{ok:true});
+   return send(res,200,{ok:true,saved});
  }
  if(action==='settings'){
    if(me.id!==room.hostId)return send(res,403,{error:'Só o líder escolhe mapa e dificuldade'});

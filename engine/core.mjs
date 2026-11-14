@@ -459,7 +459,8 @@ function defeated(world,m,source){
   world.spPotionAt=world.time+lag(world,11);groundDrop(world,'sppotion',m.x+5,m.y+5,30);}
  // Mesmas chances de carta do modo solo (cards.js / game.js): comum 0,035% · elite 0,045% · miniboss 0,08% · MVP 0,75%.
  // Só monstros que TÊM carta (antes o online sorteava carta até de quem não tem, como Gatuna/Gatuno).
- if(CARDS.has(m.id)&&rand(world)<(m.cardRate??(m.elite==='mvp'?.0075:m.elite==='miniBoss'?.0008:m.elite?.00045:.00035))){
+ // V25.10: no modo infinito as cartas caem 10× menos (a horda é enorme e as cartas viravam rotina).
+ if(CARDS.has(m.id)&&rand(world)<(m.cardRate??(m.elite==='mvp'?.0075:m.elite==='miniBoss'?.0008:m.elite?.00045:.00035))*(world.endless?.1:1)){
    const card=groundDrop(world,'card',m.x,m.y,1,m.id);
    event(world,'cardDrop',{id:m.id,x:card.x,y:card.y});
  }
@@ -1601,8 +1602,12 @@ export function rollMvpGear(world,p){
  const worn=new Set(gearItems(p)),found=new Set(p.discoveries?.codex||[]);
  const wanted=[...new Set(Object.entries(CODEX_EVOLUTIONS).filter(([id,r])=>!found.has(id)&&p.pool.includes(r.skill)&&!worn.has(r.item)&&canEquipItem(r.item,p.job,stage)).map(([,r])=>r.item))];
  if(wanted.length&&rand(world)<.6){const id=wanted[Math.floor(rand(world)*wanted.length)];picks.push(id);types.splice(types.indexOf(ITEMS[id].type),1);}
- while(picks.length<4&&types.length){
-  const type=types.splice(Math.floor(rand(world)*types.length),1)[0];
+ // V25.10: chapéu aparecia pouco (só ~50% dos tesouros); agora entra em ~80% deles, e a peça do Códex é um extra.
+ const limit=picks.length?5:4;
+ if(types.includes('headgear')&&rand(world)<.6)types.unshift(...types.splice(types.indexOf('headgear'),1));
+ let first=types[0]==='headgear';
+ while(picks.length<limit&&types.length){
+  const type=first?types.shift():types.splice(Math.floor(rand(world)*types.length),1)[0];first=false;
   const ofType=usable.filter(id=>ITEMS[id].type===type);
   // V25.2: o piso de raridade é relativo ao melhor item que existe DAQUELE tipo. Chapéus e acessórios não têm
   // raridade 4, então a partir do 2º mapa só saíam o Elmo e o Rosário; agora entram as duas melhores raridades do tipo.
