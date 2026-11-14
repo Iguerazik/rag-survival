@@ -48,7 +48,18 @@ test('V25.10: qualquer jogador sai da run online guardando o progresso; o grupo 
 });
 
 test('V25.10: botão "Sair da run e salvar" para todos no online; cartas 10× mais raras no infinito',()=>{
- assert.match(read('game.js'),/Sair da run e salvar/);
+ assert.match(read('game.js'),/Sair da run sozinho e salvar/);
  assert.match(read('coop.js'),/async function leaveSaving\(\)/);
  assert.match(read('engine/core.mjs'),/\*\(world\.endless\?\.1:1\)\)\{/);
+});
+
+test('V25.11: personagem travado na sala, só o líder encerra o infinito para todos, item do MVP não some no merge',()=>{
+ const game=read('game.js'),server=read('server.mjs');
+ assert.match(game,/function roomLocked\(\)/);
+ assert.match(game,/if \(id !== selected && roomLocked\(\)\)/);
+ assert.match(server,/if\(me\.id!==room\.hostId&&data\.input\.endRun\)/);
+ assert.match(server,/if\(me\.id!==room\.hostId&&msg\.input\.endRun\)/);
+ assert.match(game,/Sair da run sozinho e salvar/);
+ assert.match(game,/\.\.\.\(Array\.isArray\(server\.items\)\?\{items:server\.items\}:\{\}\)/);
+ assert.match(server,/grantMember\(room,me,!!room\.world\.endless\)/);
 });

@@ -662,7 +662,10 @@ function skillTree(job, talents, onSpend) {
   }
   return grid;
 }
+// V25.11: dentro de uma sala online o personagem fica travado (trocar no lobby misturava a classe de um com a skill de outro).
+function roomLocked() { return typeof Coop !== 'undefined' && !!Coop.id?.(); }
 function selectClass(id) {
+  if (id !== selected && roomLocked()) { try { Coop.refresh(); } catch {} announceLocked(); return; }
   selected = id;
   if (!mapUnlocked(selectedMap)) selectedMap=mapOrder[0];
   selectedDifficulty=Campaign.validDifficulty(saved,selected,selectedDifficulty);
@@ -1428,6 +1431,10 @@ function showDialog(label, title, body, actions) {
   ui.dialog.hidden = false;
   ui.actions.querySelector('button')?.focus({ preventScroll: true });
 }
+function announceLocked(){
+  const msg='Personagem travado enquanto você está numa sala online. Saia da sala para trocar de personagem.';
+  if(run&&mode!=='menu')announce(msg,4);else{const st=document.getElementById('coop-status');if(st)st.textContent=msg;}
+}
 async function leaveRunSaving(){
   if(!run?.coop||mode==='ended')return;
   const finishedRun=run,line=run.line,result={line,kills:run.kills,seconds:Math.max(0,run.time-(run.mapStart||0)),win:false,zeny:run.zeny};
@@ -1452,9 +1459,9 @@ function pause() {
   const lock = $('hud-layout-lock'), locked = lock?.getAttribute('aria-pressed') === 'true';
   showDialog(run.inMvp ? 'ARENA DO MVP' : expeditions[run.map].name.toUpperCase(), 'Jogo pausado', 'A partida continua de onde você parou. As janelas da tela (personagem, mapa, atalhos, música) podem ser arrastadas pelo título.', [
     button('Continuar', 'primary', resume),
-    ...(run.endless!=null ? [button('Encerrar run e receber recompensas', 'primary', () => { run.endRequest = true; resume(); })] : []),
-    // V25.10: no online, qualquer jogador pode sair da run guardando o que já ganhou (o grupo continua jogando).
-    ...(run.coop && run.endless==null ? [button('Sair da run e salvar (EXP, Zeny e cartas)', 'secondary', () => leaveRunSaving())] : []),
+    // V25.11: no online só o líder encerra o infinito para o grupo; qualquer jogador sai SOZINHO salvando (o grupo continua).
+    ...(run.endless!=null && (!run.coop || Coop.host()) ? [button(run.coop?'Encerrar run para o grupo e receber recompensas':'Encerrar run e receber recompensas', 'primary', () => { run.endRequest = true; resume(); })] : []),
+    ...(run.coop ? [button('Sair da run sozinho e salvar (EXP, Zeny e cartas)', 'secondary', () => leaveRunSaving())] : []),
     button('Restaurar posição das janelas', 'secondary', () => { $('hud-layout-reset')?.click(); resume(); }),
     button(locked ? 'Destravar janelas' : 'Travar janelas', 'secondary', () => { lock?.click(); resume(); }),
     button('Voltar ao menu', 'secondary', menu),
@@ -1505,7 +1512,11 @@ async function syncOnlineRewards(result){
   const codexFound={...(saved.codexFound||{}),...(server.codexFound||{})},runSynergies={...(saved.runSynergies||{}),...(server.runSynergies||{})};
   saved={...server,...saved,journeys,album,campaign,codexFound,runSynergies,codexCoins:Math.max(Number(server.codexCoins)||0,Number(saved.codexCoins)||0),
     zeny:Math.max(Number(server.zeny)||0,(Number(saved.zeny)||0)+(Number(result.zeny)||0)),
-    best:Math.max(Number(server.best)||0,Number(saved.best)||0)};
+    best:Math.max(Number(server.best)||0,Number(saved.best)||0),
+    // V25.11: o servidor acabou de gravar o item do MVP e as asas/poções da run. Antes o save local (sem o item)
+    // sobrescrevia a lista e o item sumia do inventário; agora itens e consumíveis vêm da conta.
+    ...(Array.isArray(server.items)?{items:server.items}:{}),...(server.wings?{wings:server.wings}:{}),
+    ...(server.healPotions!=null?{healPotions:server.healPotions}:{})};
   try{localStorage.setItem(SAVE,JSON.stringify(saved));}catch{}
   window.MidgardAccount.queueSave(saved);
   return {before,after:journeys[result.line]};

@@ -187,7 +187,8 @@ async function roomsApi(req,res,parts){
    // V25.10: qualquer jogador (não só o líder) pode sair no meio da run guardando EXP, Zeny, cartas e descobertas.
    let saved=false;
    if(data.save===true&&room.phase==='playing'&&room.world&&!room.world.finished&&!me.rewarded){
-     try{saved=grantMember(room,me,false);}catch(err){console.error('Falha ao salvar a saída da run:',err);}
+     // No modo infinito o MVP já caiu: sair sozinho conta como vitória (item do MVP e mapa liberado).
+     try{saved=grantMember(room,me,!!room.world.endless);}catch(err){console.error('Falha ao salvar a saída da run:',err);}
    }
    removeMember(room,me.id);
    if(!room.members.size)closeRoom(room);
@@ -254,6 +255,8 @@ async function roomsApi(req,res,parts){
    if(me.profile.name!==changed.name||me.profile.job!==changed.job){me.profile=changed;if(me.id!==room.hostId)me.ready=false}
  }
  if(room.phase==='playing'&&data.input&&typeof data.input==='object'){
+   // V25.11: só o líder encerra o modo infinito para todos; os outros saem sozinhos ("Sair da run e salvar").
+   if(me.id!==room.hostId&&data.input.endRun)data.input={...data.input,endRun:false};
    command(room.world,me.id,data.input);
    me.input=inputView(room.world,me.id);
  }
@@ -371,6 +374,7 @@ function wsMessage(conn,text){
  if(!me||!room||rooms.get(room.code)!==room||!room.members.has(me.id))return;
  me.updated=now;
  if(msg.t==='in'&&room.phase==='playing'&&room.world&&msg.input&&typeof msg.input==='object'){
+  if(me.id!==room.hostId&&msg.input.endRun)msg.input={...msg.input,endRun:false};
   command(room.world,me.id,msg.input);me.input=inputView(room.world,me.id);
  }else if(msg.t==='ping')wsJson(conn,{t:'pong',c:Number.isFinite(msg.c)?msg.c:0});
  else if(msg.t==='emote'&&room.phase==='playing'&&EMOTE_IDS.has(msg.id)){
