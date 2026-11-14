@@ -132,7 +132,21 @@ const MenuHome = (() => {
       online.title = user ? 'Progresso salvo no servidor.' : 'Sem conta o progresso fica só neste navegador.';
     }
     text('mh-hero-name', info.job.name);
+    playAsButton();
     kick();
+  }
+  /** V26: atalho "Jogar como" (classes anteriores já liberadas) ao lado do nome da classe. */
+  function playAsButton() {
+    const tag = $('mh-hero-tag'); if (!tag) return;
+    let b = $('mh-playas');
+    if (!b) {
+      b = document.createElement('button'); b.type = 'button'; b.id = 'mh-playas'; b.className = 'mh-emote-open mh-playas';
+      b.title = 'Jogar com uma classe anterior já liberada'; b.innerHTML = '<span>⇄ Jogar como</span>';
+      b.addEventListener('click', () => { try { window.openProgressionGuide?.(); setTimeout(() => document.querySelector('.progression-playas')?.scrollIntoView({ block: 'center' }), 50); } catch {} });
+      tag.append(b);
+    }
+    let stage = 0; try { stage = journeyOf().stage || 0; } catch {}
+    b.hidden = stage < 1;
   }
   function cycleClass(step) {
     const list = Object.keys(jobLines), i = list.indexOf(selected);
