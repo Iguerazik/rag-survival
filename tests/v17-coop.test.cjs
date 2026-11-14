@@ -67,7 +67,7 @@ test('V17: ataques e conjuração de habilidades sincronizam hit no quadro de im
  const game=script('game.js'),fx=script('combat-v17.js'),client=script('coop.js');
  // V23: o efeito da habilidade espera a chegada (pendingEffects) e o golpe básico, o impacto (resolveStrikes) — no motor.
  const core=script('engine/core.mjs');
- assert.match(core,/world\.pendingEffects\.push\(\{time:world\.time\+(?:lag\(world,)?arrive/);
+ assert.match(core,/world\.pendingEffects\.push\(\{time:world\.time\+(?:lag\(world,)?(?:cast\+)?arrive/); // V25.12: + conjuração
  assert.match(core,/resolveStrikes\(world,p,visible\)/);
  assert.match(game,/CombatV17\.draw\(ctx,actor,motion/);
  assert.match(game,/CombatV17\.draw\(ctx,actor,remote/);

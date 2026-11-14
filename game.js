@@ -744,7 +744,9 @@ function resize() {
 function onlineMoveIntent(){
   let dx=Number(keys.has('d')||keys.has('arrowright'))-Number(keys.has('a')||keys.has('arrowleft'))+(run.touch?.x||0);
   let dy=Number(keys.has('s')||keys.has('arrowdown'))-Number(keys.has('w')||keys.has('arrowup'))+(run.touch?.y||0);
-  if((Math.abs(dx)+Math.abs(dy))>.01){moveRoute=[];moveTarget=undefined;}
+  // V25.12: teclado e clique não brigam mais: com tecla apertada vale o teclado; um clique feito
+  // durante isso fica guardado e o herói segue até lá ao soltar. Apertar uma tecla nova cancela o clique antigo.
+  if((Math.abs(dx)+Math.abs(dy))>.01){/* teclado manda */}
   else if(moveRoute?.length){
     while(moveRoute.length && distance(run.player,moveRoute[0])<14)moveRoute.shift();
     if(moveRoute.length){const aim=moveRoute[0],len=Math.hypot(aim.x-run.player.x,aim.y-run.player.y)||1;
@@ -1165,8 +1167,8 @@ function receiveAuthoritativeWorld(world){
     if(e.type==='hurt'&&e.player===selfId()){p.hitFlash=run.time+.24;burst(p.x,p.y,'#ff9e8b',6);tone(122,79,.2,'triangle',.075);}
     if(e.type==='downed'&&e.player===selfId())announce('Você caiu! Um aliado pode ficar perto de você para ressuscitar.',5);
     if(e.type==='revived'&&e.player===selfId())announce('Você foi ressuscitado! 3 segundos de proteção.',4);
-    if(e.type==='revived'&&e.by===selfId())announce('Companheiro ressuscitado! ✚',3);
-    if(e.type==='elite'&&!world.arena)announce('⚔ ELITE APARECEU! Derrote-o para receber recompensas.',4);
+    if(e.type==='revived'&&e.by===selfId())minorNote('Companheiro ressuscitado! ✚',3);
+    if(e.type==='elite'&&!world.arena)minorNote('⚔ ELITE APARECEU! Derrote-o para receber recompensas.',4);
     if(e.type==='boss')announce('⚔ MVP invocado! A luta final começou.',5);
     if(e.type==='levelUp'&&e.player===selfId()){
       popup(p.x,p.y-43,'NÍVEL '+e.level,'#ffdf8d',14);
@@ -1189,11 +1191,19 @@ function receiveAuthoritativeWorld(world){
       else if(run.numbers.length<14)popup(loc.x,loc.y-65,name,'#fff3c9',12);
     }
     if(e.type==='projectile'){
-      if(run.onlineProjectiles.length<24)run.onlineProjectiles.push({at:performance.now(),duration:e.duration||.25,
+      if(run.onlineProjectiles.length<24)run.onlineProjectiles.push({at:performance.now()+(e.delay||0)*1000,duration:e.duration||.25,
         x:e.fromX,y:e.fromY,toX:e.toX,toY:e.toY,skill:e.skill||'fire'});
     }
+    // V25.12: barra de conjuração (o personagem continua andando enquanto conjura).
+    if(e.type==='castStart'&&e.duration>0){run.casts=run.casts||new Map();run.casts.set(e.player,{skill:e.skill,start:performance.now(),end:performance.now()+e.duration*1000});}
+    if(e.type==='cardWon'){
+      const mine=e.player===selfId(),card=cardDb[e.id]?.name||e.id;
+      announce('🃏 '+card+' · sorteada'+(e.party>1?' entre '+e.party+' jogadores':'')+' para '+(mine?'VOCÊ':nameOf(e.player))+'!',6);
+      if(mine){tone(660,1320,.35,'sine',.06);run.picked.push(card);}
+      if(run.effects.length<16)effect('ring',e.x,e.y,60,'#ffd65a');
+    }
     if(e.type==='skillFail'&&e.player===selfId()){const name=skillInfo(e.skill)?.n||'Habilidade';
-      combatNote(name+': '+({cooldown:'recarregando',sp:'SP insuficiente',full:'ninguém precisa de cura',active:'já está ativa',range:'nenhum inimigo ao alcance'}[e.reason]||'não pode ser usada agora')+'.');}
+      combatNote(name+': '+({casting:'ainda conjurando outra habilidade',cooldown:'recarregando',sp:'SP insuficiente',full:'ninguém precisa de cura',active:'já está ativa',range:'nenhum inimigo ao alcance'}[e.reason]||'não pode ser usada agora')+'.');}
     if(e.type==='skillEffect'){
       // Efeito no lugar onde a habilidade ACERTA (antes também tocava em cima de quem conjurava).
       const info=skillInfo(e.skill),radius=e.rad||(e.style==='area'?95:52);
@@ -1210,19 +1220,19 @@ function receiveAuthoritativeWorld(world){
     if(e.type==='blocked'&&e.player===selfId())popup(p.x,p.y-44,'Bloqueado','#e9e1ff',12);
     if(e.type==='trial')announce('PROVA DE GUILDA: '+e.name+' apareceu! Derrote-o para liberar a evolução da classe.',7);
     if(e.type==='trialDone'&&!run.local)announce('Prova da Guilda concluída: '+e.name+' derrotado! ✦',6);
-    if(e.type==='contract')announce(e.stage===1?'Rastro revelado: derrotem '+(e.goal||2)+' elites.':e.stage===2?'Elites derrotados! Localizem o selo e consagrem a relíquia.':'Relíquia consagrada · +EXP e baú de elite para o grupo!',6);
-    if(e.type==='magnet')announce(e.kind==='xp'?'Orbe de Experiência · toda a EXP do chão foi recolhida para o grupo!':'Ímã de Zeny · '+(e.amount||0)+' z recolhidos para cada jogador!',4);
+    if(e.type==='contract')minorNote(e.stage===1?'Rastro revelado: derrotem '+(e.goal||2)+' elites.':e.stage===2?'Elites derrotados! Localizem o selo e consagrem a relíquia.':'Relíquia consagrada · +EXP e baú de elite para o grupo!',6);
+    if(e.type==='magnet')minorNote(e.kind==='xp'?'Orbe de Experiência · toda a EXP do chão foi recolhida para o grupo!':'Ímã de Zeny · '+(e.amount||0)+' z recolhidos para cada jogador!',4);
     if(e.type==='riftOpen')announce('✧ Fenda aberta! Pise no portal (ou use o botão) para levar TODO o grupo.',6);
     if(e.type==='riftClosed')combatNote('A fenda se fechou.');
     if(e.type==='riftEnter')announce(nameOf(e.by)+' abriu a fenda · '+(e.name||'Fenda da Guilda')+(e.mvp?'! Derrote o MVP em até 2 minutos.':'! Destrua os 3 selos para enfraquecer o guardião.'),7);
-    if(e.type==='riftWard')announce('SELOS ROMPIDOS · o Guardião está vulnerável!',4);
-    if(e.type==='riftPhase')announce('FASE II · novos selos protegem o guardião!',5);
-    if(e.type==='riftComplete')announce('Fenda concluída! Zeny, cura e um baú de recompensa para o grupo.',6);
+    if(e.type==='riftWard')minorNote('SELOS ROMPIDOS · o Guardião está vulnerável!',4);
+    if(e.type==='riftPhase')minorNote('FASE II · novos selos protegem o guardião!',5);
+    if(e.type==='riftComplete')minorNote('Fenda concluída! Zeny, cura e um baú de recompensa para o grupo.',6);
     if(e.type==='riftCleared')announce('Guardião derrotado! Recolha os prêmios e saia pelo portal no centro (tecla E).',7);
     if(e.type==='riftFailed')announce(e.wiped?'O grupo caiu na fenda · todos voltaram com 25% de HP, sem recompensa.':'O tempo da fenda acabou · o grupo voltou sem recompensa.',6);
     if(e.type==='cardDrop')combatNote('Uma carta rara caiu no chão!');
     if(e.type==='chestShared'){const kind=e.grade==='relic'?'♛ Relicário de imbuimento':e.grade>=3?'♛ Tesouro do MVP':e.grade===2?'♢ Baú de elite':'♢ Baú azul';
-      announce(run.local?kind+' aberto · escolha '+(e.grade==='relic'?'um imbuimento':'uma bênção')+'!':kind+' aberto por '+nameOf(e.by)+' · cada jogador escolhe '+(e.grade==='relic'?'o seu imbuimento':'a sua bênção')+'!',4);}
+      minorNote(run.local?kind+' aberto · escolha '+(e.grade==='relic'?'um imbuimento':'uma bênção')+'!':kind+' aberto por '+nameOf(e.by)+' · cada jogador escolhe '+(e.grade==='relic'?'o seu imbuimento':'a sua bênção')+'!',4);}
     if(e.type==='pickup' && e.player===selfId() && e.kind==='card'){
       // Solo: a carta vai para o álbum local (como sempre foi). Online: o servidor grava na conta.
       if(run.local)collectCard(e.id);
@@ -1232,19 +1242,19 @@ function receiveAuthoritativeWorld(world){
     if(e.type==='drain' && e.player===selfId() && run.numbers.length<12)popup(p.x,p.y-40,'+'+e.amount,'#8dff9c',13);
     // Etapa 3: bênçãos, runas, combinações e evoluções (iguais no solo e no online).
     // Etapa 5: eventos de campo, labirinto, asas, poções, forja e rota da missão.
-    if(e.type==='fieldElite')announce(e.name+' entrou na horda!',5);
+    if(e.type==='fieldElite')minorNote(e.name+' entrou na horda!',5);
     if(e.type==='mazeGuardian')announce('⚠ PORTAIS SELADOS · O GUARDIÃO DOS PORTAIS APARECEU!',7);
     if(e.type==='mazeCleared')announce('GUARDIÃO DERROTADO! Portais reabertos. Recolha os tesouros secretos.',7);
-    if(e.type==='contractRoute')announce(e.route==='seal'?'Rota escolhida: Purificar · bônus contra o MVP.':(e.auto?'Rota da Relíquia escolhida automaticamente · fique perto do selo.':'Rota escolhida: Relíquia · +1 elite e tesouro.'),4);
+    if(e.type==='contractRoute')minorNote(e.route==='seal'?'Rota escolhida: Purificar · bônus contra o MVP.':(e.auto?'Rota da Relíquia escolhida automaticamente · fique perto do selo.':'Rota escolhida: Relíquia · +1 elite e tesouro.'),4);
     if(e.player===selfId()){
-      if(e.type==='flyWing'){announce((e.automatic?'Asa de Mosca automática':'Asa de Mosca')+' · fuga e recuperação por 4s!',4);SkillFX.play('warp',{x:e.x,y:e.y});if(run.local)persistWing('flywing',-1);}
-      if(e.type==='butterfly'){announce('Asa de Borboleta · fenda contra '+e.name+'!',5);if(run.local)persistWing('butterflywing',-1);}
-      if(e.type==='pursuit')announce('⚠ O comandante encontrou seu rastro e voltou à caça!',4);
+      if(e.type==='flyWing'){minorNote((e.automatic?'Asa de Mosca automática':'Asa de Mosca')+' · fuga e recuperação por 4s!',4);SkillFX.play('warp',{x:e.x,y:e.y});if(run.local)persistWing('flywing',-1);}
+      if(e.type==='butterfly'){minorNote('Asa de Borboleta · fenda contra '+e.name+'!',5);if(run.local)persistWing('butterflywing',-1);}
+      if(e.type==='pursuit')minorNote('⚠ O comandante encontrou seu rastro e voltou à caça!',4);
       if(e.type==='mazeWarp'){SkillFX.play('warp',{x:p.x,y:p.y});if(!run.mazeEvent?.active)combatNote('Teleportado para a sala '+(e.room+1)+' do labirinto');tone(520,1040,.3,'sine',.05);}
-      if(e.type==='wing'){announce(RunRelics.names[e.kind]+' obtida! Ative em Inventário → Itens de run.',4);if(run.local)persistWing(e.kind,1);}
+      if(e.type==='wing'){minorNote(RunRelics.names[e.kind]+' obtida! Ative em Inventário → Itens de run.',4);if(run.local)persistWing(e.kind,1);}
       if(e.type==='potionUsed'&&run.local)persist({healPotions:Math.max(0,(saved.healPotions||0)-1)});
-      if(e.type==='zenyCache')announce('Bolsa de Zeny · +'+e.amount+' z',3);
-      if(e.type==='forged')announce('Forja temporária · '+(itemDb[e.item]?.name||e.item)+' · '+RuneLoot.bnames[e.key]+' +'+e.level+'/4',4);
+      if(e.type==='zenyCache')minorNote('Bolsa de Zeny · +'+e.amount+' z',3);
+      if(e.type==='forged')minorNote('Forja temporária · '+(itemDb[e.item]?.name||e.item)+' · '+RuneLoot.bnames[e.key]+' +'+e.level+'/4',4);
     }
     // Etapa 4: ataques com aviso no chão, elementos, imunidades, portal/arena/tesouro do MVP.
     if(e.type==='bossAttack')combatNote(e.name);
@@ -1254,7 +1264,7 @@ function receiveAuthoritativeWorld(world){
       if(run.numbers.length<14)popup(e.x,e.y-35,Elemental.names[e.el]+' ×'+e.f,e.f>1?'#ffdc7b':'#a8bad2',11);}}
     if(e.type==='immune'&&e.by===selfId()&&run.numbers.length<14)popup(e.x,e.y-35,'Imune · '+Elemental.names[e.el],'#bcc9e0',11);
     if(e.type==='magicImmune'&&e.player===selfId())popup(p.x,p.y-44,'Imune','#ffe28a',13);
-    if(e.type==='mvpWarning'){announce('⚠ PRESENÇA DE MVP DETECTADA! Prepare-se para a batalha.',4);tone(180,95,.6,'sawtooth',.07);if(run.effects.length<16)effect('blast',e.x,e.y,120,'#e7b75e');}
+    if(e.type==='mvpWarning'){minorNote('⚠ PRESENÇA DE MVP DETECTADA! Prepare-se para a batalha.',4);tone(180,95,.6,'sawtooth',.07);if(run.effects.length<16)effect('blast',e.x,e.y,120,'#e7b75e');}
     if(e.type==='endlessStart'){announce('∞ MODO INFINITO! O MVP caiu e as hordas não param: EXP ×'+String(e.xp||2.5).replace('.',',')+'. Esc → Encerrar run para receber as recompensas.',9);tone(330,660,.45,'triangle',.06);}
     if(e.type==='mvpPhase'){const names={2:'REFORÇOS',3:'PODER ESPECIAL',4:'FÚRIA'};announce('⚠ MVP · FASE '+e.phase+' — '+names[e.phase]+'!',5);tone(e.phase===4?95:210,110,.5,'triangle',.08);if(run.effects.length<16)effect('blast',e.x,e.y,130,e.phase===4?'#ff584a':'#ffbf68');}
     if(e.type==='mvpEnter')announce('⚠ O MVP '+e.name+' APARECEU! Ele chama reforços · desvie dos avisos no chão.',7);
@@ -1267,11 +1277,11 @@ function receiveAuthoritativeWorld(world){
       }else announce((itemDb[e.id]?.name||e.id)+' · será guardado na sua conta ao fim da partida.',5);
     }
     if(e.type==='chain'){run.chainArcs??=[];if(run.chainArcs.length<18)run.chainArcs.push({x:e.x,y:e.y,tx:e.tx,ty:e.ty,until:run.time+.24});}
-    if(e.type==='levelUp'&&e.player===selfId()&&e.level===3)announce('Cadeia Rúnica desbloqueada · seus acertos saltam para mais dois inimigos!',5);
+    if(e.type==='levelUp'&&e.player===selfId()&&e.level===3)minorNote('Cadeia Rúnica desbloqueada · seus acertos saltam para mais dois inimigos!',5);
     if(e.player===selfId()){
-      if(e.type==='blessing')announce('✦ '+e.name+' · '+e.rank+'/'+e.cap,4);
-      if(e.type==='rune')announce('ᛟ '+e.name+' · '+e.level+'/2',4);
-      if(e.type==='chestZeny')announce('Baú convertido em '+e.amount+' Zeny · todas as bênçãos possíveis já estão no máximo.',4);
+      if(e.type==='blessing')minorNote('✦ '+e.name+' · '+e.rank+'/'+e.cap,4);
+      if(e.type==='rune')minorNote('ᛟ '+e.name+' · '+e.level+'/2',4);
+      if(e.type==='chestZeny')minorNote('Baú convertido em '+e.amount+' Zeny · todas as bênçãos possíveis já estão no máximo.',4);
       if(e.type==='synergy'){announce('✧ COMBINAÇÃO: '+e.name+'!',5);if(run.local&&!saved.runSynergies?.[e.id])persist({runSynergies:{...(saved.runSynergies||{}),[e.id]:true},codexCoins:(saved.codexCoins||0)+75});}
       if(e.type==='evolution'){announce('✨ Evolução descoberta: '+e.name+(run.local&&!saved.codexFound?.[e.id]?' · +240 Códex!':''),4.5);if(run.local&&!saved.codexFound?.[e.id])persist({codexFound:{...(saved.codexFound||{}),[e.id]:true},codexCoins:(saved.codexCoins||0)+240});}
       if(e.type==='runeCombo'){run.shout={name:e.name,at:run.time+1.8,color:'#ffe3a3'};SkillFX.play(e.role==='boss'?'bash':'storm',{x:e.x,y:e.y,from:p,radius:145});
@@ -1404,7 +1414,8 @@ function start(online = false, partySlot = 0, map = selectedMap) {
 function menu() {
   // V22.5: ao terminar uma partida online, voltar ao menu mantém a sala (lobby) para a próxima.
   if (run?.coop) { if (mode === 'ended') Coop.lobby(); else Coop.leave(); }
-  for (const id of ['coop-server-upgrades','coop-server-rewards','online-passives','skill-tip']) { const el = document.getElementById(id); if (el) el.hidden = true; }
+  // V25.12: os ícones de buffs (Kyrie, Gloria…) também somem ao sair da run.
+  for (const id of ['coop-server-upgrades','coop-server-rewards','online-passives','skill-tip','buff-bar']) { const el = document.getElementById(id); if (el) { el.hidden = true; if (id==='buff-bar') { el.dataset.key=''; el.replaceChildren(); } } }
   mode = 'menu';
   run = null;
   BGM.enter('menu',!muted);
@@ -1443,7 +1454,7 @@ async function leaveRunSaving(){
   let text=ok?'Progresso salvo no servidor.':'Você saiu da run. Sem conta conectada, nada foi salvo no servidor.';
   if(ok){try{const change=await syncOnlineRewards(result);if(change)text+=' Base '+(change.before.base||1)+' → '+(change.after.base||1)+' · Classe '+(change.before.job||1)+' → '+(change.after.job||1)+(result.zeny?' · +'+result.zeny.toLocaleString('pt-BR')+' z':'')+'.';}catch{}}
   if(run!==finishedRun)return;
-  mode='ended';BGM.stop();
+  mode='ended';BGM.stop();finishedRun.onlineBuffs=[];try{renderBuffBar();}catch{}
   showDialog('VOCÊ SAIU DA RUN',ok?'Tudo salvo':'Saída da run',text,[button('Voltar ao menu','primary',()=>{run=finishedRun;menu();})]);
 }
 function resume() {
@@ -1538,6 +1549,7 @@ function finish(victory) {
   if(run.authoritative){for(const name of ['coop-server-upgrades','coop-server-rewards']){const window=document.getElementById(name);if(window)window.hidden=true;}const overlay=$('online-death-overlay');if(overlay)overlay.hidden=true;}
   mode = 'ended';
   BGM.stop();
+  try { renderBuffBar(); } catch {} // fim da run: some com os ícones de buffs
   if(!serverOwned)persist({ best: Math.max(saved.best ?? 0, Math.floor(run.time)) });
   // V23.6: tabela de recordes. No online o servidor registra; no solo o navegador envia o resultado (conta logada).
   if(run.local&&window.MidgardAccount?.signedIn()&&run.time>=10)fetch('/api/account/scores',{method:'POST',credentials:'same-origin',cache:'no-store',
@@ -1735,6 +1747,8 @@ function nearestTo(player, range, prioritize = false) {
   return target;
 }
 
+/** V25.12: avisos de menor importância saem do topo da tela e vão para a linha de combate (embaixo, curta). */
+function minorNote(message) { combatNote(message); }
 function combatNote(message) {
   ui.note.textContent = message;
   run.noteUntil = run.time + 1.35;
@@ -1804,7 +1818,7 @@ function tickAuthoritative(dt){
   mob.walking=performance.now()<(mob.walkHold||0);
   mob.walkTick=mob.walking?(mob.walkTick||0)+dt*4.2:0;
  }
- run.onlineProjectiles=run.onlineProjectiles.filter(pr=>performance.now()-pr.at<pr.duration*1000);
+ run.onlineProjectiles=run.onlineProjectiles.filter(pr=>performance.now()-pr.at<pr.duration*1000);if(run.casts)for(const [id,c] of run.casts)if(performance.now()>c.end)run.casts.delete(id);
  for(const fx of run.effects)fx.life-=dt;
  run.effects=run.effects.filter(fx=>fx.life>0);
  for(const n of run.numbers){n.life-=dt;n.y-=dt*25;}
@@ -2312,6 +2326,7 @@ function draw() {
     ctx.restore();
   }
   if(run.authoritative)for(const proj of run.onlineProjectiles||[]){
+    if(performance.now()<proj.at)continue; // ainda conjurando
     const t=clamp((performance.now()-proj.at)/(proj.duration*1000),0,1);
     const x=proj.x+(proj.toX-proj.x)*t,y=proj.y+(proj.toY-proj.y)*t;
     const color=skillColor(proj.skill);
@@ -2335,7 +2350,7 @@ function draw() {
     ...(run.inMvp ? [] : run.field.props.filter(prop => visible(prop, bounds, 265))),
     ...run.mobs.filter(enemy => visible(enemy, bounds)),
     ...run.party.filter(member => member.input.arena === run.inMvp && visible(member.input, bounds)).map(member => ({
-      ...renderRemote(member), id: member.profile.job, name: member.profile.name, ally: true,
+      ...renderRemote(member), id: member.profile.job, name: member.profile.name, ally: true, memberId: member.id,
     })),
     run.player,
   ].sort((a, b) => a.y - b.y);
@@ -2476,6 +2491,13 @@ function draw() {
   for (const fx of run.effects) drawEffect(fx);
   ctx.save();
   ctx.globalCompositeOperation = 'lighter';
+  // V25.12: barra de conjuração embaixo de quem está conjurando (dá para andar enquanto isso).
+  if(run.casts?.size){const now=performance.now();
+    for(const actor of actors){if(actor.scenery||!(actor===run.player||actor.ally))continue;
+      const c=run.casts.get(actor===run.player?selfId():actor.memberId);if(!c||now>c.end)continue;
+      const t=clamp((now-c.start)/(c.end-c.start),0,1),w=44,x=actor.x-w/2,y=actor.y+12;
+      ctx.save();ctx.fillStyle='rgba(10,16,30,.82)';ctx.fillRect(x-1,y-1,w+2,7);ctx.fillStyle='#8fd0ff';ctx.fillRect(x,y,w*t,5);
+      ctx.strokeStyle='#e8f4ff';ctx.lineWidth=1;ctx.strokeRect(x-1,y-1,w+2,7);ctx.restore();}}
   SkillFX.draw(ctx, run.time);
   ctx.restore();
   for (const particle of run.particles) {
@@ -2578,6 +2600,7 @@ window.addEventListener('keydown', event => {
   const move = Controls.moveKey(event);
   if (move && mode === 'play') {
     event.preventDefault();
+    if (!event.repeat && !keys.has(move)) { moveRoute = []; moveTarget = undefined; }
     keys.add(move);
     return;
   }
@@ -2614,6 +2637,8 @@ window.addEventListener('keydown', event => {
 window.addEventListener('keyup', event=>{
   const move=Controls.moveKey(event);
   if(move)keys.delete(move);
+  // Clique feito enquanto andava pelo teclado: recalcula o caminho a partir de onde o herói está agora.
+  if(move&&!keys.size&&moveTarget&&run?.player&&mode==='play'){try{moveRoute=pathTo(moveTarget);}catch{}}
 });
 // V24.1: trocar de aba ou de janela NÃO pausa mais (só o Esc pausa). As teclas são soltas para o herói não andar sozinho.
 window.addEventListener('blur', () => { keys.clear(); clearPointer?.(); });

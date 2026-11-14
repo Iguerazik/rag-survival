@@ -461,8 +461,14 @@ function defeated(world,m,source){
  // Só monstros que TÊM carta (antes o online sorteava carta até de quem não tem, como Gatuna/Gatuno).
  // V25.10: no modo infinito as cartas caem 10× menos (a horda é enorme e as cartas viravam rotina).
  if(CARDS.has(m.id)&&rand(world)<(m.cardRate??(m.elite==='mvp'?.0075:m.elite==='miniBoss'?.0008:m.elite?.00045:.00035))*(world.endless?.1:1)){
-   const card=groundDrop(world,'card',m.x,m.y,1,m.id);
-   event(world,'cardDrop',{id:m.id,x:card.x,y:card.y});
+   // V25.12: no online a carta é SORTEADA entre os jogadores do grupo e todos veem quem ganhou.
+   if(world.players.size>1){
+    const party=[...world.players.values()],winner=party[Math.floor(rand(world)*party.length)];
+    winner.cards.push(m.id);event(world,'cardWon',{player:winner.id,id:m.id,x:Math.round(m.x),y:Math.round(m.y),party:party.length});
+   }else{
+    const card=groundDrop(world,'card',m.x,m.y,1,m.id);
+    event(world,'cardDrop',{id:m.id,x:card.x,y:card.y});
+   }
  }
  // Etapa 5: asas e ímãs (RunRelics.rollDrops do solo). Asas são consumíveis guardados na conta/save.
  if(!m.summoned&&!m.riftSeal&&!m.trial){
@@ -622,9 +628,19 @@ function bossInRange(world,p,visible,range){
  for(const m of visible){if(!isBoss(m)||m.hp<=0||(m.riftGuardian&&world.rift?.ward))continue;const d=distance(p,m);if(d<=range&&d<best){best=d;pick=m;}}
  return pick;
 }
+/** V25.12: tempo de conjuração (s). Magias de Mago/Noviço usam o tempo cheio; as demais classes, 45%.
+ * Habilidades mais fortes demoram mais. DES reduz: 99 de DES ≈ 38% do tempo (mínimo 25%). */
+const CAST_BASE={bolt:.45,ball:.7,area:.9,zone:.8,heal:.5,healzone:.9,buff:.35,debuff:.4,revive:1.2,trap:.3,self:.25,melee:0};
+function castTime(p,def){
+ const base=def.cast??(CAST_BASE[def.k]||0);if(!(base>0))return 0;
+ const caster=p.job==='mage'||p.job==='acolyte';
+ const heavy=.7+Math.min(.8,(def.m||1)*.2),dex=p.base?.s?.dex||1;
+ return Math.round(base*heavy*(caster?1:.45)*Math.max(.25,1-dex/160)*100)/100;
+}
 function skillCast(world,p,id,closest,visible,auto=false){
  const def=SK[id],level=p.skills[id]||0;if(!def||!level||def.k==='passive')return false;
  if(world.time<(p.cooldowns[id]||0))return false;
+ if(world.time<(p.castUntil||0))return false; // V25.12: uma conjuração por vez
  const cost=spCost(p,def,level,auto);if(p.sp<cost)return false;
  const map=nav(world),range=skillRange(p,def),allies=[...world.players.values()];
  // V25.7: habilidades de ataque também miram primeiro o chefe que estiver ao alcance.
@@ -668,8 +684,11 @@ function skillCast(world,p,id,closest,visible,auto=false){
  const arrive=def.k==='bolt'||def.k==='ball'?.26:def.k==='melee'?.22:support?.5:.45;
  const power=p.damage*(1.25+(def.m||0))*(1+level*.23)*dmgBonus(p)*(id==='falcon'?1+p.st.falcon:1)*widePower(p,id);
  skillCombos(world,p,id,level,target,point);
- world.pendingEffects.push({time:world.time+lag(world,arrive),player:p.id,skill:id,target:target?(target.uid??target.id):null,x:point.x,y:point.y,power,level});
- if(def.k==='bolt'||def.k==='ball')event(world,'projectile',{player:p.id,skill:id,fromX:Math.round(p.x),fromY:Math.round(p.y),toX:Math.round(point.x),toY:Math.round(point.y),duration:arrive});
+ // V25.12: tempo de conjuração. Dá para andar conjurando (o personagem não para); DES reduz o tempo.
+ const cast=castTime(p,def);
+ if(cast>0){p.castUntil=world.time+lag(world,cast);event(world,'castStart',{player:p.id,skill:id,duration:Math.round(cast*100)/100});}
+ world.pendingEffects.push({time:world.time+lag(world,cast+arrive),player:p.id,skill:id,target:target?(target.uid??target.id):null,x:point.x,y:point.y,power,level});
+ if(def.k==='bolt'||def.k==='ball')event(world,'projectile',{player:p.id,skill:id,fromX:Math.round(p.x),fromY:Math.round(p.y),toX:Math.round(point.x),toY:Math.round(point.y),duration:arrive,delay:Math.round(cast*100)/100});
  return true;
 }
 // V25.7: quem é ressuscitado (por um aliado ou pela habilidade) volta com HP e SP cheios.
@@ -1045,7 +1064,7 @@ function advancePlayer(world,p,dt){
  const visible=world.mobs.filter(m=>targetable(m)&&distance(m,p)<=reach&&hasSight(map,p,m));
  resolveStrikes(world,p,visible);
  let closest=null,best=Infinity;for(const m of visible){const d=distance(m,p);if(d<best){best=d;closest=m;}}
- if(!hidden&&closest&&world.time>=p.attackAt&&input.attack){
+ if(!hidden&&closest&&world.time>=p.attackAt&&world.time>=(p.castUntil||0)&&input.attack){
   const range=p.range+(p.modifiers.range||0)+st.range+(p.level>6?20:0);
   // V25.7: chefe (MVP, mini chefe, guardião, Prova) ao alcance tem prioridade sobre o monstro mais perto.
   const boss=bossInRange(world,p,visible,range);
@@ -1068,7 +1087,7 @@ function advancePlayer(world,p,dt){
   if(manual){casted=skillCast(world,p,manual,closest,visible);
    // Tecla apertada e a habilidade não saiu: avisa o motivo (antes não acontecia nada na tela).
    if(!casted&&SK[manual]){const def=SK[manual],lv=p.skills[manual]||1;
-    const reason=world.time<(p.cooldowns[manual]||0)?'cooldown':p.sp<spCost(p,def,lv)?'sp':def.k==='heal'||def.k==='healzone'?'full':def.k==='buff'&&p.buffs.get(manual)?.until>world.time+1?'active':'range';
+    const reason=world.time<(p.castUntil||0)?'casting':world.time<(p.cooldowns[manual]||0)?'cooldown':p.sp<spCost(p,def,lv)?'sp':def.k==='heal'||def.k==='healzone'?'full':def.k==='buff'&&p.buffs.get(manual)?.until>world.time+1?'active':'range';
     event(world,'skillFail',{player:p.id,skill:manual,reason});}}
   if(!casted && input.auto && world.time>=p.lastSkillAt){
    const ready=p.slots.filter(id=>world.time>=(p.cooldowns[id]||0))
