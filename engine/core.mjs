@@ -56,7 +56,7 @@ const mobStat={
  orc_zombie:[65,55,17,3],orc_skeleton:[58,74,16,3],steel_chonchon:[43,110,12,2],
  marionette:[55,76,16,3],whisper:[44,83,13,3],nightmare:[82,82,22,4],deviruchi:[70,94,20,4],
  // V26 (Diretor de Eventos): família Poring para a Invasão de Porings (sprites poring/lunatic/fabre/spore já existem).
- poring:[20,58,8,1],lunatic:[26,82,10,2],fabre:[38,66,12,2],spore:[52,56,15,3],
+ poring:[20,58,8,1],lunatic:[26,82,10,2],fabre:[38,66,12,2],spore:[52,56,15,3],mimic:[70,92,20,6],
  savage:[76,90,20,4],beetle_king:[85,84,21,4],greatestgeneral:[98,30,25,5]};
 /* V25.4: cada mapa da sequência tem monstros com mais vida e mais dano que o anterior. A média do elenco de cada
  * mapa (já com o bônus por mapa) nunca fica abaixo da do mapa anterior +12% de HP e +8% de dano; mapas que já
@@ -1238,7 +1238,8 @@ function autoCollect(world){
    const amount=(22+5*(p.skills.recovery||0))*(1+p.base.s.vit*.02)*(1+(p.base.lv-1)*.006);
    const heal=Math.max(0,Math.min(amount,p.max-p.hp));p.hp+=heal;
    event(world,'healed',{player:p.id,by:'potion',amount:Math.round(heal),x:Math.round(p.x),y:Math.round(p.y),skill:'heal'});
-  }else if(item.kind==='chest')shareChest(world,item.amount,p);else if(item.kind==='relic')shareChest(world,'relic',p);else if(item.kind==='card')p.cards.push(item.id);
+  }else if(item.kind==='treasure')openTreasure(world,item,p);
+  else if(item.kind==='chest')shareChest(world,item.amount,p);else if(item.kind==='relic')shareChest(world,'relic',p);else if(item.kind==='card')p.cards.push(item.id);
   else if(item.kind==='xpmagnet'||item.kind==='zenymagnet'){
    // Orbe de Experiência / Ímã de Zeny: recolhe TUDO daquele tipo que está no chão, para o grupo.
    const want=item.kind==='xpmagnet'?'xp':'zeny';let total=0;
@@ -1378,17 +1379,24 @@ const TRIAL_NAMES={sword:['Cavaleiro da Provação','Guardião das Runas'],mage:
  * Estados: idle → prep (aviso curto) → active → done (sucesso/fracasso) → idle (com intervalo).
  * Um evento por vez, nunca durante fenda, arena, MVP ou evento do labirinto. A horda normal continua.
  * Cada evento define: mapas (null = todos), duração, metas, spawns (em lotes, com teto) e recompensas (uma vez só). */
-export const DIRECTOR={first:150,gap:[160,250],prep:4};
+// V26.2: eventos só a partir do 4º mapa da campanha (Orcs) OU na dificuldade Difícil/Pesadelo em qualquer mapa.
+export const DIRECTOR={first:150,gap:[160,250],prep:4,minTier:3,difficulties:['hard','nightmare']};
+export function eventsEnabled(world){return mapTier(world)>=DIRECTOR.minTier||DIRECTOR.difficulties.includes(world.difficulty);}
 export const WORLD_EVENTS={
  poringInvasion:{name:'Invasão de Porings',maps:null,duration:[60,90],weight:1,
   // lotes a cada 1,6 s, no máximo 34 (+6 por jogador) Porings do evento vivos ao mesmo tempo
   interval:1.6,batch:6,alive:34,alivePerPlayer:6,goalShare:.6,
-  roster:[['poring',.58],['lunatic',.18],['fabre',.14],['spore',.10]],poporing:.12,golden:.45}
+  roster:[['poring',.58],['lunatic',.18],['fabre',.14],['spore',.10]],poporing:.12,golden:.45},
+ // Baús aparecem pelo mapa (perto do grupo, longe das paredes e de quem está jogando). Parte deles é Mimic.
+ treasureRain:{name:'Chuva de Tesouros',maps:null,duration:[45,60],weight:1,chests:7,chestsPerPlayer:1,mimic:.3,goalShare:.5},
+ // Formação: guerreiros na frente, arqueiros atrás e dois veteranos nos flancos; depois cada um usa a IA normal.
+ orcMarch:{name:'Marcha dos Orcs',maps:null,duration:[55,65],weight:1,front:7,back:5,perPlayer:2,goalShare:.7}
 };
 function directorState(world){return world.director||(world.director={state:'idle',next:DIRECTOR.first,ev:null,seq:0,history:[]});}
 function eventBlocked(world){return world.arena||world.rift||world.mvpActive||world.bossAlive||world.maze?.active||world.finished||
  (!world.endless&&clock(world)>(world.mvpAt||720)-75);} // não começa no último minuto antes do MVP
 function pickEvent(world){
+ if(WORLD_EVENTS[world.director.force])return world.director.force; // só testes (?tipo= no solo / MIDGARD_TEST_EVENT_ID)
  const options=Object.entries(WORLD_EVENTS).filter(([,d])=>!d.maps||d.maps.includes(world.map));
  if(!options.length)return null;
  const last=world.director.history.at(-1);
@@ -1400,21 +1408,29 @@ function pickEvent(world){
 function tickDirector(world,living){
  const dir=directorState(world),now=clock(world);
  if(dir.state==='idle'){
-  if(now<dir.next||!living.length||eventBlocked(world))return;
+  if(now<dir.next||!living.length||eventBlocked(world)||(!eventsEnabled(world)&&!dir.ignoreRules))return; // ignoreRules: só no modo de teste
   const id=pickEvent(world);if(!id){dir.next=now+60;return;}
   const def=WORLD_EVENTS[id],dur=random(world,def.duration[0],def.duration[1]);
   dir.ev={uid:++dir.seq,id,name:def.name,phase:'prep',startAt:now+DIRECTOR.prep,endAt:now+DIRECTOR.prep+dur,
    spawned:0,killed:0,goal:0,nextBatch:now+DIRECTOR.prep,golden:rand(world)<def.golden?now+DIRECTOR.prep+random(world,10,dur*.6):Infinity,goldenUid:0,rewarded:false};
-  dir.state='prep';event(world,'worldEvent',{uid:dir.ev.uid,id,name:def.name,phase:'prep',in:DIRECTOR.prep});
+  dir.state='prep';event(world,'worldEvent',{uid:dir.ev.uid,id,name:def.name,phase:'prep',in:DIRECTOR.prep,angle:Math.round(random(world,0,D.PI*2)*1000)/1000});
+  dir.ev.angle=world.events.at(-1).angle;
   return;
  }
  const ev=dir.ev,def=ev&&WORLD_EVENTS[ev.id];if(!ev||!def){dir.state='idle';dir.ev=null;return;}
  // MVP, fenda ou arena no meio do evento: ele termina sem recompensa (os monstros do evento continuam no mapa).
  if((world.arena||world.rift||world.mvpActive)&&dir.state!=='done'){finishEvent(world,dir,'cancel');return;}
- if(dir.state==='prep'&&now>=ev.startAt){dir.state='active';ev.phase='active';event(world,'worldEvent',{uid:ev.uid,id:ev.id,name:ev.name,phase:'start',ends:Math.round(ev.endAt-now)});}
+ if(dir.state==='prep'&&now>=ev.startAt){
+  dir.state='active';ev.phase='active';
+  if(ev.id==='treasureRain')startTreasureRain(world,ev,def,living,now);
+  if(ev.id==='orcMarch')startOrcMarch(world,ev,def,living);
+  event(world,'worldEvent',{uid:ev.uid,id:ev.id,name:ev.name,phase:'start',ends:Math.round(ev.endAt-now),goal:ev.goal});
+ }
  if(dir.state!=='active')return;
  if(ev.id==='poringInvasion')tickPoringInvasion(world,ev,def,living,now);
- if(now>=ev.endAt)finishEvent(world,dir,ev.killed>=Math.max(1,Math.ceil(ev.spawned*def.goalShare))?'success':'fail');
+ if(ev.id==='treasureRain'&&ev.opened>=ev.total)return finishEvent(world,dir,ev.killed>=ev.goal?'success':'fail'); // todos os baús abertos
+ if(ev.id==='orcMarch'&&ev.spawned&&ev.killed>=ev.spawned)return finishEvent(world,dir,'success'); // formação destruída
+ if(now>=ev.endAt)finishEvent(world,dir,ev.killed>=Math.max(1,ev.id==='poringInvasion'?Math.ceil(ev.spawned*def.goalShare):ev.goal)?'success':'fail');
 }
 function tickPoringInvasion(world,ev,def,living,now){
  if(now>=ev.nextBatch&&living.length){
@@ -1434,10 +1450,47 @@ function tickPoringInvasion(world,ev,def,living,now){
  }
  ev.goal=Math.max(1,Math.ceil(ev.spawned*def.goalShare));
 }
+function startTreasureRain(world,ev,def,living,now){
+ const map=nav(world),total=def.chests+def.chestsPerPlayer*living.length,spots=[];
+ for(let tries=0;spots.length<total&&tries<total*14;tries++){
+  const p=living[tries%living.length],a=random(world,0,D.PI*2),d=random(world,220,560);
+  const at=openNear(world,p,p.x+D.cos(a)*d,p.y+D.sin(a)*d*.8);
+  if(!passable(map,at.x,at.y))continue;
+  if(living.some(q=>distance(q,at)<120)||spots.some(o=>distance(o,at)<80))continue; // nunca em cima de alguém nem colados
+  spots.push(at);
+ }
+ const mimics=Math.max(1,Math.round(spots.length*def.mimic));
+ spots.forEach((at,i)=>{const item=groundDrop(world,'treasure',at.x,at.y,i<mimics?'mimic':'gold');item.eventId=ev.uid;item.timed=true;item.expires=world.time+lag(world,ev.endAt-now);});
+ ev.total=spots.length;ev.opened=0;ev.goal=Math.max(1,Math.ceil((spots.length-mimics)*def.goalShare));ev.spawned=spots.length;
+}
+/** Baú da Chuva de Tesouros aberto por aproximação (igual aos outros baús). Mimic vira um monstro de evento. */
+function openTreasure(world,item,p){
+ const ev=world.director?.ev;if(ev&&item.eventId===ev.uid)ev.opened++;
+ if(item.amount==='mimic'){
+  const m=spawn(world,'mimic',{at:{x:item.x,y:item.y}});m.eventId=item.eventId;m.variant='mimic';m.name='Mímico';
+  m.hp=m.max=m.max*5;m.damage*=1.35;m.speed*=1.1;m.xp*=4;
+  event(world,'worldEvent',{uid:item.eventId,id:'treasureRain',name:'Chuva de Tesouros',phase:'mimic',player:p.id,x:Math.round(item.x),y:Math.round(item.y)});
+  return;
+ }
+ const gain=30+mapTier(world)*12;p.zeny+=gain;if(ev&&item.eventId===ev.uid)ev.killed++; // "killed" = baús bons abertos
+ const bonus=rand(world)<.25;if(bonus)shareChest(world,1,p);
+ event(world,'worldEvent',{uid:item.eventId,id:'treasureRain',name:'Chuva de Tesouros',phase:'treasure',player:p.id,amount:gain,bonus,x:Math.round(item.x),y:Math.round(item.y)});
+}
+function startOrcMarch(world,ev,def,living){
+ const map=nav(world),target=living[Math.floor(rand(world)*living.length)],a=ev.angle??random(world,0,D.PI*2);
+ const fx=D.cos(a),fy=D.sin(a),px=-fy,py=fx,center={x:target.x+fx*640,y:target.y+fy*640*.8};
+ const extra=def.perPlayer*(living.length-1),front=def.front+extra,back=def.back+Math.ceil(extra/2);
+ const place=(id,row,i,count,opts={})=>{const off=(i-(count-1)/2)*48,x=center.x+px*off+fx*row,y=center.y+(py*off+fy*row)*.8;
+  const at=openNear(world,target,x,y);const m=spawn(world,id,{at,...opts});m.eventId=ev.uid;ev.spawned++;return m;};
+ for(let i=0;i<front;i++){const m=place('orc_zombie',0,i,front);m.name='Orc Guerreiro';m.hp=m.max=m.max*1.4;}
+ for(let i=0;i<back;i++){const m=place('orc_skeleton',70,i,back);m.name='Orc Arqueiro';}
+ for(const side of [-1,1]){const m=place('orc_zombie',35,side<0?-1:front,front,{elite:'elite'});m.name='Orc Veterano';m.hp=m.max=m.max*1.6;m.damage*=1.4;}
+ ev.goal=Math.max(1,Math.ceil(ev.spawned*def.goalShare));
+}
 /** Abate de monstro de evento: conta para a meta; o Poring Dourado dá Zeny para cada jogador e um baú de elite. */
 function eventKill(world,m){
  const ev=world.director?.ev;if(!ev||m.eventId!==ev.uid)return;
- ev.killed++;
+ if(ev.id!=='treasureRain')ev.killed++;
  if(m.variant==='gold'&&!m.goldRewarded){m.goldRewarded=true;const gain=120+mapTier(world)*40;
   for(const p of world.players.values())p.zeny+=gain;
   groundDrop(world,'chest',m.x,m.y,2);event(world,'worldEvent',{uid:ev.uid,id:ev.id,name:ev.name,phase:'goldenDown',amount:gain,x:Math.round(m.x),y:Math.round(m.y)});}
@@ -1449,6 +1502,7 @@ function finishEvent(world,dir,result){
   ev.rewarded=true;const xp=60+mapTier(world)*18,zeny=40+mapTier(world)*15;
   giveExperience(world,xp);for(const p of world.players.values())p.zeny+=zeny;reward={xp,zeny};
  }
+ if(ev.id==='treasureRain')world.pickups=world.pickups.filter(o=>!(o.kind==='treasure'&&o.eventId===ev.uid)); // baús que sobraram somem
  event(world,'worldEvent',{uid:ev.uid,id:ev.id,name:ev.name,phase:'end',result,killed:ev.killed,spawned:ev.spawned,goal:ev.goal,reward});
  dir.history.push(ev.id);if(dir.history.length>8)dir.history.shift();
  dir.state='idle';dir.ev=null;dir.next=clock(world)+random(world,DIRECTOR.gap[0],DIRECTOR.gap[1]);
@@ -1891,10 +1945,10 @@ export function snapshotWorld(world,id,sinceEvent=0,opts={}){
      m.warning?[m.warning.kind,Math.round(m.warning.x),Math.round(m.warning.y),m.warning.radius,Math.round(m.warning.angle*1000)/1000,Math.round(m.warning.since*1000)/1000,Math.round(m.warning.at*1000)/1000]:0]),
    players:Object.fromEntries([...world.players.values()].map(p=>[p.id,inputView(world,p.id)]))};
  if(world.zones.length)snap.zones=world.zones.filter(z=>near(z,MOB_VIEW_X,MOB_VIEW_Y)).map(z=>[z.uid,Math.round(z.x),Math.round(z.y),z.rad,z.el,z.trap?1:z.heal?2:0]);
- if(opts.pickups!==false)snap.pickups=world.pickups.filter(o=>o.kind==='card'||o.kind==='chest'||o.kind==='relic'||o.kind==='xpmagnet'||o.kind==='zenymagnet'||near(o,PICKUP_VIEW,PICKUP_VIEW))
+ if(opts.pickups!==false)snap.pickups=world.pickups.filter(o=>o.kind==='card'||o.kind==='chest'||o.kind==='treasure'||o.kind==='relic'||o.kind==='xpmagnet'||o.kind==='zenymagnet'||near(o,PICKUP_VIEW,PICKUP_VIEW))
    .map(o=>[o.uid,o.kind,Math.round(o.x),Math.round(o.y),o.amount,o.id||'']);
  return snap;
 }
 export function roomStatus(world){return {id:world.id,map:world.map,phase:world.phase,time:world.time,kills:world.kills,players:[...world.players.values()].map(p=>({id:p.id,level:p.level,hp:p.hp,zeny:p.zeny}))}}
 /** Ganchos só para os testes automáticos (não usados pelo jogo). */
-export const testing=Object.freeze({defeated:(world,mob,by)=>defeated(world,mob,by),spawn:(world,id,opts)=>spawn(world,id,opts),basicStrike:(world,p,mob)=>basicStrike(world,p,mob),evades:(world,p,m)=>evades(world,p,m),nav:world=>nav(world)});
+export const testing=Object.freeze({defeated:(world,mob,by)=>defeated(world,mob,by),spawn:(world,id,opts)=>spawn(world,id,opts),basicStrike:(world,p,mob)=>basicStrike(world,p,mob),evades:(world,p,m)=>evades(world,p,m),nav:world=>nav(world),pickEvent:world=>pickEvent(world)});

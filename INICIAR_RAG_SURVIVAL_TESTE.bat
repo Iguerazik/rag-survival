@@ -20,7 +20,8 @@ set "TICK_RATE=60"
 set "SNAPSHOT_RATE=20"
 set "TRUST_PROXY=1"
 set "MIDGARD_AUTO_UPDATE=0"
-rem Teste dos eventos dinamicos: no ONLINE o 1o evento comeca aos 45 s (no solo use o link com ?evento=30).
+rem Teste dos eventos dinamicos: no ONLINE o 1o evento comeca aos 45 s em qualquer mapa (no solo use ?evento=30).
+rem Para escolher o evento online: set MIDGARD_TEST_EVENT_ID=orcMarch  (ou treasureRain / poringInvasion) antes de rodar.
 if not defined MIDGARD_TEST_EVENT_AT set "MIDGARD_TEST_EVENT_AT=45"
 set "LOGS=%~dp0logs-teste"
 if not exist "%DATA_DIR%" mkdir "%DATA_DIR%"

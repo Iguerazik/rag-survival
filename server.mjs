@@ -221,7 +221,7 @@ async function roomsApi(req,res,parts){
    // Somente para testes locais: MIDGARD_TEST_RIFT_AT=10 abre a primeira fenda aos 10 s.
    if(Number(process.env.MIDGARD_TEST_RIFT_AT)>0)room.world.nextRiftAt=Number(process.env.MIDGARD_TEST_RIFT_AT);
    if(Number(process.env.MIDGARD_TEST_MVP_AT)>0)room.world.mvpAt=Number(process.env.MIDGARD_TEST_MVP_AT); // só para testes
-   if(Number(process.env.MIDGARD_TEST_EVENT_AT)>0)room.world.director={state:'idle',next:Number(process.env.MIDGARD_TEST_EVENT_AT),ev:null,seq:0,history:[]}; // só para testes
+   if(Number(process.env.MIDGARD_TEST_EVENT_AT)>0)room.world.director={state:'idle',next:Number(process.env.MIDGARD_TEST_EVENT_AT),ev:null,seq:0,history:[],force:process.env.MIDGARD_TEST_EVENT_ID||null,ignoreRules:true}; // só para testes
    return send(res,200,summary(room));
  }
  if(action==='lobby'){
@@ -248,7 +248,7 @@ async function roomsApi(req,res,parts){
    room.world=makeWorld(map,room.config.difficulty,partyOf(room),WORLD_OPTS);
    if(Number(process.env.MIDGARD_TEST_RIFT_AT)>0)room.world.nextRiftAt=Number(process.env.MIDGARD_TEST_RIFT_AT);
    if(Number(process.env.MIDGARD_TEST_MVP_AT)>0)room.world.mvpAt=Number(process.env.MIDGARD_TEST_MVP_AT); // só para testes
-   if(Number(process.env.MIDGARD_TEST_EVENT_AT)>0)room.world.director={state:'idle',next:Number(process.env.MIDGARD_TEST_EVENT_AT),ev:null,seq:0,history:[]}; // só para testes
+   if(Number(process.env.MIDGARD_TEST_EVENT_AT)>0)room.world.director={state:'idle',next:Number(process.env.MIDGARD_TEST_EVENT_AT),ev:null,seq:0,history:[],force:process.env.MIDGARD_TEST_EVENT_ID||null,ignoreRules:true}; // só para testes
    return send(res,200,summary(room,me.id));
  }
  if(action!=='sync')return send(res,404,{error:'Ação inexistente'});

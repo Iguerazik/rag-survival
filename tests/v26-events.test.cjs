@@ -5,12 +5,11 @@ const root=path.join(__dirname,'..');
 const url=file=>require('node:url').pathToFileURL(path.join(root,file)).href;
 const engine=()=>import(url('authoritative-world.mjs')).then(()=>import(url('engine/core.mjs')));
 const member=(id,job='sword')=>({id,profile:{job,classId:job},character:{base:60,stage:0,stats:{str:60,agi:40,vit:60,int:20,dex:40,luk:10},gear:{weaponAtk:150}}});
-const force=(w,golden=1)=>{w.director={state:'idle',next:0,ev:null,seq:0,history:[]};w.nextRiftAt=1e9;w.eliteAt=1e9;w.contract.done=true;w.trials=[];
- const d=require('node:assert');return golden;};
+const force=(w,id='poringInvasion')=>{w.director={state:'idle',next:0,ev:null,seq:0,history:[],force:id};w.nextRiftAt=1e9;w.eliteAt=1e9;w.contract.done=true;w.trials=[];};
 
 test('V26 Diretor: Invasão de Porings passa por preparação → ativo → fim, com lotes limitados e recompensa uma vez',async()=>{
  const core=await engine();
- const w=core.makeWorld('sewer','normal',[member('a'),member('b','mage')],{seed:11});force(w);
+ const w=core.makeWorld('orc','normal',[member('a'),member('b','mage')],{seed:11});force(w);
  core.WORLD_EVENTS.poringInvasion.golden=1; // garante o Poring Dourado neste teste
  const phases=[];let maxAlive=0;
  for(let i=0;i<60*110;i++){
@@ -33,7 +32,7 @@ test('V26 Diretor: Invasão de Porings passa por preparação → ativo → fim,
 
 test('V26 Diretor: não começa durante MVP, fenda ou arena e cancela sem recompensa se o MVP aparece',async()=>{
  const core=await engine();
- const w=core.makeWorld('sewer','normal',[member('a')],{seed:3});force(w);
+ const w=core.makeWorld('sewer','hard',[member('a')],{seed:3});force(w);
  w.mvpActive=true;w.bossAlive=true;
  for(let i=0;i<300;i++)core.tickWorld(w,1/60);
  assert.equal(w.director.state,'idle','bloqueado durante o MVP');
@@ -48,7 +47,7 @@ test('V26 Diretor: não começa durante MVP, fenda ou arena e cancela sem recomp
 
 test('V26 Diretor: mesmo resultado em solo e online (mesma semente) e tick dentro do orçamento de 60 TPS',async()=>{
  const core=await engine();
- const run=()=>{const w=core.makeWorld('payon','normal',[member('a'),member('b','archer'),member('c','mage'),member('d','acolyte')],{seed:21});force(w);
+ const run=()=>{const w=core.makeWorld('glast','normal',[member('a'),member('b','archer'),member('c','mage'),member('d','acolyte')],{seed:21});force(w);
   let worst=0,total=0,n=0;
   for(let i=0;i<60*70;i++){for(const p of w.players.values()){p.hp=p.max;p.input={...(p.input||{}),attack:true,auto:true};}
    const t=process.hrtime.bigint();core.tickWorld(w,1/60);const ms=Number(process.hrtime.bigint()-t)/1e6;if(i>60*10){worst=Math.max(worst,ms);total+=ms;n++;}w.events.length=0;}
@@ -74,8 +73,58 @@ test('V26 Diretor ONLINE: os dois jogadores da sala veem o mesmo evento (servido
   const a=await post('/'+lead.data.code+'/sync',{token:lead.data.token}),b=await post('/'+lead.data.code+'/sync',{token:mate.data.token});
   const ea=a.data.world?.worldEvent,eb=b.data.world?.worldEvent;
   assert.ok(ea&&eb,'evento visível para os dois');
-  assert.equal(ea.uid,eb.uid);assert.equal(ea.id,'poringInvasion');assert.equal(ea.phase,eb.phase);
+  assert.equal(ea.uid,eb.uid);assert.equal(ea.id,eb.id);assert.ok(['poringInvasion','treasureRain','orcMarch'].includes(ea.id));assert.equal(ea.phase,eb.phase);
   const health=await (await fetch(base+'/api/health')).json();
   assert.equal(health.tick.configured,60);
  }finally{child.kill('SIGTERM');fs.rmSync(dir,{recursive:true,force:true});}
+});
+
+
+test('V26.2: eventos só a partir do mapa dos Orcs ou na dificuldade Difícil/Pesadelo',async()=>{
+ const core=await engine();
+ const ok=(map,d)=>core.eventsEnabled(core.makeWorld(map,d,[member('a')],{seed:1}));
+ assert.equal(ok('sewer','normal'),false);assert.equal(ok('payon','easy'),false);assert.equal(ok('maze','normal'),false);
+ assert.equal(ok('orc','normal'),true);assert.equal(ok('shadow','easy'),true);
+ assert.equal(ok('sewer','hard'),true);assert.equal(ok('payon','nightmare'),true);
+ const w=core.makeWorld('sewer','normal',[member('a')],{seed:2});w.director={state:'idle',next:0,ev:null,seq:0,history:[]};
+ for(let i=0;i<600;i++)core.tickWorld(w,1/60);
+ assert.equal(w.director.state,'idle','Esgoto no Normal: nenhum evento');
+ // variedade: sorteio não repete o mesmo evento em seguida
+ const w2=core.makeWorld('orc','normal',[member('a')],{seed:4});w2.director={state:'idle',next:0,ev:null,seq:0,history:['orcMarch']};
+ const seen=new Set();for(let i=0;i<40;i++){w2.director.history=['orcMarch'];seen.add(core.testing.pickEvent(w2));}
+ assert.ok(!seen.has('orcMarch')&&seen.size===2,'sem repetir e com variedade: '+[...seen]);
+});
+
+test('V26.2: Chuva de Tesouros — baús em lugares válidos, Mímicos, prêmio por baú e baús somem no fim',async()=>{
+ const core=await engine();
+ const w=core.makeWorld('glast','normal',[member('a'),member('b','mage')],{seed:7});force(w,'treasureRain');
+ const map=core.testing.nav(w);let chests=[];
+ for(let i=0;i<60*6&&!chests.length;i++){core.tickWorld(w,1/60);chests=w.pickups.filter(o=>o.kind==='treasure');}
+ assert.equal(chests.length,9,'7 + 1 por jogador');
+ const players=[...w.players.values()];
+ for(const c of chests){assert.ok(core.passable(map,c.x,c.y),'baú fora da parede');assert.ok(players.every(p=>Math.hypot(p.x-c.x,p.y-c.y)>=110),'longe dos jogadores');}
+ const mimics=chests.filter(c=>c.amount==='mimic').length;assert.ok(mimics>=2&&mimics<=3,'≈30% Mímicos: '+mimics);
+ // abrir tudo: anda até cada baú
+ const a=w.players.get('a'),z0=a.zeny;let mimicMobs=0;
+ for(const c of chests){a.x=c.x;a.y=c.y;a.hp=a.max;core.tickWorld(w,1/60);}
+ for(let i=0;i<5;i++){a.hp=a.max;core.tickWorld(w,1/60);}
+ for(const e of w.events)if(e.type==='worldEvent'&&e.phase==='mimic')mimicMobs++;
+ assert.equal(mimicMobs,mimics,'cada Mímico vira monstro');
+ assert.ok(a.zeny>z0,'Zeny dos baús bons');
+ const end=w.events.filter(e=>e.type==='worldEvent'&&e.phase==='end').at(-1);
+ assert.equal(end?.result,'success','todos abertos → evento termina com sucesso');
+ assert.equal(w.pickups.filter(o=>o.kind==='treasure').length,0);
+});
+
+test('V26.2: Marcha dos Orcs entra em formação (guerreiros na frente, arqueiros atrás, veteranos) e usa a IA normal',async()=>{
+ const core=await engine();
+ const w=core.makeWorld('orc','normal',[member('a')],{seed:9});force(w,'orcMarch');w.spawnAt=1e9;w.mobs=[];
+ for(let i=0;i<60*5;i++){core.tickWorld(w,1/60);if(w.director.state==='active')break;}
+ const orcs=w.mobs.filter(m=>m.eventId);const p=w.players.get('a');
+ const front=orcs.filter(m=>m.name==='Orc Guerreiro'),back=orcs.filter(m=>m.name==='Orc Arqueiro'),vets=orcs.filter(m=>m.name==='Orc Veterano');
+ assert.equal(front.length,7);assert.equal(back.length,5);assert.equal(vets.length,2);assert.ok(vets.every(m=>m.elite));
+ const avg=list=>list.reduce((t,m)=>t+Math.hypot(m.x-p.x,m.y-p.y),0)/list.length;
+ assert.ok(avg(back)>avg(front),'arqueiros atrás dos guerreiros');
+ const d0=avg(orcs);for(let i=0;i<60*3;i++){p.hp=p.max;core.tickWorld(w,1/60);}
+ assert.ok(avg(orcs.filter(m=>m.hp>0))<d0,'a formação avança contra o grupo');
 });

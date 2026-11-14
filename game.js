@@ -11,6 +11,7 @@ const monsters = {
   lunatic: { hp: 25, speed: 81, r: 11, damage: 10, xp: 2, color: '#f2cfd0' },
   fabre: { hp: 38, speed: 66, r: 13, damage: 13, xp: 2, color: '#c0e19b' },
   spore: { hp: 57, speed: 54, r: 15, damage: 17, xp: 3, color: '#f2aeae' },
+  mimic: { name: 'Mímico', hp: 70, speed: 92, r: 15, damage: 20, xp: 6, color: '#c48a3a' }, // V26.2: baú-monstro da Chuva de Tesouros (desenhado como baú)
   ...bosses,
   ...Object.fromEntries(Object.entries(renewalMobs).map(([id, [name, hp, speed, r, damage, xp, color]]) =>
     [id, { name, hp, speed, r, damage, xp, color }])),
@@ -1133,6 +1134,7 @@ function receiveAuthoritativeWorld(world){
       else if(kind==='potion')run.potions.push({uid,x,y});
       else if(kind==='sppotion')run.potions.push({uid,x,y,sp:true});
       else if(kind==='chest')run.chests.push({uid,x,y,mvp:amount>=3,kind:amount==='maze'?'maze':amount===2?'elite':'server'});
+      else if(kind==='treasure')run.chests.push({uid,x,y,mvp:true,kind:'treasure'}); // V26.2: Mímico e baú bom têm a mesma cara
       else if(kind==='relic')run.chests.push({uid,x,y,mvp:true,kind:'server',relic:true});
       else if(kind==='xpmagnet')run.chests.push({uid,x,y,kind:'xpMagnet'});
       // Etapa 5: itens de campo do solo, asas e baú verde da forja.
@@ -1198,7 +1200,9 @@ function receiveAuthoritativeWorld(world){
     // V26: Diretor de Eventos — avisos curtos só no começo, no Poring Dourado e no resultado.
     if(e.type==='worldEvent'){
       if(e.phase==='prep'){announce('⚠ '+e.name.toUpperCase()+' em '+e.in+' s!',3);tone(330,660,.25,'triangle',.05);}
-      else if(e.phase==='start')minorNote(e.name+' começou · derrotem os invasores!');
+      else if(e.phase==='start')minorNote(e.id==='treasureRain'?'Baús espalhados pelo mapa · cuidado com os Mímicos!':e.id==='orcMarch'?'A formação orc avança · guerreiros na frente, arqueiros atrás!':e.name+' começou · derrotem os invasores!');
+      else if(e.phase==='treasure'&&e.player===selfId())minorNote('Baú: +'+e.amount+' z'+(e.bonus?' e um baú para o grupo!':''));
+      else if(e.phase==='mimic'){announce('😱 Era um MÍMICO!',3);if(run.effects.length<16)effect('ring',e.x,e.y,55,'#ff5a5a');}
       else if(e.phase==='golden'){announce('✨ Um PORING DOURADO apareceu! Derrote-o antes que fuja.',4);if(run.effects.length<16)effect('ring',e.x,e.y,70,'#ffd84a');}
       else if(e.phase==='goldenDown'){announce('Poring Dourado derrotado! +'+e.amount+' z para cada um e um baú de elite.',4);tone(660,1320,.3,'sine',.06);}
       else if(e.phase==='end'&&e.result==='success')announce(e.name+' contida! '+e.killed+'/'+e.goal+' · +'+(e.reward?.xp||0)+' EXP · +'+(e.reward?.zeny||0)+' z para cada um',5);
@@ -1762,7 +1766,8 @@ function renderWorldEventBar(){
   let bar=$('world-event-bar');
   if(!bar){bar=document.createElement('div');bar.id='world-event-bar';bar.setAttribute('role','status');document.body.append(bar);}
   const ev=run?.worldEvent,show=!!ev&&mode!=='menu'&&mode!=='ended';bar.hidden=!show;if(!show)return;
-  const time=Math.ceil(ev.left),text=ev.phase==='prep'?'⚠ '+ev.name+' em '+time+' s':'🎈 '+ev.name+' · '+Math.floor(time/60)+':'+String(time%60).padStart(2,'0')+' · '+ev.killed+'/'+(ev.goal||'?');
+  const time=Math.ceil(ev.left),icon={poringInvasion:'🎈',treasureRain:'📦',orcMarch:'⚔'}[ev.id]||'✦',label=ev.id==='treasureRain'?'baús bons '+ev.killed+'/'+(ev.goal||'?'):ev.killed+'/'+(ev.goal||'?');
+  const text=ev.phase==='prep'?'⚠ '+ev.name+' em '+time+' s':icon+' '+ev.name+' · '+Math.floor(time/60)+':'+String(time%60).padStart(2,'0')+' · '+label;
   if(bar.textContent!==text)bar.textContent=text;
 }
 /** V25.12: avisos de menor importância saem do topo da tela e vão para a linha de combate (embaixo, curta). */
@@ -2429,7 +2434,8 @@ function draw() {
       const striking=run.authoritative&&enemy.attackStart&&performance.now()-enemy.attackStart<420;
       const spriteAction=striking?16+enemy.dir:(enemy.warning ? 16 : (enemy.walking ? 8 : 0)) + enemy.dir;
       const spriteFrame=striking?Math.floor((performance.now()-enemy.attackStart)/420*CombatAnimations.frames(enemy.id,16+enemy.dir)):enemy.slow ? 0 : enemy.walking?(enemy.walkTick||0)*3+enemy.phase:run.time*6+enemy.phase;
-      actorSprite(enemy,spriteAction,spriteFrame,spriteScale);
+      if(enemy.id==='mimic'){Gear.drawChest(ctx,enemy.x,enemy.y,run.time*3,true);ctx.save();ctx.fillStyle='#3a0b0b';ctx.fillRect(enemy.x-11,enemy.y-15,22,4);ctx.fillStyle='#fff';for(let i=-9;i<=7;i+=4)ctx.fillRect(enemy.x+i,enemy.y-15,2,3);ctx.restore();}
+      else actorSprite(enemy,spriteAction,spriteFrame,spriteScale);
       const glow=(enemy.hit > 0 && (enemy.elite||bosses[enemy.id])) ? .42 : (enemy.slow && (enemy.elite||bosses[enemy.id])) ? .22 : 0;
       if(glow){ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=glow;actorSprite(enemy,spriteAction,spriteFrame,spriteScale);ctx.restore();}
       if(enemy.variant==='gold'){ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.45;actorSprite(enemy,spriteAction,spriteFrame,spriteScale);ctx.restore();
