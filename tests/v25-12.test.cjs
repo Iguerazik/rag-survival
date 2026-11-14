@@ -40,5 +40,5 @@ test('V25.12: carta no online é sorteada entre o grupo e todos veem quem ganhou
  assert.equal(w.pickups.filter(o=>o.kind==='card').length,0,'no online a carta não fica no chão');
  const g=read('game.js');
  assert.match(g,/e\.type==='cardWon'/);assert.match(g,/function minorNote\(message\)/);
- assert.match(g,/'buff-bar'\]\)/);
+ assert.match(g,/'buff-bar','world-event-bar'\]\)/);
 });

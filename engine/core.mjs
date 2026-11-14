@@ -55,6 +55,8 @@ const mobStat={
  baphometjr:[22,69,11,1],hunterfly:[24,106,11,2],mantis:[41,68,14,2],sidewinder:[56,73,17,3],
  orc_zombie:[65,55,17,3],orc_skeleton:[58,74,16,3],steel_chonchon:[43,110,12,2],
  marionette:[55,76,16,3],whisper:[44,83,13,3],nightmare:[82,82,22,4],deviruchi:[70,94,20,4],
+ // V26 (Diretor de Eventos): família Poring para a Invasão de Porings (sprites poring/lunatic/fabre/spore já existem).
+ poring:[20,58,8,1],lunatic:[26,82,10,2],fabre:[38,66,12,2],spore:[52,56,15,3],
  savage:[76,90,20,4],beetle_king:[85,84,21,4],greatestgeneral:[98,30,25,5]};
 /* V25.4: cada mapa da sequência tem monstros com mais vida e mais dano que o anterior. A média do elenco de cada
  * mapa (já com o bônus por mapa) nunca fica abaixo da do mapa anterior +12% de HP e +8% de dano; mapas que já
@@ -447,6 +449,7 @@ function defeated(world,m,source){
  if(m.dead)return;m.dead=true;
  if(m.noLoot){event(world,'kill',{uid:m.uid,killer:source.id,elite:null,seal:true});return;}
  world.kills++;source.kills++;
+ if(m.eventId)eventKill(world,m);
  const zenyChance=(source.base?.gear?.zeny||0)+(source.runBonus?.zeny||0); // Carta Cãibra + Bolso de Poring/Destino Afortunado
  if(zenyChance&&rand(world)<zenyChance){const gain=1+Math.floor(rand(world)*500);source.zeny+=gain;event(world,'cardZeny',{player:source.id,amount:gain,x:Math.round(m.x),y:Math.round(m.y)});}
  const rare=!!m.elite,amount=(m.xp*(1+clock(world)/900)+(rare?12:0))*(world.endless?ENDLESS.xp:1);
@@ -1260,7 +1263,7 @@ export function tickWorld(world,dt){
   // V22.5: horda progressiva POR JOGADOR. Cada um tem a própria cota de monstros por perto (maior se
   // estiver acompanhado), então quem se afasta do grupo também recebe horda. Elites não contam na cota.
   const players=[...world.players.values()],living=players.filter(p=>p.hp>0),minutes=now/60;
-  const common=world.mobs.filter(m=>!m.elite&&!m.riftSeal&&!m.dead);
+  const common=world.mobs.filter(m=>!m.elite&&!m.riftSeal&&!m.dead&&!m.eventId); // V26: monstros de evento não ocupam a cota da horda
   world.spawnAt-=dt;
   if(now>=world.pruneAt){
    // Monstros esquecidos longe de todos voltam para a "fila" e reaparecem perto de alguém.
@@ -1289,6 +1292,7 @@ export function tickWorld(world,dt){
    }else world.spawnAt=lag(world,.2);
   }
   tickContract(world,dt,living);
+  tickDirector(world,living);
   // Etapa 5 (eventos de campo do solo): a cada 65 s, a partir dos 55 s, aparece Poção de Cura, Orbe de Experiência
   // ou Bolsa de Zeny a 230 de alguém (no máximo 5 no chão, somem em 95 s).
   if(now>=world.nextMagnetAt&&living.length){
@@ -1369,6 +1373,86 @@ function endEndless(world,reason){
 }
 const TRIAL_NAMES={sword:['Cavaleiro da Provação','Guardião das Runas'],mage:['Conjurador de Geffen','Sentinela Elemental'],archer:['Caçador da Guilda','Lobo do Desafio'],
  acolyte:['Discípulo da Luz','Protetor de Yggdrasil'],merchant:['Ferreiro da Prova','Autômato da Forja'],thief:['Sombra da Guilda','Executor da Meia-noite']};
+/* ===================== V26: DIRETOR DE EVENTOS DINÂMICOS =====================
+ * Um único diretor para todos os mapas (servidor autoritativo no online; mesma regra no solo, que roda este motor).
+ * Estados: idle → prep (aviso curto) → active → done (sucesso/fracasso) → idle (com intervalo).
+ * Um evento por vez, nunca durante fenda, arena, MVP ou evento do labirinto. A horda normal continua.
+ * Cada evento define: mapas (null = todos), duração, metas, spawns (em lotes, com teto) e recompensas (uma vez só). */
+export const DIRECTOR={first:150,gap:[160,250],prep:4};
+export const WORLD_EVENTS={
+ poringInvasion:{name:'Invasão de Porings',maps:null,duration:[60,90],weight:1,
+  // lotes a cada 1,6 s, no máximo 34 (+6 por jogador) Porings do evento vivos ao mesmo tempo
+  interval:1.6,batch:6,alive:34,alivePerPlayer:6,goalShare:.6,
+  roster:[['poring',.58],['lunatic',.18],['fabre',.14],['spore',.10]],poporing:.12,golden:.45}
+};
+function directorState(world){return world.director||(world.director={state:'idle',next:DIRECTOR.first,ev:null,seq:0,history:[]});}
+function eventBlocked(world){return world.arena||world.rift||world.mvpActive||world.bossAlive||world.maze?.active||world.finished||
+ (!world.endless&&clock(world)>(world.mvpAt||720)-75);} // não começa no último minuto antes do MVP
+function pickEvent(world){
+ const options=Object.entries(WORLD_EVENTS).filter(([,d])=>!d.maps||d.maps.includes(world.map));
+ if(!options.length)return null;
+ const last=world.director.history.at(-1);
+ const pool=options.length>1?options.filter(([id])=>id!==last):options; // não repete o mesmo evento seguido
+ let total=pool.reduce((t,[,d])=>t+(d.weight||1),0),r=rand(world)*total;
+ for(const [id,d] of pool){r-=d.weight||1;if(r<=0)return id;}
+ return pool.at(-1)[0];
+}
+function tickDirector(world,living){
+ const dir=directorState(world),now=clock(world);
+ if(dir.state==='idle'){
+  if(now<dir.next||!living.length||eventBlocked(world))return;
+  const id=pickEvent(world);if(!id){dir.next=now+60;return;}
+  const def=WORLD_EVENTS[id],dur=random(world,def.duration[0],def.duration[1]);
+  dir.ev={uid:++dir.seq,id,name:def.name,phase:'prep',startAt:now+DIRECTOR.prep,endAt:now+DIRECTOR.prep+dur,
+   spawned:0,killed:0,goal:0,nextBatch:now+DIRECTOR.prep,golden:rand(world)<def.golden?now+DIRECTOR.prep+random(world,10,dur*.6):Infinity,goldenUid:0,rewarded:false};
+  dir.state='prep';event(world,'worldEvent',{uid:dir.ev.uid,id,name:def.name,phase:'prep',in:DIRECTOR.prep});
+  return;
+ }
+ const ev=dir.ev,def=ev&&WORLD_EVENTS[ev.id];if(!ev||!def){dir.state='idle';dir.ev=null;return;}
+ // MVP, fenda ou arena no meio do evento: ele termina sem recompensa (os monstros do evento continuam no mapa).
+ if((world.arena||world.rift||world.mvpActive)&&dir.state!=='done'){finishEvent(world,dir,'cancel');return;}
+ if(dir.state==='prep'&&now>=ev.startAt){dir.state='active';ev.phase='active';event(world,'worldEvent',{uid:ev.uid,id:ev.id,name:ev.name,phase:'start',ends:Math.round(ev.endAt-now)});}
+ if(dir.state!=='active')return;
+ if(ev.id==='poringInvasion')tickPoringInvasion(world,ev,def,living,now);
+ if(now>=ev.endAt)finishEvent(world,dir,ev.killed>=Math.max(1,Math.ceil(ev.spawned*def.goalShare))?'success':'fail');
+}
+function tickPoringInvasion(world,ev,def,living,now){
+ if(now>=ev.nextBatch&&living.length){
+  ev.nextBatch=now+def.interval;
+  const alive=world.mobs.filter(m=>m.eventId===ev.uid&&!m.dead&&m.hp>0).length,limit=def.alive+def.alivePerPlayer*living.length;
+  const target=living[Math.floor(rand(world)*living.length)];
+  for(let n=0;n<Math.min(def.batch,limit-alive);n++){
+   let r=rand(world),id=def.roster[0][0];for(const [k,w] of def.roster){r-=w;if(r<=0){id=k;break;}}
+   const m=spawn(world,id,{near:target,edge:true});m.eventId=ev.uid;ev.spawned++;
+   if(id==='poring'&&rand(world)<def.poporing){m.variant='popo';m.name='Poporing';m.hp=m.max=m.max*1.8;m.damage*=1.3;m.xp*=2;}
+  }
+ }
+ if(now>=ev.golden&&!ev.goldenUid&&living.length){
+  const target=living[Math.floor(rand(world)*living.length)],g=spawn(world,'poring',{near:target,edge:true});
+  g.eventId=ev.uid;g.variant='gold';g.name='Poring Dourado';g.hp=g.max=g.max*14;g.speed*=1.35;g.xp*=8;g.r=16;
+  ev.goldenUid=g.uid;event(world,'worldEvent',{uid:ev.uid,id:ev.id,name:ev.name,phase:'golden',x:Math.round(g.x),y:Math.round(g.y)});
+ }
+ ev.goal=Math.max(1,Math.ceil(ev.spawned*def.goalShare));
+}
+/** Abate de monstro de evento: conta para a meta; o Poring Dourado dá Zeny para cada jogador e um baú de elite. */
+function eventKill(world,m){
+ const ev=world.director?.ev;if(!ev||m.eventId!==ev.uid)return;
+ ev.killed++;
+ if(m.variant==='gold'&&!m.goldRewarded){m.goldRewarded=true;const gain=120+mapTier(world)*40;
+  for(const p of world.players.values())p.zeny+=gain;
+  groundDrop(world,'chest',m.x,m.y,2);event(world,'worldEvent',{uid:ev.uid,id:ev.id,name:ev.name,phase:'goldenDown',amount:gain,x:Math.round(m.x),y:Math.round(m.y)});}
+}
+function finishEvent(world,dir,result){
+ const ev=dir.ev;if(!ev)return;
+ let reward=null;
+ if(result==='success'&&!ev.rewarded){
+  ev.rewarded=true;const xp=60+mapTier(world)*18,zeny=40+mapTier(world)*15;
+  giveExperience(world,xp);for(const p of world.players.values())p.zeny+=zeny;reward={xp,zeny};
+ }
+ event(world,'worldEvent',{uid:ev.uid,id:ev.id,name:ev.name,phase:'end',result,killed:ev.killed,spawned:ev.spawned,goal:ev.goal,reward});
+ dir.history.push(ev.id);if(dir.history.length>8)dir.history.shift();
+ dir.state='idle';dir.ev=null;dir.next=clock(world)+random(world,DIRECTOR.gap[0],DIRECTOR.gap[1]);
+}
 /** Missão da expedição no online (igual à do solo, para o grupo): investigar → caçar elites → consagrar. */
 /** Missão da expedição (regra do solo): escolher a rota (Purificar ou Relíquia; 3 s no selo sem escolher = Relíquia),
  * investigar 6 s, caçar elites (2, ou 3 na Relíquia) e consagrar 10 s. Dano recebido no selo atrasa 0,5 s. */
@@ -1799,10 +1883,11 @@ export function snapshotWorld(world,id,sinceEvent=0,opts={}){
    simTime:Math.round(world.time*1000)/1000,mapStart:Math.round((world.time-now)*1000)/1000,
    wave:world.wave,kills:world.kills,arena:!!world.arena,portal:null,mvpActive:world.mvpActive,endless:world.endless?Math.round(world.time-world.endless.start):null,
    rift:r?{active:true,index:r.index,left:Math.max(0,Math.round(((r.cleared?r.autoLeave:r.ends)-world.time)*10)/10),ward:r.ward,phase:r.phase,uid:r.guardian,mvp:!!r.mvp,exit:r.cleared?r.exit:null}:null,
-   riftPortal:world.riftPortal,mvpPortal:world.mvpPortal||null,mvpArena:!!world.mvpArena,mvpDefeated:!!world.mvpDefeated,maze:world.maze?{active:world.maze.active,defeated:world.maze.defeated,room:world.maze.room}:null,contract:world.arena?null:{route:world.contract.route,stage:world.contract.stage,charge:Math.round(world.contract.charge*10)/10,node:world.contract.node,eliteKills:world.contract.eliteKills,goal:world.contract.goal,done:world.contract.done},reviveSeconds:REVIVE_SECONDS,reviveRadius:REVIVE_RADIUS,
+   riftPortal:world.riftPortal,mvpPortal:world.mvpPortal||null,
+   worldEvent:world.director?.ev?(e=>({uid:e.uid,id:e.id,name:e.name,phase:e.phase,left:Math.max(0,Math.round(((e.phase==='prep'?e.startAt:e.endAt)-clock(world))*10)/10),killed:e.killed,goal:e.goal,spawned:e.spawned}))(world.director.ev):null,mvpArena:!!world.mvpArena,mvpDefeated:!!world.mvpDefeated,maze:world.maze?{active:world.maze.active,defeated:world.maze.defeated,room:world.maze.room}:null,contract:world.arena?null:{route:world.contract.route,stage:world.contract.stage,charge:Math.round(world.contract.charge*10)/10,node:world.contract.node,eliteKills:world.contract.eliteKills,goal:world.contract.goal,done:world.contract.done},reviveSeconds:REVIVE_SECONDS,reviveRadius:REVIVE_RADIUS,
    chests:[],ack:{},mazeEvent:null,self:pview,events:world.events.filter(e=>e.seq>sinceEvent).slice(-48),lastEvent:world.lastEvent,
    mobs:world.mobs.filter(m=>m.elite||near(m,MOB_VIEW_X,MOB_VIEW_Y)).map(m=>[m.uid,m.id,Math.round(m.x),Math.round(m.y),Math.max(0,Math.round(m.hp)),Math.round(m.max),m.dir,m.attackUntil>world.time?1:0,0,m.stunUntil>world.time?2:m.slowUntil>world.time||m.poisonUntil>world.time?1:0,
-     m.elite==='mvp'?'miniBoss':m.elite,0,m.riftGuardian?1:0,m.riftSeal?1:0,m.name||'',Math.round(m.damage),
+     m.elite==='mvp'?'miniBoss':m.elite,m.variant||0,m.riftGuardian?1:0,m.riftSeal?1:0,m.name||'',Math.round(m.damage),
      m.warning?[m.warning.kind,Math.round(m.warning.x),Math.round(m.warning.y),m.warning.radius,Math.round(m.warning.angle*1000)/1000,Math.round(m.warning.since*1000)/1000,Math.round(m.warning.at*1000)/1000]:0]),
    players:Object.fromEntries([...world.players.values()].map(p=>[p.id,inputView(world,p.id)]))};
  if(world.zones.length)snap.zones=world.zones.filter(z=>near(z,MOB_VIEW_X,MOB_VIEW_Y)).map(z=>[z.uid,Math.round(z.x),Math.round(z.y),z.rad,z.el,z.trap?1:z.heal?2:0]);

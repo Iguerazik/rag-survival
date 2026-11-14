@@ -18,6 +18,8 @@ const LocalRoom = (() => {
     const core = window.MidgardEngine.core;
     const world = core.makeWorld(map, difficulty, [{ id: ID, profile: { job, classId, name }, character }],
       Number.isFinite(seed) ? { seed } : {});
+    // V26 (só para testes): ?evento=30 na URL faz o 1º evento dinâmico começar aos 30 s da run solo.
+    try { const at = Number(new URLSearchParams(location.search).get('evento')); if (at > 0) world.director = { state: 'idle', next: at, ev: null, seq: 0, history: [] }; } catch {}
     return { core, world, acc: 0, ended: false, steps: 0, tickMs: 0 };
   }
 

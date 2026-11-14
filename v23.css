@@ -43,3 +43,7 @@
 /* V25.4: oferta que faz parte de uma combinação do Códex ainda não descoberta. */
 .coop-server-upgrades button.coop-offer.coop-offer-codex{border:2px solid #e8c25a!important;box-shadow:0 0 0 1px #6b4f12 inset,0 0 10px #e8c25a55}
 .coop-server-upgrades button.coop-offer.coop-offer-codex .coop-offer-desc{color:#ffe7a6!important}
+/* V26: faixa do evento dinâmico ativo */
+#world-event-bar{position:fixed;z-index:1500;left:50%;top:64px;transform:translateX(-50%);padding:5px 14px;border-radius:999px;
+ background:rgba(20,30,52,.86);border:1px solid #e8c25a;color:#ffe9b0;font:700 13px system-ui,sans-serif;pointer-events:none;box-shadow:0 3px 12px #0008;white-space:nowrap}
+#world-event-bar[hidden]{display:none}

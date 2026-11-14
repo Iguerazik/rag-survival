@@ -1091,6 +1091,7 @@ function receiveAuthoritativeWorld(world){
   run.wave=world.wave;run.mvpActive=!!world.mvpActive;run.endless=Number.isFinite(world.endless)?world.endless:null;
   if(Number.isFinite(world.mapStart))run.mapStart=world.mapStart;
   if(run.time<simTime-1||run.time>simTime+1)run.time=simTime;
+  run.worldEvent=world.worldEvent||null;renderWorldEventBar();
   run.riftPortal=world.riftPortal||null;run.portal=world.rift?.exit||null;run.mvpArena=!!world.mvpArena;
   run.rift=world.rift?{active:true,index:world.rift.index,phase:world.rift.phase,ward:world.rift.ward,uid:world.rift.uid,mvp:!!world.rift.mvp,
     cleared:!!world.rift.exit,left:world.rift.left,start:simTime-(90-world.rift.left),online:true}:null;
@@ -1153,7 +1154,7 @@ function receiveAuthoritativeWorld(world){
       x:prev?.x??x,y:prev?.y??y,samples,hp,max,dir,
       // Etapa 4: aviso no chão vindo do motor (linha, círculo, anel) e clarão do golpe.
       warning:Array.isArray(tele)?{kind:tele[0],x:tele[1],y:tele[2],radius:tele[3],angle:tele[4],since:tele[5],at:tele[6]}:null,
-      strike:prev?.strike&&prev.strike.until>run.time?prev.strike:null,elite,specialBoss:false,riftBoss:!!riftBoss,riftSeal:!!riftSeal,
+      strike:prev?.strike&&prev.strike.until>run.time?prev.strike:null,elite,specialBoss:false,variant:specialBoss||null,riftBoss:!!riftBoss,riftSeal:!!riftSeal,
       slow:slow===2?1:0,ailment:slow||0,phase:uid%6,hit:(prev&&hp<prev.hp?0.22:Math.max(0,(prev?.hit||0)-.05)),
       lastDamaged:prev&&hp<prev.hp?simTime:(prev?.lastDamaged??-999),
       walking:prev?.walking||false,walkHold:prev?.walkHold||0,walkTick:prev?.walkTick||0};
@@ -1193,6 +1194,15 @@ function receiveAuthoritativeWorld(world){
     if(e.type==='projectile'){
       if(run.onlineProjectiles.length<24)run.onlineProjectiles.push({at:performance.now()+(e.delay||0)*1000,duration:e.duration||.25,
         x:e.fromX,y:e.fromY,toX:e.toX,toY:e.toY,skill:e.skill||'fire'});
+    }
+    // V26: Diretor de Eventos — avisos curtos só no começo, no Poring Dourado e no resultado.
+    if(e.type==='worldEvent'){
+      if(e.phase==='prep'){announce('⚠ '+e.name.toUpperCase()+' em '+e.in+' s!',3);tone(330,660,.25,'triangle',.05);}
+      else if(e.phase==='start')minorNote(e.name+' começou · derrotem os invasores!');
+      else if(e.phase==='golden'){announce('✨ Um PORING DOURADO apareceu! Derrote-o antes que fuja.',4);if(run.effects.length<16)effect('ring',e.x,e.y,70,'#ffd84a');}
+      else if(e.phase==='goldenDown'){announce('Poring Dourado derrotado! +'+e.amount+' z para cada um e um baú de elite.',4);tone(660,1320,.3,'sine',.06);}
+      else if(e.phase==='end'&&e.result==='success')announce(e.name+' contida! '+e.killed+'/'+e.goal+' · +'+(e.reward?.xp||0)+' EXP · +'+(e.reward?.zeny||0)+' z para cada um',5);
+      else if(e.phase==='end'&&e.result==='fail')minorNote(e.name+' terminou · faltaram '+Math.max(0,e.goal-e.killed)+' abates para a recompensa.');
     }
     // V25.12: barra de conjuração (o personagem continua andando enquanto conjura).
     if(e.type==='castStart'&&e.duration>0){run.casts=run.casts||new Map();run.casts.set(e.player,{skill:e.skill,start:performance.now(),end:performance.now()+e.duration*1000});}
@@ -1415,7 +1425,7 @@ function menu() {
   // V22.5: ao terminar uma partida online, voltar ao menu mantém a sala (lobby) para a próxima.
   if (run?.coop) { if (mode === 'ended') Coop.lobby(); else Coop.leave(); }
   // V25.12: os ícones de buffs (Kyrie, Gloria…) também somem ao sair da run.
-  for (const id of ['coop-server-upgrades','coop-server-rewards','online-passives','skill-tip','buff-bar']) { const el = document.getElementById(id); if (el) { el.hidden = true; if (id==='buff-bar') { el.dataset.key=''; el.replaceChildren(); } } }
+  for (const id of ['coop-server-upgrades','coop-server-rewards','online-passives','skill-tip','buff-bar','world-event-bar']) { const el = document.getElementById(id); if (el) { el.hidden = true; if (id==='buff-bar') { el.dataset.key=''; el.replaceChildren(); } } }
   mode = 'menu';
   run = null;
   BGM.enter('menu',!muted);
@@ -1747,6 +1757,14 @@ function nearestTo(player, range, prioritize = false) {
   return target;
 }
 
+/** V26: faixa discreta do evento ativo (nome, tempo e progresso), embaixo do aviso do topo. */
+function renderWorldEventBar(){
+  let bar=$('world-event-bar');
+  if(!bar){bar=document.createElement('div');bar.id='world-event-bar';bar.setAttribute('role','status');document.body.append(bar);}
+  const ev=run?.worldEvent,show=!!ev&&mode!=='menu'&&mode!=='ended';bar.hidden=!show;if(!show)return;
+  const time=Math.ceil(ev.left),text=ev.phase==='prep'?'⚠ '+ev.name+' em '+time+' s':'🎈 '+ev.name+' · '+Math.floor(time/60)+':'+String(time%60).padStart(2,'0')+' · '+ev.killed+'/'+(ev.goal||'?');
+  if(bar.textContent!==text)bar.textContent=text;
+}
 /** V25.12: avisos de menor importância saem do topo da tela e vão para a linha de combate (embaixo, curta). */
 function minorNote(message) { combatNote(message); }
 function combatNote(message) {
@@ -2405,13 +2423,19 @@ function draw() {
       if(enemy.ailment)ring(enemy.x,enemy.y,enemy.type.r+3,enemy.ailment===2?'#bfeaff':'#bce37f',enemy.ailment===2?2.5:1.5);
       // V22.1: sem ctx.filter (CSS filter no canvas é caríssimo e derrubava o FPS na fenda/MVP).
       // O "brilho" de acerto é uma segunda passada aditiva do mesmo sprite.
-      const spriteScale=enemy.guildTrial ? 1.23 : enemy.specialBoss ? 1.65 : enemy.elite === 'miniBoss' ? 1.39 : enemy.elite ? 1.18 : (!!bosses[enemy.id] ? 1.12 : .82);
+      // V26: variantes dos eventos (Poring Dourado brilha; Poporing com anel verde) — sem ctx.filter (caro).
+      if(enemy.variant==='gold')SkillFX.glow(ctx,enemy.x,enemy.y-10,30+Math.sin(run.time*5)*3,'#ffd84a',.85);
+      const spriteScale=enemy.variant==='gold'?1.25:enemy.variant==='popo'?.95:enemy.guildTrial ? 1.23 : enemy.specialBoss ? 1.65 : enemy.elite === 'miniBoss' ? 1.39 : enemy.elite ? 1.18 : (!!bosses[enemy.id] ? 1.12 : .82);
       const striking=run.authoritative&&enemy.attackStart&&performance.now()-enemy.attackStart<420;
       const spriteAction=striking?16+enemy.dir:(enemy.warning ? 16 : (enemy.walking ? 8 : 0)) + enemy.dir;
       const spriteFrame=striking?Math.floor((performance.now()-enemy.attackStart)/420*CombatAnimations.frames(enemy.id,16+enemy.dir)):enemy.slow ? 0 : enemy.walking?(enemy.walkTick||0)*3+enemy.phase:run.time*6+enemy.phase;
       actorSprite(enemy,spriteAction,spriteFrame,spriteScale);
       const glow=(enemy.hit > 0 && (enemy.elite||bosses[enemy.id])) ? .42 : (enemy.slow && (enemy.elite||bosses[enemy.id])) ? .22 : 0;
       if(glow){ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=glow;actorSprite(enemy,spriteAction,spriteFrame,spriteScale);ctx.restore();}
+      if(enemy.variant==='gold'){ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.45;actorSprite(enemy,spriteAction,spriteFrame,spriteScale);ctx.restore();
+        ring(enemy.x,enemy.y,enemy.type.r+10,'#ffe27a',2.5);ctx.save();ctx.textAlign='center';ctx.font='900 11px system-ui';ctx.lineWidth=3;ctx.strokeStyle='#2a1b00';ctx.fillStyle='#ffe27a';
+        ctx.strokeText('Poring Dourado',enemy.x,enemy.y-36);ctx.fillText('Poring Dourado',enemy.x,enemy.y-36);ctx.restore();}
+      else if(enemy.variant==='popo')ring(enemy.x,enemy.y,enemy.type.r+4,'#8fe36b',1.6);
       if(enemy.guildTrial){ring(enemy.x,enemy.y,enemy.type.r+12,'#f6cf77',3);ctx.save();ctx.textAlign='center';ctx.font='900 12px system-ui';ctx.lineWidth=4;ctx.strokeStyle='#111722';ctx.fillStyle='#fff2bb';ctx.strokeText(enemy.guildTrial.name,enemy.x,enemy.y-62);ctx.fillText(enemy.guildTrial.name,enemy.x,enemy.y-62);ctx.restore();}
       if (enemy.elite || enemy.guildTrial || enemy.riftBoss) {
         ring(enemy.x, enemy.y, enemy.type.r + 9 + Math.sin(run.time * 3) * 2, enemy.specialBoss ? '#d8b2ff' : enemy.elite==='miniBoss'?'#ffb36b':'#f4d96b', enemy.specialBoss ? 3 : 2);

@@ -189,6 +189,7 @@ test('V23 Etapa 4: a tela desenha avisos do motor, usa portais só com E e mostr
 test('V24.1: modo infinito pós-MVP — EXP ×2,5, hordas maiores e mais densas',async()=>{
  const core=await engine();
  const make=endless=>{const w=core.makeWorld('sewer','normal',[member('a','sword')],{seed:11});w.nextRiftAt=1e9;w.eliteAt=1e9;w.trials=[];w.mobs=[];w.time=600;
+  w.director={state:'idle',next:1e9,ev:null,seq:0,history:[]}; // V26: sem evento dinâmico nesta comparação
   if(endless){w.won=true;w.mvpDefeated=true;w.endless={start:590,boss:'x'};}return w;};
  const xpOf=w=>{const a=w.players.get('a');core.testing.spawn(w,'poring',{x:a.x+40,y:a.y});const m=w.mobs.at(-1);
   const before=w.pickups.length;core.testing.defeated(w,m,a);return w.pickups.slice(before).filter(o=>o.kind==='xp').reduce((s,o)=>s+o.amount,0);};
