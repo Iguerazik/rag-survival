@@ -1,0 +1,65 @@
+/* V27 — Gráficos (Opções), contador de FPS e transições */
+.ro-options-dialog .graphics-choice{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.ro-options-dialog .graphics-mode{width:auto!important;min-width:76px;padding:0 8px}
+.ro-options-dialog .graphics-mode.active{background:#3b6ea8!important;color:#fff!important;border-color:#ffd77a!important;box-shadow:0 0 0 1px #ffd77a inset}
+.ro-options-dialog .graphics-fps{cursor:pointer}
+.ro-options-dialog .graphics-fps input{width:18px;height:18px;accent-color:#3b6ea8}
+#fps-meter{position:fixed;left:8px;bottom:6px;z-index:2050;pointer-events:none;font:700 11px/1 system-ui,sans-serif;color:#e8f2ff;background:#0d1b2cb3;border:1px solid #6f93bf88;border-radius:4px;padding:3px 6px;letter-spacing:.02em}
+#fps-meter[hidden]{display:none}
+
+/* Gráficos leves: sem desfoque atrás das janelas (o campo continua se mexendo por trás no online) */
+html.gfx-light ::backdrop,html.gfx-light dialog::backdrop{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+
+/* ---- Transições de cena ---- */
+#scene-veil{position:fixed;inset:0;z-index:2600;pointer-events:none;background:radial-gradient(ellipse at 50% 55%,#0b1424 0%,#03060c 75%);opacity:0}
+#scene-veil[hidden],#scene-card[hidden]{display:none}
+#scene-veil.scene-cover{animation:scene-cover 650ms ease-out forwards}
+#scene-veil.scene-flash{animation:scene-flash 420ms ease-in-out forwards}
+@keyframes scene-cover{0%{opacity:1}35%{opacity:1}100%{opacity:0}}
+@keyframes scene-flash{0%{opacity:0}35%{opacity:.85}100%{opacity:0}}
+#scene-card{position:fixed;left:50%;top:33%;z-index:2601;pointer-events:none;transform:translate(-50%,-50%);display:grid;justify-items:center;gap:4px;text-align:center;opacity:0;
+  color:#ffe9b8;text-shadow:0 2px 8px #000,0 0 18px #000c}
+#scene-card small{font:800 11px/1 system-ui,sans-serif;letter-spacing:.28em;text-transform:uppercase;color:#c9d6ea}
+#scene-card strong{font:700 clamp(26px,4.2vw,44px)/1.1 Georgia,'Times New Roman',serif;letter-spacing:.02em}
+#scene-card span{font:600 13px/1.2 system-ui,sans-serif;color:#e3d2a8;letter-spacing:.08em}
+#scene-card strong::after{content:"";display:block;height:2px;margin:8px auto 0;width:60%;background:linear-gradient(90deg,transparent,#e8c25a,transparent)}
+#scene-card.scene-card-on{animation:scene-card 1700ms ease-out forwards}
+@keyframes scene-card{0%{opacity:0;transform:translate(-50%,-44%)}18%{opacity:1;transform:translate(-50%,-50%)}72%{opacity:1;transform:translate(-50%,-50%)}100%{opacity:0;transform:translate(-50%,-54%)}}
+
+/* ---- Janelas: abrem com um leve "zoom" ---- */
+dialog[open]{animation:win-open 150ms ease-out}
+@keyframes win-open{from{opacity:0;transform:translateY(6px) scale(.985)}to{opacity:1;transform:none}}
+dialog[open]::backdrop{animation:win-fade 180ms ease-out}
+@keyframes win-fade{from{opacity:0}to{opacity:1}}
+
+/* ---- Escolha de habilidade / baú: entra deslizando, opções em cascata ---- */
+.coop-server-upgrades:not([hidden]){animation:panel-in 220ms cubic-bezier(.2,.8,.3,1)}
+@keyframes panel-in{from{opacity:0;transform:translateX(26px)}to{opacity:1;transform:none}}
+.coop-server-upgrades:not([hidden]) > button{animation:offer-in 240ms ease-out backwards}
+.coop-server-upgrades:not([hidden]) > button:nth-of-type(2){animation-delay:40ms}
+.coop-server-upgrades:not([hidden]) > button:nth-of-type(3){animation-delay:80ms}
+.coop-server-upgrades:not([hidden]) > button:nth-of-type(4){animation-delay:120ms}
+@keyframes offer-in{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.coop-server-upgrades button.coop-offer{transition:background-color .12s,transform .12s,box-shadow .12s}
+.coop-server-upgrades button.coop-offer:hover{transform:translateX(-2px)}
+
+/* ---- HUD: barras e avisos suaves ---- */
+.health i,.xp i,.boss-hud i,#sp-row i{transition:width .18s ease-out}
+.announcement:not([hidden]){animation:notice-in 260ms ease-out}
+@keyframes notice-in{from{opacity:0}to{opacity:1}}
+.boss-hud:not([hidden]){animation:notice-in 260ms ease-out}
+#buff-bar .buff-chip{animation:win-fade 200ms ease-out}
+
+/* ---- Menu: entrada suave ao voltar da run ---- */
+#menu:not([hidden]){animation:win-fade 260ms ease-out}
+button.primary,button.sound,.mh-btn{transition:filter .12s,transform .12s,background-color .12s,box-shadow .12s}
+button.primary:active,.mh-btn:active{transform:translateY(1px) scale(.99)}
+
+@media (prefers-reduced-motion: reduce){
+  dialog[open],dialog[open]::backdrop,.coop-server-upgrades:not([hidden]),.coop-server-upgrades:not([hidden]) > button,
+  .announcement:not([hidden]),.boss-hud:not([hidden]),#menu:not([hidden]),#buff-bar .buff-chip{animation:none!important}
+  .health i,.xp i,.boss-hud i{transition:none!important}
+}
+.ro-options-dialog .graphics-section{grid-column:1 / -1}
+.ro-options-dialog .graphics-note{display:block;margin:4px 0 2px;color:#5a6f86;font-size:11px}
+html[data-theme="dark"] .ro-options-dialog .graphics-note{color:#a9bbd0}

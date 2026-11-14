@@ -59,6 +59,27 @@ const Controls = (() => {
       }
       list.append(group);
     }
+    // V27: qualidade gráfica (resolução adaptativa) e contador de FPS.
+    if (typeof Graphics !== 'undefined') {
+      const group=document.createElement('section');group.className='controls-section graphics-section';
+      const title=document.createElement('h3');title.textContent='Gráficos';group.append(title);
+      const line=document.createElement('div');line.className='controls-line graphics-modes';
+      const name=document.createElement('span');name.textContent='Qualidade';line.append(name);
+      const wrap=document.createElement('div');wrap.className='graphics-choice';wrap.setAttribute('role','radiogroup');wrap.setAttribute('aria-label','Qualidade gráfica');
+      for(const [id,text,tip] of [['auto','Automático','Ajusta a resolução sozinho se o jogo engasgar'],['high','Alta','Resolução cheia e todos os brilhos'],['low','Leve','Para PC fraco: menos pixels e sem brilhos extras']]){
+        const b=document.createElement('button');b.type='button';b.className='controls-key graphics-mode'+(Graphics.mode()===id?' active':'');b.textContent=text;b.title=tip;
+        b.setAttribute('role','radio');b.setAttribute('aria-checked',String(Graphics.mode()===id));
+        b.addEventListener('click',()=>{Graphics.setMode(id);message.textContent=text==='Leve'?'Gráficos leves ativados.':text==='Alta'?'Gráficos em qualidade alta.':'Qualidade automática: baixa a resolução só se o jogo engasgar.';redraw();});
+        wrap.append(b);
+      }
+      line.append(wrap);group.append(line);
+      const fps=document.createElement('label');fps.className='controls-line graphics-fps';
+      const fpsName=document.createElement('span');fpsName.textContent='Mostrar FPS na partida';
+      const box=document.createElement('input');box.type='checkbox';box.checked=Graphics.fps();box.addEventListener('change',()=>Graphics.setFps(box.checked));
+      fps.append(fpsName,box);group.append(fps);
+      const note=document.createElement('small');note.className='graphics-note';note.textContent='Se o jogo engasgar no seu PC, use Leve. Não muda a velocidade da partida nem o online.';group.append(note);
+      list.prepend(group);
+    }
   }
   const isOpen=()=>!!dialog?.open;
   function open(){if(!dialog || dialog.open)return;capture=null;message.textContent='';

@@ -378,6 +378,7 @@ function wsMessage(conn,text){
  if(msg.t==='in'&&room.phase==='playing'&&room.world&&msg.input&&typeof msg.input==='object'){
   if(me.id!==room.hostId&&msg.input.endRun)msg.input={...msg.input,endRun:false};
   command(room.world,me.id,msg.input);me.input=inputView(room.world,me.id);
+ }else if(msg.t==='resync'){conn.mobStatic=null; // V27: o cliente perdeu os campos fixos de algum monstro → próximo quadro completo
  }else if(msg.t==='ping')wsJson(conn,{t:'pong',c:Number.isFinite(msg.c)?msg.c:0});
  else if(msg.t==='emote'&&room.phase==='playing'&&EMOTE_IDS.has(msg.id)){
   // Emotes: só repassa para a sala (lista fechada, no máximo 1 a cada 0,8 s por jogador). Não toca no mundo/simulação.
@@ -402,8 +403,26 @@ function pushTo(room,member,force=false){
   const signature=JSON.stringify(roster);
   if(force||signature!==conn.rosterSig||(room.snap||0)%40===0){message.members=roster;conn.rosterSig=signature;}else delete message.members;
   conn.lastEvent=world.lastEvent;if(pickups)conn.pickupRev=world.pickupRev;
+  if(message.world)compactMobs(conn,message.world);
   wsJson(conn,message);
  }else wsJson(conn,{t:'s',...summary(room,member.id,0)});
+}
+/* V27: tráfego menor no online. Os campos fixos de cada monstro (tipo, HP máximo, elite, variante, nome, dano…)
+ * só vão no WebSocket quando o monstro aparece para esta conexão ou quando algum deles muda; nos outros quadros
+ * vai a forma curta [uid,x,y,hp,dir,ataque,golpe,lento,aviso]. O cliente (coop.js) guarda os campos fixos por
+ * conexão e remonta a lista completa antes de desenhar. O HTTP de reserva e o solo continuam com a lista completa. */
+const MOB_STATIC=[1,5,10,11,12,13,14,15];
+function compactMobs(conn,world){
+ if(!Array.isArray(world.mobs))return;
+ const known=conn.mobStatic||(conn.mobStatic=new Map()),stamp=conn.mobStamp=(conn.mobStamp||0)+1;
+ // Esquece quem não foi enviado há 100 quadros (5 s): se voltar, vai completo. O cliente só esquece depois de 400.
+ if(stamp%50===0)for(const [uid,v] of known)if(stamp-v.at>100)known.delete(uid);
+ world.mobs=world.mobs.map(m=>{
+  const key=MOB_STATIC.map(i=>m[i]).join('\u0001'),old=known.get(m[0]);
+  if(old&&old.key===key){old.at=stamp;return [m[0],m[2],m[3],m[4],m[6],m[7],m[8],m[9],m[16]];}
+  known.set(m[0],{key,at:stamp});return m;
+ });
+ world.mk=1;
 }
 server.on('upgrade',(req,socket,head)=>{
  let url;try{url=new URL(req.url,'http://localhost')}catch{return socket.destroy()}

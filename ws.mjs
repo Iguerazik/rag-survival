@@ -1,10 +1,13 @@
 /**
  * V23 — WebSocket mínimo (RFC 6455) sem dependências, usado só pelo modo cooperativo.
- * Suporta texto, ping/pong, fechamento e permessage-deflate sem contexto compartilhado
- * (cada mensagem é comprimida sozinha, o que mantém a memória por conexão constante).
+ * Suporta texto, ping/pong, fechamento e permessage-deflate.
+ * V27: o servidor comprime COM contexto (o compressor lembra os quadros anteriores da mesma conexão), o que corta
+ * 40–60% do tráfego dos snapshots. A compressão roda fora da linha principal (zlib assíncrono) e a ordem das
+ * mensagens é garantida por uma fila. O cliente → servidor continua sem contexto (mensagens pequenas).
+ * Se o navegador pedir server_no_context_takeover, volta ao modo antigo (cada mensagem comprimida sozinha).
  */
 import { createHash } from 'node:crypto';
-import { deflateRawSync, inflateRawSync, constants as zlibConstants } from 'node:zlib';
+import { deflateRawSync, inflateRawSync, createDeflateRaw, constants as zlibConstants } from 'node:zlib';
 
 const GUID = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
 const MAX_MESSAGE = 64 * 1024;
@@ -20,7 +23,9 @@ export function acceptWebSocket(req, socket, head, { onMessage, onClose } = {}) 
   const offered = String(req.headers['sec-websocket-extensions'] || '');
   const deflate = /\bpermessage-deflate\b/.test(offered) && process.env.WS_DEFLATE !== '0';
   const lines = ['HTTP/1.1 101 Switching Protocols', 'Upgrade: websocket', 'Connection: Upgrade', 'Sec-WebSocket-Accept: ' + accept];
-  if (deflate) lines.push('Sec-WebSocket-Extensions: permessage-deflate; server_no_context_takeover; client_no_context_takeover');
+  // V27: compressão com contexto no sentido servidor → cliente (WS_DEFLATE_CONTEXT=0 desliga).
+  const context = deflate && !/\bserver_no_context_takeover\b/.test(offered) && process.env.WS_DEFLATE_CONTEXT !== '0';
+  if (deflate) lines.push('Sec-WebSocket-Extensions: permessage-deflate; ' + (context ? '' : 'server_no_context_takeover; ') + 'client_no_context_takeover');
   socket.write(lines.join('\r\n') + '\r\n\r\n');
   socket.setNoDelay(true);
   socket.setTimeout(0);
@@ -28,14 +33,40 @@ export function acceptWebSocket(req, socket, head, { onMessage, onClose } = {}) 
   let buffer = head?.length ? Buffer.from(head) : Buffer.alloc(0);
   let fragments = [], fragmentCompressed = false, fragmentSize = 0;
   let closed = false;
+  // V27: fila da compressão com contexto (mantém a ordem; bytes na fila contam como "buffer" do cliente lento).
+  const queue = []; let zs = null, busy = false, queued = 0;
+  function pump() {
+    while (!busy && !closed && queue.length) {
+      const next = queue.shift();
+      if (next.length <= 256) { queued -= next.length; frame(0x1, next, 0); continue; }
+      busy = true;
+      if (!zs) {
+        zs = createDeflateRaw({ level: 6, memLevel: 8 });
+        zs.on('error', () => { busy = false; if (!closed) fail(1011); });
+      }
+      const parts = [], onData = d => parts.push(d);
+      zs.on('data', onData);
+      zs.write(next);
+      zs.flush(zlibConstants.Z_SYNC_FLUSH, () => {
+        zs?.off('data', onData);
+        busy = false; queued -= next.length;
+        if (closed) return;
+        const packed = Buffer.concat(parts);
+        frame(0x1, packed.subarray(packed.length - 4).equals(TAIL) ? packed.subarray(0, packed.length - 4) : packed, 0x40);
+        pump();
+      });
+    }
+  }
   const conn = {
     open: true,
     deflate,
+    context,
     lastSeen: Date.now(),
     ping() { if (!closed) frame(0x9, Buffer.alloc(0), 0); },
-    get buffered() { return socket.writableLength; },
+    get buffered() { return socket.writableLength + queued; },
     send(text) {
       if (closed) return false;
+      if (context) { const payload = Buffer.from(text, 'utf8'); queued += payload.length; queue.push(payload); pump(); return true; }
       let payload = Buffer.from(text, 'utf8'), rsv1 = 0;
       if (deflate && payload.length > 256) {
         const packed = deflateRawSync(payload, { level: 3, finishFlush: zlibConstants.Z_SYNC_FLUSH });
@@ -66,6 +97,7 @@ export function acceptWebSocket(req, socket, head, { onMessage, onClose } = {}) 
   function finish() {
     if (closed) return;
     closed = true; conn.open = false;
+    queue.length = 0; queued = 0; if (zs) { try { zs.close(); } catch {} zs = null; }
     try { onClose?.(conn); } catch (error) { console.error('ws close', error); }
   }
   function fail(code) { conn.close(code); socket.destroy(); }

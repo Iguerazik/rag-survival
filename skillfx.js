@@ -20,6 +20,10 @@ const SkillFX = (() => {
     if (!(r > 0) || !Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(r)) return;
     ctx.save();
     ctx.globalAlpha *= alpha;
+    // V27 (gráficos leves): disco simples no lugar do gradiente, com metade do raio.
+    if (typeof Graphics !== 'undefined' && Graphics.light()) {
+      ctx.globalAlpha *= .3; ctx.fillStyle = color; ctx.beginPath(); ctx.arc(x, y, r * .5, 0, Math.PI * 2); ctx.fill(); ctx.restore(); return;
+    }
     const g = ctx.createRadialGradient(x, y, 0, x, y, r);
     g.addColorStop(0, color);
     g.addColorStop(1, 'rgba(0,0,0,0)');

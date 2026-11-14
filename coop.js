@@ -154,6 +154,7 @@ const Coop = (() => {
       if (msg.t === 'emote') { if (msg.from !== current.id && typeof Emotes !== 'undefined') Emotes.showRemote(msg.from, msg.id); return; } // emotes: só visual
       if (msg.t !== 's') return;
       socketLive = performance.now(); socketRetry = 0;
+      if (msg.world?.mk) expandMobs(ws, msg.world);
       try { handle(current, msg, wsRtt || run?.netRtt || 0); } catch (error) { console.error('[Midgard] snapshot', error); }
     };
     ws.onclose = () => {
@@ -161,6 +162,24 @@ const Coop = (() => {
       if (session === current) socketTimer = setTimeout(openSocket, Math.min(5000, 600 * 2 ** socketRetry++));
     };
     ws.onerror = () => {};
+  }
+  /* V27: o servidor manda os campos fixos de cada monstro só na 1ª vez (ou quando mudam); aqui a lista completa
+   * é remontada no formato de sempre. O cache é desta conexão: reconectar começa do zero, igual ao servidor. */
+  function expandMobs(ws, world) {
+    const cache = ws.mobCache || (ws.mobCache = { world: null, map: new Map(), seen: 0 });
+    if (cache.world !== world.id) { cache.world = world.id; cache.map.clear(); }
+    const stamp = ++cache.seen, out = []; let missing = false;
+    for (const m of world.mobs) {
+      if (m.length > 9) { cache.map.set(m[0], { full: m, at: stamp }); out.push(m); continue; }
+      const known = cache.map.get(m[0]);
+      if (!known) { missing = true; continue; } // sem os campos fixos: pede o quadro completo ao servidor
+      const f = known.full; known.at = stamp;
+      out.push([m[0], f[1], m[1], m[2], m[3], f[5], m[4], m[5], m[6], m[7], f[10], f[11], f[12], f[13], f[14], f[15], m[8]]);
+    }
+    // Só esquece depois de 400 quadros sem ver o monstro (o servidor esquece em 100): nunca fica sem os campos fixos.
+    if (stamp % 50 === 0) for (const [uid, v] of cache.map) if (stamp - v.at > 400) cache.map.delete(uid);
+    if (missing && (!cache.askedAt || stamp - cache.askedAt > 20)) { cache.askedAt = stamp; try { ws.send(JSON.stringify({ t: 'resync' })); } catch {} }
+    world.mobs = out; delete world.mk;
   }
   function sendInput() {
     if (!session || !socketOk()) return;
@@ -338,5 +357,5 @@ const Coop = (() => {
     if (!session || !isHost()) return;
     await api('/' + session.code + '/next', { token: session.token, mode: modeName });
   }
-  return { init, leave, leaveSaving, lobby, next, refresh: sessionUi, id: () => session?.id, host: isHost, config:()=>roomConfig, transport: () => socketOk() ? 'websocket' : 'http', sendEmote };
+  return { init, leave, leaveSaving, lobby, next, refresh: sessionUi, id: () => session?.id, host: isHost, config:()=>roomConfig, transport: () => socketOk() ? 'websocket' : 'http', sendEmote, expandMobs };
 })();

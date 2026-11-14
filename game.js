@@ -742,13 +742,33 @@ function toggleSound() {
   tone(440, 660, .16);
 }
 
+let vignetteCache = null;
+/** V27: a vinheta é desenhada uma vez por tamanho de tela (antes: gradiente na tela inteira a cada quadro). */
+function drawVignette(w, h) {
+  if (typeof Graphics !== 'undefined' && Graphics.light()) return;
+  if (!vignetteCache || vignetteCache.w !== w || vignetteCache.h !== h) {
+    const c = document.createElement('canvas'), k = Math.min(1, 640 / Math.max(w, h));
+    c.width = Math.max(1, Math.round(w * k)); c.height = Math.max(1, Math.round(h * k));
+    const g = c.getContext('2d'), cw = c.width, ch = c.height;
+    const grad = g.createRadialGradient(cw / 2, ch / 2, Math.min(cw, ch) * .17, cw / 2, ch / 2, Math.max(cw, ch) * .64);
+    grad.addColorStop(0, '#0a120000'); grad.addColorStop(1, '#282d1330');
+    g.fillStyle = grad; g.fillRect(0, 0, cw, ch);
+    vignetteCache = { w, h, c };
+  }
+  const smooth = ctx.imageSmoothingEnabled; ctx.imageSmoothingEnabled = true;
+  ctx.drawImage(vignetteCache.c, 0, 0, w, h);
+  ctx.imageSmoothingEnabled = smooth;
+}
 function resize() {
   const width = canvas.clientWidth;
   const height = canvas.clientHeight;
   if (!width || !height) return;
-  const ratio = Math.min(1.6, window.devicePixelRatio || 1);
-  canvas.width = Math.round(width * ratio);
-  canvas.height = Math.round(height * ratio);
+  // V27: resolução do campo pela qualidade gráfica (Automático/Alta/Leve); o desenho não muda, só a densidade de pixels.
+  const ratio = typeof Graphics !== 'undefined' ? Graphics.ratio() : Math.min(1.6, window.devicePixelRatio || 1);
+  const nextW = Math.max(1, Math.round(width * ratio)), nextH = Math.max(1, Math.round(height * ratio));
+  if (canvas.width !== nextW) canvas.width = nextW;
+  if (canvas.height !== nextH) canvas.height = nextH;
+  vignetteCache = null;
   viewport = { w: width, h: height };
   ctx.setTransform(canvas.width / width, 0, 0, canvas.height / height, 0, 0);
   ctx.imageSmoothingEnabled = false;
@@ -1051,6 +1071,7 @@ function reconcileSelf(self){
   const p=run.player;
   if(!run.serverSpawnSynced || self.warpSeq!==run.warpSeq){
     // Teleporte do servidor (início, entrada/saída da fenda): aceita a posição oficial.
+    if(run.serverSpawnSynced&&typeof Transition!=='undefined'&&Math.hypot(p.x-self.x,p.y-self.y)>160)Transition.flash(); // V27: piscada de teleporte
     p.x=self.x;p.y=self.y;run.warpSeq=self.warpSeq||0;run.mvHistory=[];run.serverSpawnSynced=true;
     moveRoute=[];moveTarget=undefined;return;
   }
@@ -1072,6 +1093,7 @@ function setOnlineArena(world){
   run.inMvp=inArena;remoteSamples.clear();remoteAppearance.clear();
   run.effects=[];run.numbers=[];run.onlineProjectiles=[];run.mobs=[];SkillFX.clear();moveRoute=[];moveTarget=undefined;
   $('map-title').textContent=inArena?(world.mvpArena?'Arena do MVP · '+bosses[expeditions[run.map].boss].name:'Fenda da Guilda'):expeditions[run.map].name;
+  if(typeof Transition!=='undefined')Transition.flash(inArena?(world.mvpArena?bosses[expeditions[run.map].boss].name:'Fenda da Guilda'):''); // V27
 }
 function receiveAuthoritativeWorld(world){
   if(!run?.authoritative)return;
@@ -1432,6 +1454,9 @@ function start(online = false, partySlot = 0, map = selectedMap) {
   }
   updateHud();
   announce('Onda 1 · ' + expeditions[map].firstWave + ' · habilidades até nv. ' + SkillProgression.cap(run.mapTier), 3.5);
+  // V27: cortina de entrada com o nome do mapa (some sozinha; não pausa nem bloqueia clique).
+  if (typeof Transition !== 'undefined') Transition.reveal({ kicker: run.coop ? 'Expedição em grupo' : 'Expedição', title: expeditions[map].name,
+    subtitle: RunDifficulty.get(run.difficulty).name + ' · ' + hero.name });
   tone(262, 523, .25);
   canvas.tabIndex = -1;
   canvas.focus({ preventScroll: true });
@@ -1448,6 +1473,7 @@ function menu() {
   keys.clear();
   $('arena').hidden = true;
   $('menu').hidden = false;
+  if (typeof Transition !== 'undefined') Transition.reveal({ ms: 420 });
   renderMenu();
   $('start').focus({ preventScroll: true });
 }
@@ -2158,7 +2184,7 @@ function drawPortal(portal) {
   ctx.save();
   ctx.globalCompositeOperation = 'lighter';
   ctx.shadowColor = '#b588ff';
-  ctx.shadowBlur = 22;
+  ctx.shadowBlur = typeof Graphics !== 'undefined' && Graphics.light() ? 0 : 22;
   ring(portal.x, portal.y, 27 + pulse * 7, '#dcb3ff', 4);
   ring(portal.x, portal.y, 42 - pulse * 6, '#896aff', 2);
   const beam = ctx.createLinearGradient(portal.x, portal.y, portal.x, portal.y - 120);
@@ -2172,7 +2198,7 @@ function drawEffect(fx) {
   ctx.save();
   ctx.globalAlpha = 1 - progress;
   ctx.globalCompositeOperation = 'lighter';
-  if (fx.kind !== 'slash' && fx.kind !== 'beam') {
+  if (fx.kind !== 'slash' && fx.kind !== 'beam' && !(typeof Graphics !== 'undefined' && Graphics.light())) {
     const radius = Math.max(28, fx.radius * 1.55);
     const glow = ctx.createRadialGradient(fx.x, fx.y, 0, fx.x, fx.y, radius);
     glow.addColorStop(0, fx.color + 'a0');
@@ -2564,17 +2590,14 @@ function draw() {
   ctx.restore();
   drawMinimap();
   const { w, h } = viewport;
-  const vignette = ctx.createRadialGradient(w / 2, h / 2, Math.min(w, h) * .17, w / 2, h / 2, Math.max(w, h) * .64);
-  vignette.addColorStop(0, '#0a120000');
-  vignette.addColorStop(1, '#282d1330');
-  ctx.fillStyle = vignette;
-  ctx.fillRect(0, 0, w, h);
+  drawVignette(w, h);
 }
 
 let frameFaults=0;
 function frame(now) {
   try {
     let dt = lastFrame ? Math.min(.055, Math.max(0,(now - lastFrame) / 1000)) : 0;
+    if (typeof Graphics !== 'undefined' && lastFrame) Graphics.frame(now - lastFrame, now, mode === 'play' && !!run);
     lastFrame = now;
     // Only simulate up to 3 steps, so slow frames do not trigger a death spiral.
     for(let i=0;i<3 && dt>.0001 && mode==='play';i++){
@@ -2706,6 +2729,7 @@ function backgroundTicker(on) {
   } catch (error) { console.warn('[Midgard] Sem relógio em segundo plano:', error); }
 }
 window.addEventListener('resize', resize);
+if (typeof Graphics !== 'undefined') Graphics.onChange(() => { resize(); });
 $('minimap-toggle').addEventListener('click', () => {
   const toggle = $('minimap-toggle');
   const map = $('minimap');
