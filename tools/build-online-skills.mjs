@@ -237,13 +237,21 @@ const boon = [
  add('treino_pele','Pele Grossa',5,'passive','Melhoria: menos dano recebido e regeneração de HP por nível.',{stats:{def:.025,regen:.4},boon:1,ic:'endure'}),
 ];
 for (const line of [sword, mage, archer, acolyte, merchant, thief]) line.boon = boon;
+// V26.4: herança — as habilidades marcantes da 1ª classe continuam na 2ª classe e na transclasse
+// (ex.: o Ferreiro mantém Mammonita, Cavalo-de-Pau e Usar Carrinho; o Cavaleiro mantém Golpe Fulminante).
+const heritage = { sword:['bash','magnum','mastery'], mage:['fire','cbolt','lbolt'], archer:['arrows','shower','owl'],
+ acolyte:['heal','blessing','agiup'], merchant:['mammon','cartrev','pushcart'], thief:['envenom','doubleattack','hide'] };
+for (const [name, line] of Object.entries({ sword, mage, archer, acolyte, merchant, thief })) {
+  line.heritage = heritage[name].map(id => { if (!line.first.includes(id)) throw new Error('herança sem ' + id); return id; });
+}
 const lines = { sword, mage, archer, acolyte, merchant, thief };
 const starters = { sword: 'bash', mage: 'fire', archer: 'arrows', acolyte: 'heal', merchant: 'mammon', thief: 'envenom' };
 // estágio da jornada -> conjuntos liberados
 // V25.9: cada classe só recebe as PRÓPRIAS habilidades (pedido do jogador). 1ª classe e 1ª transclasse: as da 1ª classe;
 // 2ª classe: as da 2ª; transclasse: as da 2ª + as dela; 3ª classe: só as da 3ª (com as Melhorias de treino, que
 // completam o pool curto). Para usar as skills das classes anteriores, o jogador escolhe "Jogar como" na Progressão.
-const stages = [['first'], ['second'], ['novice','boon'], ['first','boon'], ['second','trans'], ['third','boon']];
+// V26.4: 2ª classe e transclasse também levam a 'herança' (3 habilidades marcantes da 1ª classe).
+const stages = [['first'], ['second','heritage'], ['novice','boon'], ['first','boon'], ['second','trans','heritage'], ['third','boon']];
 const classes = {
  sword: ['sword','knight','highnovice','highsword','lordknight','runeknight'], mage: ['mage','wizard','highnovice','highmage','highwizard','warlock'],
  archer: ['archer','hunter','highnovice','higharcher','sniper','ranger'], acolyte: ['acolyte','priest','highnovice','highacolyte','highpriest','archbishop'],

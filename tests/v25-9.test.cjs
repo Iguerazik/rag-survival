@@ -10,9 +10,9 @@ const S=JSON.parse(read('online-skills.json'));
 const routes={sword:['sword','knight','highnovice','highsword','lordknight','runeknight'],mage:['mage','wizard','highnovice','highmage','highwizard','warlock'],
  archer:['archer','hunter','highnovice','higharcher','sniper','ranger'],acolyte:['acolyte','priest','highnovice','highacolyte','highpriest','archbishop'],
  merchant:['merchant','blacksmith','highnovice','highmerchant','whitesmith','mechanic'],thief:['thief','assassin','highnovice','highthief','assassincross','guillotine']};
-const want=[['first'],['second'],['novice','boon'],['first','boon'],['second','trans'],['third','boon']];
+const want=[['first'],['second','heritage'],['novice','boon'],['first','boon'],['second','trans','heritage'],['third','boon']]; // V26.4: herança da 1ª classe
 
-test('V25.9: cada classe recebe só as próprias habilidades',async()=>{
+test('V25.9/V26.4: cada classe recebe as próprias habilidades (+ herança marcante da 1ª na 2ª/trans)',async()=>{
  const core=await engine();
  for(const [job,route] of Object.entries(routes))for(const [stage,classId] of route.entries()){
   const w=core.makeWorld('sewer','normal',[{id:'a',profile:{job,classId},character:{base:60,stage,stats:{str:40}}}],{seed:1});
@@ -50,6 +50,7 @@ test('V25.9: "Jogar como" — classe anterior liberada usa as skills dela; metas
  assert.match(game,/function playStageOf\(profile\)/);
  assert.match(game,/jobs\[jobLines\[selected\]\[journeyMode === 'training' \? 5 : playStageOf\(journeyOf\(\)\)\]\]/);
  assert.match(read('v12-ui.js'),/Jogar como/);
+ assert.deepEqual(S.lines.merchant.heritage,['mammon','cartrev','pushcart'],'Ferreiro mantém Mammonita, Cavalo-de-Pau e Usar Carrinho');
  assert.match(read('v12-systems.js'),/playStageOf\(profile\)!==profile\.stage\)return;/);
  assert.match(read('server.mjs'),/playStage:p\.stage/);
  assert.match(read('accounts.mjs'),/if\(award\.playStage==null\|\|Number\(award\.playStage\)===stage\)next\.runRecords=/);

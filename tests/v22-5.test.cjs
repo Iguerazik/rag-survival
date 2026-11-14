@@ -22,7 +22,7 @@ test('V22.5: no máximo 5 ativas por run, ofertas com identificador e fila de n�
  const {makeWorld,tickWorld,command,snapshotWorld}=await mod();
  const w=makeWorld('sewer','normal',[{id:'a',profile:{job:'mage',classId:'wizard'}}]),p=w.players.get('a');
  w.spawnAt=1e9;p.invulnerableUntil=1e9;
- assert.deepEqual(p.slots,['firepillar'],'V25.9: o Bruxo só tem as skills de Bruxo');assert.ok(p.pool.includes('stormgust')&&!p.pool.includes('fire'),'2ª classe: só as habilidades de Bruxo');
+ assert.deepEqual(p.slots,['fire'],'V26.4: o Bruxo herda as Lanças de Fogo');assert.ok(p.pool.includes('stormgust')&&p.pool.includes('fire')&&!p.pool.includes('soulstrike'),'2ª classe: Bruxo + herança (não toda a 1ª classe)');
  w.pickups.push({uid:'xp-1',kind:'xp',x:p.x,y:p.y,amount:5000});tickWorld(w,.05);
  assert.ok(p.level>5&&p.pendingUps>3,'vários níveis de uma vez ficam na fila');
  let seq=0,guard=0;const seen=new Set();
