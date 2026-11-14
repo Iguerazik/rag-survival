@@ -273,12 +273,24 @@ function renderJourney() {
     ' · Classe ' + profile.job + '/' + rule.jobCap + '</p>';
   const path = document.createElement('ol');
   path.className = 'journey-path';
+  // V26: clicar numa classe já liberada escolhe "Jogar como" (as skills da run passam a ser as dela).
+  const playing = playStageOf(profile);
   route.forEach((id, index) => {
     const item = document.createElement('li');
-    if (index === profile.stage) item.setAttribute('aria-current', 'true');
-    item.innerHTML = '<small>' + stages[index].name + '</small><strong>' + jobs[id].name + '</strong>';
+    if (index === playing) item.setAttribute('aria-current', 'true');
+    item.innerHTML = '<small>' + stages[index].name + (index === playing && index !== profile.stage ? ' · jogando' : '') + '</small><strong>' + jobs[id].name + '</strong>';
+    if (index <= profile.stage) {
+      item.classList.add('journey-playable');item.tabIndex = 0;item.setAttribute('role', 'button');
+      item.title = index === playing ? 'Classe escolhida para jogar' : 'Clique para jogar como ' + jobs[id].name;
+      const pick = () => { if (index === playing) return; if (roomLocked()) { announceLocked(); return; }
+        saveJourney(selected, { ...journeyOf(selected), playAs: index === profile.stage ? null : index }); renderMenu(); renderJourney(); };
+      item.addEventListener('click', pick); item.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } });
+    } else item.classList.add('journey-locked');
     path.append(item);
   });
+  const playHint = document.createElement('p');
+  playHint.className = 'journey-playas-hint';
+  playHint.textContent = profile.stage > 0 ? (playing !== profile.stage ? '⇄ Jogando como ' + jobs[route[playing]].name + ' (skills dessa classe). Clique em ' + jobs[route[profile.stage]].name + ' para voltar à classe atual.' : '⇄ Clique numa classe já liberada acima para jogar com ela (as metas de mudança de classe só contam com a classe atual).') : '';
   const meters = document.createElement('div');
   meters.className = 'journey-meters';
   meters.innerHTML = '<label class="journey-meter">EXP de base<progress value="' +
@@ -310,7 +322,7 @@ function renderJourney() {
   footer.append(button('📜 Guia de classes, Reborn e terceira classe', 'sound', () => window.openProgressionGuide?.()));
   const stats = statusWindow(profile);
   const equipment = equipmentWindow(profile);
-  container.replaceChildren(heading, meters, path, footer, stats, equipment);
+  container.replaceChildren(heading, meters, path, ...(playHint.textContent ? [playHint] : []), footer, stats, equipment);
 }
 function addStat(key, times = 1) {
   let current = journeyOf();

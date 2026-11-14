@@ -67,3 +67,9 @@ html body .loot-owned-list article{overflow:visible!important}
 .progression-playas-row{display:flex;flex-wrap:wrap;gap:6px}
 .progression-playas-row button{padding:6px 10px;border-radius:6px}
 .progression-playas-row button.active{outline:2px solid #e8c25a;font-weight:700}
+/* V26: classes já liberadas na jornada são clicáveis ("Jogar como") */
+.journey-path li.journey-playable{cursor:pointer;transition:outline-color .15s}
+.journey-path li.journey-playable:hover,.journey-path li.journey-playable:focus-visible{outline:2px solid #e8c25a;outline-offset:1px}
+.journey-path li.journey-locked{opacity:.55}
+.journey-playas-hint{margin:6px 0 2px;font:700 12.5px/1.45 Tahoma,sans-serif;color:#7a4d08}
+html[data-theme="dark"] .journey-playas-hint{color:#ffd77a}
